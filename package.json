@@ -3,5 +3,13 @@
   "version": "0.0.0",
   "repository": "git@github.com:tv2/sofie-tv2-server.git",
   "author": "Anders Frederik Jørgensen <afjo@tv2.dk>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "node dist",
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.8",
+    "typescript": "^5.4.5"
+  }
 }
