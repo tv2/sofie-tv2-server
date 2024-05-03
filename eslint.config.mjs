@@ -5,12 +5,12 @@ import stylisticEslintPlugin from '@stylistic/eslint-plugin'
 export default [
 
   {
-    files: ['**/*.ts', 'eslint.config.js'],
+    files: ['**/*.ts', 'eslint.config.mjs', 'vitest.config.mts'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
       parserOptions: {
-        project: './tsconfig.json',
+        project: './tsconfig.lint.json',
       },
     },
     plugins: {
@@ -72,6 +72,6 @@ export default [
     },
   },
   {
-    ignores: ['.yarn/**'],
+    ignores: ['.yarn/**', 'coverage/**'],
   },
 ]

@@ -38,5 +38,9 @@
     "allowJs": false,
 
     "skipLibCheck": false
-  }
+  },
+  "exclude": [
+    "**/**.spec.ts",
+    "vitest.config.mts"
+  ]
 }
