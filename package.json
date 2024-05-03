@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node dist",
     "build": "tsc --build",
+    "build-watch": "tsc --build --watch",
     "watch": "nodemon",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
