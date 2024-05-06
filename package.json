@@ -2,7 +2,12 @@
   "name": "sofie-tv2-server",
   "version": "0.0.0",
   "repository": "git@github.com:tv2/sofie-tv2-server.git",
-  "author": "Anders Frederik Jørgensen <afjo@tv2.dk>",
+  "contributors": [
+    {
+      "name": "Anders Frederik Lou Jørgensen",
+      "email": "<afjo@tv2.dk>"
+    },
+  ],
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
