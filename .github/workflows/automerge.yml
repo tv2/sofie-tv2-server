@@ -15,8 +15,8 @@ jobs:
 
         - name: 'Set Git config'
           run: |
-            git config --local user.email "Sofie-Automation@users.noreply.github.com"
-            git config --local user.name "GitHub Actions # Sofie-Automation"
+            git config --local user.name "GitHub Actions # Sofie"
+            git config --local user.email "sofie@users.noreply.github.com"
 
         - name: 'Create merge PR from master to staging'
           uses: 'repo-sync/pull-request@v2'
@@ -37,8 +37,8 @@ jobs:
 
       - name: 'Set Git config'
         run: |
-          git config --local user.email "Sofie-Automation@users.noreply.github.com"
-          git config --local user.name "GitHub Actions # Sofie-Automation"
+            git config --local user.name "GitHub Actions # Sofie"
+            git config --local user.email "sofie@users.noreply.github.com"
 
       - name: 'Create merge PR from staging to develop'
         uses: 'repo-sync/pull-request@v2'
