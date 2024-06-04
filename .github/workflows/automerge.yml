@@ -1,0 +1,52 @@
+name: 'Update downstream environment branches'
+run-name: 'Update downstream environment branches'
+
+on:
+  schedule:
+    - cron: '0 0 * * 1-5' # At 00:00, Monday through Friday
+  workflow_dispatch:
+
+jobs:
+  merge-master-to-staging:
+    name: 'Create merge PR from master to staging'
+    runs-on: 'ubuntu-latest'
+    steps:
+        - uses: 'actions/checkout@v4'
+
+        - name: 'Set Git config'
+          run: |
+            git config --local user.name "GitHub Actions # Sofie"
+            git config --local user.email "sofie@users.noreply.github.com"
+
+        - name: 'Create merge PR from master to staging'
+          uses: 'repo-sync/pull-request@v2'
+          with:
+            source_branch: 'master'
+            destination_branch: 'staging'
+            pr_title: 'Merge master into staging'
+            pr_body: |
+              Branch master has changes not on staging branch.
+              Merging this pull request will apply the changes to the staging branch.
+            github_token: ${{ github.token }}
+
+  merge-staging-to-develop:
+    name: 'Create merge PR from staging to develop'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v4'
+
+      - name: 'Set Git config'
+        run: |
+            git config --local user.name "GitHub Actions # Sofie"
+            git config --local user.email "sofie@users.noreply.github.com"
+
+      - name: 'Create merge PR from staging to develop'
+        uses: 'repo-sync/pull-request@v2'
+        with:
+          source_branch: 'staging'
+          destination_branch: 'develop'
+          pr_title: 'Merge staging into develop'
+          pr_body: |
+            Branch 'staging' has changes not on 'develop' branch.
+            Merging this pull request will apply the changes to the 'develop' branch.
+          github_token: ${{ github.token }}
