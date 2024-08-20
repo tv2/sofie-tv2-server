@@ -14,7 +14,7 @@ export class FastifyServer implements ProxyServer {
   public async start(port: number): Promise<void> {
     await this.configureProxy()
     await this.fastifyServer.listen({ port })
-    console.log(`Running proxy server on port ${port} redirecting HTTP requests to ${this.proxyConfiguration.httpUrl} and WebSocket connections to ${this.proxyConfiguration.websocketUrl}.`)
+    console.log(`Running proxy server on port ${port}.\nHTTP requests are redirected to ${this.proxyConfiguration.httpUrl} and WebSocket connections to ${this.proxyConfiguration.websocketUrl}.`)
   }
 
   private async configureProxy(): Promise<void> {
