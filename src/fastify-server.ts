@@ -9,7 +9,7 @@ export interface ProxyConfiguration {
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
 
-  public constructor(private readonly port: number, private readonly proxyConfiguration: ProxyConfiguration) {
+  public constructor(private readonly proxyConfiguration: ProxyConfiguration) {
     this.configureProxy()
   }
 
@@ -21,9 +21,9 @@ export class FastifyServer implements ProxyServer {
     })
   }
 
-  public async start(): Promise<void> {
-    await this.fastifyServer.listen({ port: this.port })
-    console.log(`Running proxy server on port ${this.port} redirecting HTTP requests to ${this.proxyConfiguration.httpUrl} and WebSocket connections to ${this.proxyConfiguration.websocketUrl}.`)
+  public async start(port: number): Promise<void> {
+    await this.fastifyServer.listen({ port })
+    console.log(`Running proxy server on port ${port} redirecting HTTP requests to ${this.proxyConfiguration.httpUrl} and WebSocket connections to ${this.proxyConfiguration.websocketUrl}.`)
   }
 
   public async stop(): Promise<void> {
