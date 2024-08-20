@@ -724,6 +724,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tv2media/logger@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@tv2media/logger@npm:2.0.2"
+  checksum: 10c0/62d640e5aa369335dfa3fb369cae015fc0751b659d904ad821b2a8ca02a7acd5c9a3e5546c4027ffd96bdc3d6bac1d44613f457f2f10faafd56e94df72e1b0f7
+  languageName: node
+  linkType: hard
+
 "@types/eslint@npm:^8.56.10":
   version: 8.56.10
   resolution: "@types/eslint@npm:8.56.10"
@@ -3858,6 +3865,7 @@ __metadata:
   dependencies:
     "@fastify/http-proxy": "npm:^9.5.0"
     "@stylistic/eslint-plugin": "npm:^1.8.0"
+    "@tv2media/logger": "npm:^2.0.2"
     "@types/license-checker": "npm:^25"
     "@types/node": "npm:^20.12.8"
     "@typescript-eslint/eslint-plugin": "npm:^7.8.0"

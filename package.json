@@ -47,6 +47,7 @@
   "packageManager": "yarn@4.1.1",
   "dependencies": {
     "@fastify/http-proxy": "^9.5.0",
+    "@tv2media/logger": "^2.0.2",
     "fastify": "^4.28.1"
   }
 }
