@@ -37,7 +37,7 @@
     "allowUnreachableCode": false,
     "allowJs": false,
 
-    "skipLibCheck": false
+    "skipLibCheck": true
   },
   "exclude": [
     "**/**.spec.ts",
