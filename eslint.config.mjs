@@ -24,6 +24,7 @@ export default [
       'indent': 'off',
       '@typescript-eslint/indent': ['error', 2],
       'no-void': ['error'],
+      'no-console': 'error',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-member-accessibility': 'error',
