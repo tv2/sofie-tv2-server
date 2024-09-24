@@ -3,7 +3,7 @@ import createFastifyServer, * as fastify from 'fastify'
 import { fastifyHttpProxy } from '@fastify/http-proxy'
 import { Logger } from '@tv2media/logger'
 import { ProxyConfiguration } from './value-objects/proxy-configuration'
-import { BaseController, Route } from './controllers/base-controller'
+import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 
 export class FastifyServer implements ProxyServer {
@@ -31,16 +31,18 @@ export class FastifyServer implements ProxyServer {
   }
 
   private setupControllers(): void {
-    const fastifyRouteOptions: RouteOptions[] = this.controllers.flatMap(controller => controller.getRoutes()).map(this.mapRouteToFastifyRouteOptions)
+    const fastifyRouteOptions: RouteOptions[] = this.controllers.flatMap(this.mapRouteToFastifyRouteOptions)
     fastifyRouteOptions.forEach(routeOptions => this.fastifyServer.route(routeOptions))
   }
 
-  private mapRouteToFastifyRouteOptions(route: Route): RouteOptions {
-    return {
-      method: route.method,
-      url: `/api${route.path}`,
-      handler: route.action,
-    }
+  private mapRouteToFastifyRouteOptions(controller: BaseController): RouteOptions[] {
+    return controller.getRoutes().map((route) => {
+      return {
+        method: route.method,
+        url: `/api${route.path}`,
+        handler: route.action.bind(controller),
+      }
+    })
   }
 
   public async stop(): Promise<void> {

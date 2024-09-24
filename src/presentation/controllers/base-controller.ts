@@ -18,7 +18,7 @@ enum Method {
   DELETE = 'delete',
 }
 
-export interface Route {
+interface Route {
   path: string
   method: Method
   action: Action
