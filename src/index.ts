@@ -1,7 +1,7 @@
-import { ProxyServer } from './interfaces/proxy-server'
-import { FastifyServer } from './fastify-server'
-import { ConsoleLogger } from './console-logger'
-import { Logger } from './interfaces/logger'
+import { ProxyServer } from './presentation/interfaces/proxy-server'
+import { FastifyServer } from './presentation/fastify-server'
+import { ConsoleLogger } from './model/console-logger'
+import { Logger } from './model/interfaces/logger'
 
 const SOFIE_REST_URL: string = 'http://localhost:3005'
 const SOFIE_WEBSOCKET_URL: string = 'ws://localhost:3006'
