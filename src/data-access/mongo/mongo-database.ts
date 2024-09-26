@@ -3,6 +3,10 @@ import { Database } from '../interfaces/database'
 import { Logger } from '../../logger/logger'
 import { DatabaseNotConnectedException } from '../../model/exceptions/database-not-connected-exception'
 
+export interface MongoId {
+  _id: string
+}
+
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = getMongoDatabaseName()
 
@@ -25,8 +29,6 @@ export class MongoDatabase implements Database {
   private client?: MongoClient
   private db?: Db
 
-  private readonly onConnectCallbacks: Map<string, () => void> = new Map()
-
   private constructor(logger: Logger) {
     this.logger = logger.tag(MongoDatabase.name)
   }
@@ -46,11 +48,9 @@ export class MongoDatabase implements Database {
 
     this.db = this.client.db(MONGO_DB_NAME)
     this.logger.info(`Connected to database: ${this.db.databaseName}`)
-
-    this.onConnectCallbacks.forEach(callback => callback())
   }
 
-  public getCollection(collectionName: string): Collection {
+  public getCollection<Model extends MongoId>(collectionName: string): Collection<Model> {
     this.assertDatabaseConnection(this.db)
     return this.db.collection(collectionName)
   }
@@ -63,13 +63,5 @@ export class MongoDatabase implements Database {
 
   public getDatabaseName(): string {
     return MONGO_DB_NAME
-  }
-
-  public onConnect(callbackIdentifier: string, callback: () => void): void {
-    if (this.db) {
-      callback()
-      return
-    }
-    this.onConnectCallbacks.set(callbackIdentifier, callback)
   }
 }

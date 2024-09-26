@@ -2,12 +2,12 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { ConfiguredPanelLayoutRepository } from '../interfaces/configured-panel-layout-repository'
 import { ConfiguredPanelLayout } from '../../model/interfaces/configured-panel-layout'
 import { MongoDatabase } from './mongo-database'
-import { PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import { UuidGenerator } from '../interfaces/uuid-generator'
 
 const CONFIGURED_PANEL_LAYOUT_COLLECTION_NAME: string = 'configuredPanelLayouts'
 
 export class MongoConfiguredPanelLayoutRepository extends BaseMongoRepository implements ConfiguredPanelLayoutRepository {
-  public constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
 
@@ -23,15 +23,13 @@ export class MongoConfiguredPanelLayoutRepository extends BaseMongoRepository im
     throw new Error('Not implemented')
   }
 
-  public async createConfiguredPanelLayout(_configuredPanelLayout: Omit<ConfiguredPanelLayout, 'id'>): Promise<ConfiguredPanelLayout> {
+  public async createConfiguredPanelLayout(configuredPanelLayout: Omit<ConfiguredPanelLayout, 'id'>): Promise<ConfiguredPanelLayout> {
     this.assertDatabaseConnection(this.createConfiguredPanelLayout.name)
-    const dummy: ConfiguredPanelLayout = {
-      id: 'dummyId',
-      name: 'dummyName',
-      type: PanelType.SKAARHOJ,
-      model: SkaarhojModel.MKT1A,
+    const configuredPanelLayoutToBeInserted: ConfiguredPanelLayout = {
+      ...configuredPanelLayout,
+      id: this.uuidGenerator.generateUuid(),
     }
-    await this.getCollection().updateOne({ id: dummy.id }, { $set: dummy }, { upsert: true })
-    return dummy
+    await this.getCollection().updateOne({ _id: configuredPanelLayoutToBeInserted.id }, { $set: configuredPanelLayoutToBeInserted }, { upsert: true })
+    return configuredPanelLayoutToBeInserted
   }
 }

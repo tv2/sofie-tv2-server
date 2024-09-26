@@ -1,13 +1,13 @@
 import { DatabaseNotConnectedException } from '../../model/exceptions/database-not-connected-exception'
 import { Collection } from 'mongodb'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase, MongoId } from './mongo-database'
 
 export abstract class BaseMongoRepository {
   protected constructor(protected mongoDatabase: MongoDatabase) {}
 
   protected abstract getCollectionName(): string
 
-  protected getCollection(): Collection {
+  protected getCollection<Model extends MongoId>(): Collection<Model> {
     return this.mongoDatabase.getCollection(this.getCollectionName())
   }
 
