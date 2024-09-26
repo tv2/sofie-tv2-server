@@ -1,10 +1,10 @@
 import { ProxyServer } from './interfaces/proxy-server'
 import createFastifyServer, * as fastify from 'fastify'
 import { fastifyHttpProxy } from '@fastify/http-proxy'
-import { Logger } from '@tv2media/logger'
 import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
+import { Logger } from '../logger/logger'
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()

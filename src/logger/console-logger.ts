@@ -1,9 +1,18 @@
 import { PlainTextFormat } from '@tv2media/logger'
 import { ConsoleVault, NodeEnvironmentLogger } from '@tv2media/logger/node'
-import { LogLevel, Logger } from './interfaces/logger'
+import { LogLevel, Logger } from './logger'
 
 export class ConsoleLogger extends NodeEnvironmentLogger implements Logger {
-  public constructor() {
+  private static instance: ConsoleLogger
+
+  public static getInstance(): ConsoleLogger {
+    if (!this.instance) {
+      this.instance = new ConsoleLogger()
+    }
+    return this.instance
+  }
+
+  private constructor() {
     super([
       new ConsoleVault({
         level: LogLevel.TRACE,
