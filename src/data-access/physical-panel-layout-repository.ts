@@ -202,7 +202,7 @@ const SKAARHOJ_MK48_LAYOUT: PhysicalPanelLayout = {
   },
 }
 
-export class PhysicalPanelRepository {
+export class PhysicalPanelLayoutRepository {
   public getPhysicalPanelLayouts(): PhysicalPanelLayout[] {
     return [SKAARHOJ_MKT1A_LAYOUT, SKAARHOJ_MK48_LAYOUT]
   }
