@@ -1,6 +1,6 @@
 import { PhysicalPanelLayoutRepository } from './physical-panel-layout-repository'
-import { ConfiguredPanelLayoutRepository } from './interfaces/configured-panel-layout-repository'
-import { MongoConfiguredPanelLayoutRepository } from './mongo/mongo-configured-panel-layout-repository'
+import { PanelLayoutConfigurationRepository } from './interfaces/panel-layout-configuration-repository'
+import { MongoPanelLayoutConfigurationRepository } from './mongo/mongo-panel-layout-configuration-repository'
 import { Database } from './interfaces/database'
 import { MongoDatabase } from './mongo/mongo-database'
 import { LoggerFacade } from '../logger/logger-facade'
@@ -20,8 +20,8 @@ export class RepositoryFacade {
     return MongoDatabase.getInstance(LoggerFacade.createLogger())
   }
 
-  public static createConfiguredPanelLayoutRepository(): ConfiguredPanelLayoutRepository {
-    return new MongoConfiguredPanelLayoutRepository(this.createMongoDatabase(), this.createUuidGenerator())
+  public static createPanelLayoutConfigurationRepository(): PanelLayoutConfigurationRepository {
+    return new MongoPanelLayoutConfigurationRepository(this.createMongoDatabase(), this.createUuidGenerator())
   }
 
   private static createUuidGenerator(): UuidGenerator {

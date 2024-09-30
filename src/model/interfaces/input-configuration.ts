@@ -1,20 +1,20 @@
 import { InputDataType, InputType } from '../enums/panel-enums'
 import { HttpMethod } from '../enums/http-method'
 
-export type ConfiguredInput = ConfiguredButtonInput | ConfiguredFaderInput
+export type InputConfiguration = ButtonConfiguration | FaderConfiguration
 
-export interface DefaultConfiguredInput {
+export interface BaseInputConfiguration {
   type: InputType
   data: InputData
 }
 
-export interface ConfiguredButtonInput extends DefaultConfiguredInput {
+export interface ButtonConfiguration extends BaseInputConfiguration {
   type: InputType.BUTTON
   onPress?: boolean
   onRelease?: boolean
 }
 
-export interface ConfiguredFaderInput extends DefaultConfiguredInput {
+export interface FaderConfiguration extends BaseInputConfiguration {
   type: InputType.FADER
 }
 
