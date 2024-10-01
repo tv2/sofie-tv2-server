@@ -55,7 +55,7 @@ export class MongoDatabase implements Database {
     return this.db.collection(collectionName)
   }
 
-  private assertDatabaseConnection(database?: Db): asserts database is NonNullable<Db> {
+  private assertDatabaseConnection(database: Db | undefined): asserts database is Db {
     if (!database) {
       throw new DatabaseNotConnectedException('Not connected to the database')
     }
