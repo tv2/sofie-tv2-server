@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { JSONSchema7 } from 'json-schema'
 
 type MethodDecorator = (target: object, methodName: string) => void
 type Constructor = { prototype: object }
@@ -9,6 +10,7 @@ enum ControllerMetadata {
   METHODS = 'routable-methods',
   PATHS = 'routable-paths',
   BASE_PATH = 'routable-base-path',
+  VALIDATION_SCHEMA = 'validation-schema',
 }
 
 enum Method {
@@ -22,16 +24,19 @@ interface Route {
   path: string
   method: Method
   action: Action
+  validationSchema: JSONSchema7 | undefined
 }
 
 export abstract class BaseController {
   public getRoutes(): Route[] {
     const methods = getMethods(this)
     const paths = getPaths(this)
+    const validationSchemas = getValidationSchemas(this)
     return [...methods.keys()].map((methodName: string) => ({
       path: this.getFullPath(paths.get(methodName) ?? ''),
       method: methods.get(methodName) ?? Method.GET,
       action: this.getAction(methodName as keyof this),
+      validationSchema: validationSchemas.get(methodName),
     }))
   }
 
@@ -60,8 +65,8 @@ export function GetRequest(path?: string): MethodDecorator {
   return (target: object, methodName: string) => setRoute(target, methodName, Method.GET, path)
 }
 
-export function PostRequest(path?: string): MethodDecorator {
-  return (target: object, methodName: string) => setRoute(target, methodName, Method.POST, path)
+export function PostRequest(path?: string, validationSchema?: JSONSchema7): MethodDecorator {
+  return (target: object, methodName: string) => setRoute(target, methodName, Method.POST, path, validationSchema)
 }
 
 export function PutRequest(path?: string): MethodDecorator {
@@ -72,9 +77,12 @@ export function DeleteRequest(path?: string): MethodDecorator {
   return (target: object, methodName: string) => setRoute(target, methodName, Method.DELETE, path)
 }
 
-function setRoute(target: object, methodName: string, method: Method, path?: string): void {
+function setRoute(target: object, methodName: string, method: Method, path?: string, validationSchema?: JSONSchema7): void {
   if (path) {
     setPath(target, methodName, path)
+  }
+  if (validationSchema) {
+    setValidationSchema(target, methodName, validationSchema)
   }
   setMethod(target, methodName, method)
 }
@@ -105,4 +113,18 @@ function getMethods(target: object): Map<string, Method> {
 
 function setMethods(target: object, methods: Map<string, Method>): void {
   Reflect.defineMetadata(ControllerMetadata.METHODS, methods, target)
+}
+
+function setValidationSchema(target: object, methodName: string, validationSchema: JSONSchema7): void {
+  const validationSchemas = getValidationSchemas(target)
+  validationSchemas.set(methodName, validationSchema)
+  setValidationSchemas(target, validationSchemas)
+}
+
+function getValidationSchemas(target: object): Map<string, JSONSchema7> {
+  return Reflect.getMetadata(ControllerMetadata.VALIDATION_SCHEMA, target) ?? new Map()
+}
+
+function setValidationSchemas(target: object, schemas: Map<string, JSONSchema7>): void {
+  Reflect.defineMetadata(ControllerMetadata.VALIDATION_SCHEMA, schemas, target)
 }

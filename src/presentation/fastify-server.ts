@@ -5,6 +5,7 @@ import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
+import { FastifySchema } from 'fastify'
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
@@ -37,10 +38,17 @@ export class FastifyServer implements ProxyServer {
 
   private mapRouteToFastifyRouteOptions(controller: BaseController): RouteOptions[] {
     return controller.getRoutes().map((route) => {
+      const schema: FastifySchema = {}
+
+      if (route.validationSchema) {
+        schema.body = route.validationSchema
+      }
+
       return {
         method: route.method,
         url: `/api${route.path}`,
         handler: route.action.bind(controller),
+        schema,
       }
     })
   }
