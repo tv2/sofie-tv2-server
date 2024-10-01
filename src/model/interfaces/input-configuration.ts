@@ -20,21 +20,21 @@ export interface FaderConfiguration extends BaseInputConfiguration {
 
 export type InputData = HttpEndpointInputData | ModifierInputData | TBarInputData
 
-export interface DefaultInputData {
+export interface BaseInputData {
   type: InputDataType
 }
 
-export interface HttpEndpointInputData extends DefaultInputData {
+export interface HttpEndpointInputData extends BaseInputData {
   type: InputDataType.HTTP_ENDPOINT
   url: string
   httpMethod: HttpMethod
 }
 
-export interface ModifierInputData extends DefaultInputData {
+export interface ModifierInputData extends BaseInputData {
   type: InputDataType.MODIFIER
   modifier: string
 }
 
-export interface TBarInputData extends DefaultInputData {
+export interface TBarInputData extends BaseInputData {
   type: InputDataType.T_BAR
 }
