@@ -1,11 +1,12 @@
 import { ProxyServer } from './interfaces/proxy-server'
 import createFastifyServer, * as fastify from 'fastify'
+import { FastifySchema } from 'fastify'
 import { fastifyHttpProxy } from '@fastify/http-proxy'
 import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
-import { FastifySchema } from 'fastify'
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
@@ -29,6 +30,7 @@ export class FastifyServer implements ProxyServer {
       websocket: true,
       wsUpstream: proxyConfiguration.websocketUrl,
     })
+    this.fastifyServer.withTypeProvider<TypeBoxTypeProvider>()
   }
 
   private setupControllers(): void {

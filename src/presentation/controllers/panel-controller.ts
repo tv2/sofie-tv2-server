@@ -3,9 +3,10 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { PhysicalPanelLayoutRepository } from '../../data-access/physical-panel-layout-repository'
 import { PhysicalPanelLayout } from '../../model/interfaces/physical-panel-layout'
 import { JSONSchema7 } from 'json-schema'
+import { TObject, TString, Type } from '@fastify/type-provider-typebox'
 
 // TODO: This is for demonstration purposes. DELETE IT!
-const PANEL_LAYOUT_CONFIGURATION_SCHEMA: JSONSchema7 = {
+const JSON_SCHEMA_PANEL_LAYOUT_CONFIGURATION_SCHEMA: JSONSchema7 = {
   type: 'object',
   properties: {
     hello: {
@@ -14,6 +15,11 @@ const PANEL_LAYOUT_CONFIGURATION_SCHEMA: JSONSchema7 = {
   },
   required: ['hello'],
 }
+
+// TODO: This is for demonstration purposes. DELETE IT!
+const TYPE_BOX_PANEL_LAYOUT_CONFIGURATION_SCHEMA: TObject = Type.Object({
+  hello: Type.Required<TString>(Type.String()),
+})
 
 @RestController('/panels')
 export class PanelController extends BaseController {
@@ -27,7 +33,7 @@ export class PanelController extends BaseController {
     await reply.code(200).send(physicalPanelLayouts)
   }
 
-  @PostRequest('/panelLayoutConfigurations', PANEL_LAYOUT_CONFIGURATION_SCHEMA)
+  @PostRequest('/panelLayoutConfigurations', TYPE_BOX_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
   public async createPanelLayoutConfiguration(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     await reply.code(200).send(request.body)
   }
