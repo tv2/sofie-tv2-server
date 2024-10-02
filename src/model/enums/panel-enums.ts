@@ -16,3 +16,9 @@ export enum InputType {
   LED_DISPLAY = 'LED_DISPLAY',
   FADER = 'FADER',
 }
+
+export enum InputDataType {
+  HTTP_ENDPOINT = 'HTTP_ENDPOINT',
+  MODIFIER = 'MODIFIER',
+  T_BAR = 'T_BAR',
+}

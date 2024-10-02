@@ -30,7 +30,7 @@
     "@typescript-eslint/parser": "^7.8.0",
     "@vitest/coverage-v8": "^1.5.3",
     "cross-env": "^7.0.3",
-    "eslint": "^9.1.1",
+    "eslint": "^8.56.0",
     "license-checker": "^25.0.1",
     "nodemon": "^3.1.0",
     "rimraf": "^5.0.5",
@@ -43,6 +43,7 @@
     "@fastify/http-proxy": "^10.0.0",
     "@tv2media/logger": "^2.0.2",
     "fastify": "^5.0.0",
+    "mongodb": "^6.9.0",
     "reflect-metadata": "^0.2.2"
   }
 }
