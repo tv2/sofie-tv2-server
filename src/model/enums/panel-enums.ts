@@ -1,3 +1,5 @@
+import { TSchema, Type } from '@fastify/type-provider-typebox'
+
 export enum PanelType {
   SKAARHOJ = 'SKAARHOJ',
 }
@@ -22,3 +24,10 @@ export enum InputDataType {
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
 }
+
+// ################## Schemas below ##################
+
+export const PANEL_TYPE_SCHEMA: TSchema = Type.Enum(PanelType)
+export const PANEL_MODEL_SCHEMA: TSchema = Type.Enum(SkaarhojModel)
+export const INPUT_TYPE_SCHEMA: TSchema = Type.Enum(InputType)
+export const INPUT_DATA_TYPE_SCHEMA: TSchema = Type.Enum(InputDataType)
