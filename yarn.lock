@@ -761,7 +761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:*, @types/json-schema@npm:^7.0.12, @types/json-schema@npm:^7.0.15":
+"@types/json-schema@npm:*, @types/json-schema@npm:^7.0.12":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
@@ -4028,7 +4028,6 @@ __metadata:
     "@fastify/websocket": "npm:^11.0.1"
     "@stylistic/eslint-plugin": "npm:^1.8.0"
     "@tv2media/logger": "npm:^2.0.2"
-    "@types/json-schema": "npm:^7.0.15"
     "@types/license-checker": "npm:^25"
     "@types/node": "npm:^20.12.8"
     "@types/ws": "npm:^8.5.12"
