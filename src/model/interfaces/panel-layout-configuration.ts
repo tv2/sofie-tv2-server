@@ -1,6 +1,5 @@
-import { PANEL_MODEL_SCHEMA, PANEL_TYPE_SCHEMA, PanelModel, PanelType, SkaarhojModel } from '../enums/panel-enums'
-import { INPUT_CONFIGURATION_SCHEMA, InputConfiguration, ZOD_INPUT_CONFIGURATION_SCHEMA } from './input-configuration'
-import { TObject, Type } from '@fastify/type-provider-typebox'
+import { PanelModel, PanelType, SkaarhojModel } from '../enums/panel-enums'
+import { InputConfiguration, ZOD_INPUT_CONFIGURATION_SCHEMA } from './input-configuration'
 import z, { ZodSchema } from 'zod'
 
 export interface PanelLayoutConfiguration {
@@ -10,14 +9,6 @@ export interface PanelLayoutConfiguration {
   model: PanelModel
   inputConfigurations: Record<string, InputConfiguration>
 }
-
-export const PANEL_LAYOUT_CONFIGURATION_SCHEMA: TObject = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-  type: PANEL_TYPE_SCHEMA,
-  model: PANEL_MODEL_SCHEMA,
-  inputConfigurations: Type.Record(Type.String(), INPUT_CONFIGURATION_SCHEMA),
-})
 
 export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<Omit<PanelLayoutConfiguration, 'id'>> = z.object({
   id: z.string().optional(),
