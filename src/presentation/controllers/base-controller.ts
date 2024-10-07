@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { JSONSchema7 } from 'json-schema'
+import { ZodType } from 'zod'
 
 type MethodDecorator = (target: object, methodName: string) => void
 type Constructor = { prototype: object }
@@ -24,7 +24,7 @@ interface Route {
   path: string
   method: Method
   action: Action
-  validationSchema: JSONSchema7 | undefined
+  validationSchema: ZodType | undefined
 }
 
 export abstract class BaseController {
@@ -65,7 +65,7 @@ export function GetRequest(path?: string): MethodDecorator {
   return (target: object, methodName: string) => setRoute(target, methodName, Method.GET, path)
 }
 
-export function PostRequest(path?: string, validationSchema?: JSONSchema7): MethodDecorator {
+export function PostRequest(path?: string, validationSchema?: ZodType): MethodDecorator {
   return (target: object, methodName: string) => setRoute(target, methodName, Method.POST, path, validationSchema)
 }
 
@@ -77,7 +77,7 @@ export function DeleteRequest(path?: string): MethodDecorator {
   return (target: object, methodName: string) => setRoute(target, methodName, Method.DELETE, path)
 }
 
-function setRoute(target: object, methodName: string, method: Method, path?: string, validationSchema?: JSONSchema7): void {
+function setRoute(target: object, methodName: string, method: Method, path?: string, validationSchema?: ZodType): void {
   if (path) {
     setPath(target, methodName, path)
   }
@@ -115,16 +115,16 @@ function setMethods(target: object, methods: Map<string, Method>): void {
   Reflect.defineMetadata(ControllerMetadata.METHODS, methods, target)
 }
 
-function setValidationSchema(target: object, methodName: string, validationSchema: JSONSchema7): void {
+function setValidationSchema(target: object, methodName: string, validationSchema: ZodType): void {
   const validationSchemas = getValidationSchemas(target)
   validationSchemas.set(methodName, validationSchema)
   setValidationSchemas(target, validationSchemas)
 }
 
-function getValidationSchemas(target: object): Map<string, JSONSchema7> {
+function getValidationSchemas(target: object): Map<string, ZodType> {
   return Reflect.getMetadata(ControllerMetadata.VALIDATION_SCHEMA, target) ?? new Map()
 }
 
-function setValidationSchemas(target: object, schemas: Map<string, JSONSchema7>): void {
+function setValidationSchemas(target: object, schemas: Map<string, ZodType>): void {
   Reflect.defineMetadata(ControllerMetadata.VALIDATION_SCHEMA, schemas, target)
 }

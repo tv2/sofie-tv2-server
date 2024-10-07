@@ -6,7 +6,7 @@ import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
@@ -30,7 +30,10 @@ export class FastifyServer implements ProxyServer {
       websocket: true,
       wsUpstream: proxyConfiguration.websocketUrl,
     })
-    this.fastifyServer.withTypeProvider<TypeBoxTypeProvider>()
+
+    this.fastifyServer.setValidatorCompiler(validatorCompiler)
+    this.fastifyServer.setSerializerCompiler(serializerCompiler)
+    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
   }
 
   private setupControllers(): void {

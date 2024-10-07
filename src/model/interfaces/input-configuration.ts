@@ -1,6 +1,7 @@
 import { INPUT_TYPE_SCHEMA, InputDataType, InputType } from '../enums/panel-enums'
 import { HTTP_METHOD_SCHEMA, HttpMethod } from '../enums/http-method'
 import { TObject, TSchema, Type } from '@fastify/type-provider-typebox'
+import z, { ZodType } from 'zod'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration
 
@@ -87,4 +88,47 @@ const FADER_CONFIGURATION_SCHEMA: TSchema = Type.Composite([
 export const INPUT_CONFIGURATION_SCHEMA: TSchema = Type.Union([
   BUTTON_CONFIGURATION_SCHEMA,
   FADER_CONFIGURATION_SCHEMA,
+])
+
+// ################## Zod Schemas below ##################
+
+const ZOD_HTTP_ENDPOINT_INPUT_DATA_SCHEMA: ZodType = z.object({
+  type: z.literal(InputDataType.HTTP_ENDPOINT),
+  url: z.string(),
+  httpMethod: z.nativeEnum(HttpMethod),
+})
+
+const ZOD_MODIFIER_INPUT_DATA_SCHEMA: ZodType = z.object({
+  type: z.literal(InputDataType.MODIFIER),
+  modifier: z.string(),
+})
+
+export const ZOD_T_BAR_INPUT_DATA_SCHEMA: ZodType = z.object({
+  type: z.literal(InputDataType.T_BAR),
+})
+
+export const ZOD_INPUT_DATA_SCHEMA: ZodType = z.union([
+  ZOD_HTTP_ENDPOINT_INPUT_DATA_SCHEMA,
+  ZOD_MODIFIER_INPUT_DATA_SCHEMA,
+  ZOD_T_BAR_INPUT_DATA_SCHEMA,
+])
+
+const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodType = z.object({
+  type: z.nativeEnum(InputType),
+  data: ZOD_INPUT_DATA_SCHEMA,
+})
+
+const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodType = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+  type: z.literal(InputType.BUTTON),
+  onPress: z.boolean().optional(),
+  onRelease: z.boolean().optional(),
+}))
+
+const ZOD_FADER_CONFIGURATION_SCHEMA: ZodType = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+  type: z.literal(InputType.FADER),
+}))
+
+export const ZOD_INPUT_CONFIGURATION_SCHEMA: ZodType = z.union([
+  ZOD_BUTTON_CONFIGURATION_SCHEMA,
+  ZOD_FADER_CONFIGURATION_SCHEMA,
 ])
