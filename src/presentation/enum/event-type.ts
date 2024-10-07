@@ -1,0 +1,5 @@
+export type EventType = PanelEventType
+
+export enum PanelEventType {
+  PANEL_LAYOUT_CONFIGURATION_CREATED = 'PANEL_LAYOUT_CONFIGURATION_CREATED',
+}

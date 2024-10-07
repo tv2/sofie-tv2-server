@@ -26,6 +26,7 @@
     "@stylistic/eslint-plugin": "^1.8.0",
     "@types/license-checker": "^25",
     "@types/node": "^20.12.8",
+    "@types/ws": "^8.5.12",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "@vitest/coverage-v8": "^1.5.3",
@@ -41,6 +42,7 @@
   "packageManager": "yarn@4.1.1",
   "dependencies": {
     "@fastify/http-proxy": "^10.0.0",
+    "@fastify/websocket": "^11.0.1",
     "@tv2media/logger": "^2.0.2",
     "fastify": "^5.0.0",
     "mongodb": "^6.9.0",

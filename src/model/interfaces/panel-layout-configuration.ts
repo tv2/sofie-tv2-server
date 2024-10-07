@@ -6,5 +6,5 @@ export interface PanelLayoutConfiguration {
   name: string
   type: PanelType
   model: PanelModel
-  inputConfigurations: Map<string, InputConfiguration>
+  inputConfigurations: Record<string, InputConfiguration>
 }
