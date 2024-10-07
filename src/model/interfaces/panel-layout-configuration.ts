@@ -19,8 +19,8 @@ export const PANEL_LAYOUT_CONFIGURATION_SCHEMA: TObject = Type.Object({
   inputConfigurations: Type.Record(Type.String(), INPUT_CONFIGURATION_SCHEMA),
 })
 
-export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<PanelLayoutConfiguration> = z.object({
-  id: z.string(),
+export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<Omit<PanelLayoutConfiguration, 'id'>> = z.object({
+  id: z.string().optional(),
   name: z.string(),
   type: z.nativeEnum(PanelType),
   model: z.nativeEnum(SkaarhojModel),

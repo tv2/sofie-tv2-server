@@ -6,10 +6,11 @@ import {
   PanelLayoutConfiguration,
   ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA,
 } from '../../model/interfaces/panel-layout-configuration'
+import { PanelService } from '../../business-logic/services/interfaces/panel-service'
 
 @RestController('/panels')
 export class PanelController extends BaseController {
-  public constructor(private readonly physicalPanelLayoutRepository: PhysicalPanelLayoutRepository) {
+  public constructor(private readonly physicalPanelLayoutRepository: PhysicalPanelLayoutRepository, private readonly panelLayoutConfigurationService: PanelService) {
     super()
   }
 
@@ -21,7 +22,8 @@ export class PanelController extends BaseController {
 
   @PostRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
   public async createPanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
-    const body: PanelLayoutConfiguration = request.body
-    await reply.code(200).send(body)
+    const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
+    await this.panelLayoutConfigurationService.createPanelLayoutConfiguration(panelLayoutConfiguration)
+    await reply.code(200).send(panelLayoutConfiguration)
   }
 }

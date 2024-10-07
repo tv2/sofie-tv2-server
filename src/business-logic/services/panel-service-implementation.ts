@@ -1,0 +1,14 @@
+import { PanelEventEmitter } from './interfaces/panel-event-emitter'
+import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
+import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
+import { PanelService } from './interfaces/panel-service'
+
+export class PanelServiceImplementation implements PanelService {
+  public constructor(private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository, private readonly panelEventEmitter: PanelEventEmitter) {
+  }
+
+  public async createPanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
+    const panelLayoutConfigurationWithId: PanelLayoutConfiguration = await this.panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)
+    this.panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfigurationWithId)
+  }
+}
