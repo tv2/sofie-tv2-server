@@ -4046,8 +4046,8 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.3"
-    zod: "npm:^3.23.8"
     ws: "npm:^8.18.0"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
