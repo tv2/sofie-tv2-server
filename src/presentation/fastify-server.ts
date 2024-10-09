@@ -12,7 +12,7 @@ import WebSocket, { MessageEvent } from 'ws'
 import { PanelEventObserver } from './interfaces/panel-event-observer'
 import { PanelEvent } from './value-objects/panel-event'
 
-const RECONNECT_TO_ALBA_SERVER_IN_MS: number = 5_000
+const RECONNECT_DELAY_IN_MS: number = 5_000
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
@@ -43,16 +43,16 @@ export class FastifyServer implements ProxyServer {
       this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => socket.send(JSON.stringify(panelEvent)))
     })
 
-    this.connectToAlbServer(proxyConfiguration)
+    this.connectToAlbaServer(proxyConfiguration)
   }
 
-  private connectToAlbServer(proxyConfiguration: ProxyConfiguration): void {
+  private connectToAlbaServer(proxyConfiguration: ProxyConfiguration): void {
     const albaWebSocket: WebSocket = new WebSocket(proxyConfiguration.websocketUrl)
     albaWebSocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
 
     albaWebSocket.addEventListener('close', () => {
       this.logger.debug('Disconnected from Alba Server')
-      setTimeout(() => this.connectToAlbServer(proxyConfiguration), RECONNECT_TO_ALBA_SERVER_IN_MS)
+      setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
     albaWebSocket.addEventListener('message', (message: MessageEvent) => {
