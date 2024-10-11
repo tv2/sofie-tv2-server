@@ -43,7 +43,7 @@ export default [
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/block-spacing': ['error', 'always'],
       '@stylistic/brace-style': ['error', '1tbs'],
-      '@stylistic/comma-dangle': ['error', 'always-multiline'],
+      '@stylistic/comma-dangle': 'off',
       '@stylistic/comma-spacing': ['error'],
       '@stylistic/function-call-spacing': ['error', 'never'],
       '@stylistic/key-spacing': ['error'],
