@@ -5,6 +5,7 @@ import { BaseController } from './controllers/base-controller'
 import { ControllerFacade } from './facades/controller-facade'
 import { LoggerFacade } from '../logger/logger-facade'
 import { RepositoryFacade } from '../data-access/repository-facade'
+import { EventEmitterFacade } from './facades/event-emitter-facade'
 
 const SOFIE_REST_URL: string = 'http://localhost:3005'
 const SOFIE_WEBSOCKET_URL: string = 'ws://localhost:3006'
@@ -18,7 +19,7 @@ async function startAlbaTv2Server(logger: Logger): Promise<void> {
 }
 
 async function startProxyServer(logger: Logger): Promise<void> {
-  const proxyServer: ProxyServer = new FastifyServer(logger, controllers)
+  const proxyServer: ProxyServer = new FastifyServer(logger, controllers, EventEmitterFacade.createPanelEventObserver())
   await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: SOFIE_REST_URL, websocketUrl: SOFIE_WEBSOCKET_URL })
 }
 

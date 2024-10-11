@@ -5,17 +5,24 @@ import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
+import { fastifyWebsocket } from '@fastify/websocket'
+import WebSocket, { MessageEvent } from 'ws'
+import { PanelEventObserver } from './interfaces/panel-event-observer'
+import { PanelEvent } from './value-objects/panel-event'
+
+const RECONNECT_DELAY_IN_MS: number = 5_000
 
 export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
   private readonly logger: Logger
 
-  public constructor(logger: Logger, private readonly controllers: BaseController[]) {
+  public constructor(logger: Logger, private readonly controllers: BaseController[], private readonly panelEventObserver: PanelEventObserver) {
     this.logger = logger.tag(this.constructor.name)
   }
 
   public async start(port: number, proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.configureProxy(proxyConfiguration)
+    await this.setupWebSocketServer(proxyConfiguration)
     this.setupControllers()
     await this.fastifyServer.listen({ port })
 
@@ -25,8 +32,29 @@ export class FastifyServer implements ProxyServer {
   private async configureProxy(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyHttpProxy, {
       upstream: proxyConfiguration.httpUrl,
-      websocket: true,
-      wsUpstream: proxyConfiguration.websocketUrl,
+    })
+  }
+
+  private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
+    await this.fastifyServer.register(fastifyWebsocket)
+    this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
+      this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => socket.send(JSON.stringify(panelEvent)))
+    })
+
+    this.connectToAlbaServer(proxyConfiguration)
+  }
+
+  private connectToAlbaServer(proxyConfiguration: ProxyConfiguration): void {
+    const albaWebSocket: WebSocket = new WebSocket(proxyConfiguration.websocketUrl)
+    albaWebSocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
+
+    albaWebSocket.addEventListener('close', () => {
+      this.logger.debug('Disconnected from Alba Server')
+      setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
+    })
+
+    albaWebSocket.addEventListener('message', (message: MessageEvent) => {
+      this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
   }
 
