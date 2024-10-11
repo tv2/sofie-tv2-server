@@ -1,10 +1,12 @@
 import { ProxyServer } from './interfaces/proxy-server'
 import createFastifyServer, * as fastify from 'fastify'
+import { FastifySchema } from 'fastify'
 import { fastifyHttpProxy } from '@fastify/http-proxy'
 import { ProxyConfiguration } from './value-objects/proxy-configuration'
 import { BaseController } from './controllers/base-controller'
 import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
+import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { fastifyWebsocket } from '@fastify/websocket'
 import WebSocket, { MessageEvent } from 'ws'
 import { PanelEventObserver } from './interfaces/panel-event-observer'
@@ -56,6 +58,10 @@ export class FastifyServer implements ProxyServer {
     albaWebSocket.addEventListener('message', (message: MessageEvent) => {
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
+
+    this.fastifyServer.setValidatorCompiler(validatorCompiler)
+    this.fastifyServer.setSerializerCompiler(serializerCompiler)
+    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
   }
 
   private setupControllers(): void {
@@ -65,10 +71,17 @@ export class FastifyServer implements ProxyServer {
 
   private mapRouteToFastifyRouteOptions(controller: BaseController): RouteOptions[] {
     return controller.getRoutes().map((route) => {
+      const schema: FastifySchema = {}
+
+      if (route.validationSchema) {
+        schema.body = route.validationSchema
+      }
+
       return {
         method: route.method,
         url: `/api${route.path}`,
         handler: route.action.bind(controller),
+        schema,
       }
     })
   }
