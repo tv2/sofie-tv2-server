@@ -48,6 +48,28 @@ describe(PanelServiceImplementation.name, () => {
 
           verify(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).once()
         })
+
+        it('emits a PanelConfigurationCreatedEvent', async() => {
+          const panelType: PanelType = PanelType.SKAARHOJ
+          const panelModel: PanelModel = SkaarhojModel.MKT1A
+
+          const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: panelType, model: panelModel })
+          const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ type: panelType, model: panelModel, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+
+          const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenReturn(Promise.resolve(panelLayoutConfiguration))
+
+          const panelConfigurationRepository: PanelConfigurationRepository = mock<PanelConfigurationRepository>()
+          when(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).thenReturn(Promise.resolve(panelConfiguration))
+
+          const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
+
+          await testee.createPanelConfiguration(panelConfiguration)
+
+          verify(panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)).once()
+        })
       })
 
       describe('the PanelLayoutConfiguration.model is not equal to PanelConfiguration.model', () => {

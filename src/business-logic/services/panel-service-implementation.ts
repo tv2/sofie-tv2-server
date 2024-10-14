@@ -57,6 +57,7 @@ export class PanelServiceImplementation implements PanelService {
       )
     }
 
-    await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
+    const panelConfiguration: PanelConfiguration = await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
+    this.panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)
   }
 }

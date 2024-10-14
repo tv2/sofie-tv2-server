@@ -3,6 +3,7 @@ import { PanelEventObserver } from '../interfaces/panel-event-observer'
 import { PanelEvent } from '../value-objects/panel-event'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelEventBuilder } from '../interfaces/panel-event-builder'
+import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 
 export class PanelEventService implements PanelEventEmitter, PanelEventObserver {
   private static instance: PanelEventService
@@ -33,6 +34,10 @@ export class PanelEventService implements PanelEventEmitter, PanelEventObserver 
 
   public emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId: string): void {
     this.emitPanelEvent(this.panelEventBuilder.buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId))
+  }
+
+  public emitPanelConfigurationCreated(panelConfiguration: PanelConfiguration): void {
+    this.emitPanelEvent(this.panelEventBuilder.buildPanelConfigurationCreatedEvent(panelConfiguration))
   }
 
   public subscribeToPanelEvents(onPanelEventCallback: (panelEvent: PanelEvent) => void): void {
