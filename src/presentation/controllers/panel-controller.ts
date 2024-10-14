@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, RestController } from './base-controller'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { PhysicalPanelLayoutRepository } from '../../data-access/physical-panel-layout-repository'
 import { PhysicalPanelLayout } from '../../model/interfaces/physical-panel-layout'
@@ -58,6 +58,16 @@ export class PanelController extends BaseController {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
       await this.panelLayoutConfigurationService.createPanelLayoutConfiguration(panelLayoutConfiguration)
       await reply.code(HttpStatusCode.OK).send(panelLayoutConfiguration)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error as Exception)
+    }
+  }
+
+  @DeleteRequest('/panelLayoutConfigurations/:id')
+  public async deletePanelLayoutConfiguration(request: FastifyRequest<{ Params: Pick<PanelLayoutConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
+    try {
+      await this.panelLayoutConfigurationService.deletePanelLayoutConfiguration(request.params.id)
+      await reply.code(HttpStatusCode.OK).send(`Successfully deleted PanelLayoutConfiguration for ${request.params.id}`)
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error as Exception)
     }

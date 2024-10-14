@@ -10,3 +10,8 @@ export interface PanelLayoutConfigurationCreatedEvent extends PanelEvent {
   type: PanelEventType.PANEL_LAYOUT_CONFIGURATION_CREATED
   panelLayoutConfiguration: PanelLayoutConfigurationDto
 }
+
+export interface PanelLayoutConfigurationDeletedEVent extends PanelEvent {
+  type: PanelEventType.PANEL_LAYOUT_CONFIGURATION_DELETED
+  panelLayoutConfigurationId: string
+}

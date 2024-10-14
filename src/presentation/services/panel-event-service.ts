@@ -27,6 +27,10 @@ export class PanelEventService implements PanelEventEmitter, PanelEventObserver 
     this.emitPanelEvent(this.panelEventBuilder.buildPanelLayoutConfigurationCreatedEvent(panelLayoutConfiguration))
   }
 
+  public emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId: string): void {
+    this.emitPanelEvent(this.panelEventBuilder.buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId))
+  }
+
   public subscribeToPanelEvents(onPanelEventCallback: (panelEvent: PanelEvent) => void): void {
     this.callbacks.push(onPanelEventCallback)
   }

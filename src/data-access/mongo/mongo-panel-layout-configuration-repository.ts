@@ -41,4 +41,9 @@ export class MongoPanelLayoutConfigurationRepository extends BaseMongoRepository
     await this.getCollection().updateOne({ _id: panelLayoutConfigurationToBeInserted.id }, { $set: panelLayoutConfigurationToBeInserted }, { upsert: true })
     return panelLayoutConfigurationToBeInserted
   }
+
+  public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deletePanelLayoutConfiguration.name)
+    await this.getCollection().deleteOne({ id: panelLayoutConfigurationId })
+  }
 }
