@@ -1,3 +1,4 @@
 export enum ErrorCode {
   DATABASE_NOT_CONNECTED = 'DATABASE_NOT_CONNECTED',
+  NOT_FOUND = 'NOT_FOUND'
 }

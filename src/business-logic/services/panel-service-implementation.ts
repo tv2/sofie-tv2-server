@@ -7,6 +7,14 @@ export class PanelServiceImplementation implements PanelService {
   public constructor(private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository, private readonly panelEventEmitter: PanelEventEmitter) {
   }
 
+  public getPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelLayoutConfiguration> {
+    return this.panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfigurationId)
+  }
+
+  public getPanelLayoutConfigurations(): Promise<PanelLayoutConfiguration[]> {
+    return this.panelLayoutConfigurationRepository.getPanelLayoutConfigurations()
+  }
+
   public async createPanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
     const panelLayoutConfigurationWithId: PanelLayoutConfiguration = await this.panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)
     this.panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfigurationWithId)
