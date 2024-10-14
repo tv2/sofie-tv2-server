@@ -38,7 +38,7 @@ export class MongoPanelLayoutConfigurationRepository extends BaseMongoRepository
       ...panelLayoutConfiguration,
       id: this.uuidGenerator.generateUuid()
     }
-    await this.getCollection().updateOne({ _id: panelLayoutConfigurationToBeInserted.id }, { $set: panelLayoutConfigurationToBeInserted }, { upsert: true })
+    await this.getCollection().updateOne({ id: panelLayoutConfigurationToBeInserted.id }, { $set: panelLayoutConfigurationToBeInserted }, { upsert: true })
     return panelLayoutConfigurationToBeInserted
   }
 
