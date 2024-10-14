@@ -14,6 +14,46 @@ import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout
 import { PanelModel, PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
 
 describe(PanelServiceImplementation.name, () => {
+  describe(PanelServiceImplementation.prototype.createPanelLayoutConfiguration.name, () => {
+    it('emits a PanelLayoutConfigurationCreatedEvent', async() => {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+
+      const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+      when(panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)).thenReturn(Promise.resolve(panelLayoutConfiguration))
+
+      const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+      const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelEventEmitter })
+      await testee.createPanelLayoutConfiguration(panelLayoutConfiguration)
+
+      verify(panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfiguration)).once()
+    })
+  })
+
+  describe(PanelServiceImplementation.prototype.updatePanelLayoutConfiguration.name, () => {
+    it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+      const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+      const testee: PanelService = createTestee({ panelEventEmitter })
+      await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+
+      verify(panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
+    })
+  })
+
+  describe(PanelServiceImplementation.prototype.deletePanelLayoutConfiguration.name, () => {
+    it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+      const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+      const testee: PanelService = createTestee({ panelEventEmitter })
+      await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+
+      verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfiguration.id)).once()
+    })
+  })
+
   describe(PanelServiceImplementation.prototype.createPanelConfiguration.name, () => {
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       it('throws an Unsupported Operation error', async() => {
