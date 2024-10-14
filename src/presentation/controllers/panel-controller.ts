@@ -1,10 +1,11 @@
-import { BaseController, DeleteRequest, GetRequest, PostRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { PhysicalPanelLayoutRepository } from '../../data-access/physical-panel-layout-repository'
 import { PhysicalPanelLayout } from '../../model/interfaces/physical-panel-layout'
 import {
   PanelLayoutConfiguration,
   ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA,
+  ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID,
 } from '../../model/interfaces/panel-layout-configuration'
 import { PanelService } from '../../business-logic/services/interfaces/panel-service'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
@@ -52,12 +53,23 @@ export class PanelController extends BaseController {
     }
   }
 
-  @PostRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
+  @PostRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID)
   public async createPanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
       await this.panelLayoutConfigurationService.createPanelLayoutConfiguration(panelLayoutConfiguration)
       await reply.code(HttpStatusCode.OK).send(panelLayoutConfiguration)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error as Exception)
+    }
+  }
+
+  @PutRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
+  public async updatePanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
+    try {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
+      await this.panelLayoutConfigurationService.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+      await reply.code(HttpStatusCode.OK).send(`Successfully updated PanelLayoutConfiguration for ${panelLayoutConfiguration.id}`)
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error as Exception)
     }

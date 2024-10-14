@@ -10,10 +10,13 @@ export interface PanelLayoutConfiguration {
   inputConfigurations: Record<string, InputConfiguration>
 }
 
-export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<Omit<PanelLayoutConfiguration, 'id'>> = z.object({
-  id: z.string().optional(),
+export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelLayoutConfiguration, 'id'>> = z.object({
   name: z.string(),
   type: z.nativeEnum(PanelType),
   model: z.nativeEnum(SkaarhojModel),
   inputConfigurations: z.record(z.string(), ZOD_INPUT_CONFIGURATION_SCHEMA),
 })
+
+export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<PanelLayoutConfiguration> = ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({
+  id: z.string()
+}))
