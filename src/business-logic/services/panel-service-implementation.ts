@@ -19,4 +19,9 @@ export class PanelServiceImplementation implements PanelService {
     const panelLayoutConfigurationWithId: PanelLayoutConfiguration = await this.panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)
     this.panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfigurationWithId)
   }
+
+  public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
+    await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
+    this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
+  }
 }
