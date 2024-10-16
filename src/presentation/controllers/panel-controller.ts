@@ -67,7 +67,7 @@ export class PanelController extends BaseController {
     try {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
       await this.panelService.createPanelLayoutConfiguration(panelLayoutConfiguration)
-      await this.sendOkReply(reply, 'Successfully create PanelLayoutConfiguration')
+      await this.sendOkReply(reply, 'Successfully created PanelLayoutConfiguration')
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }
