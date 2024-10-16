@@ -2,8 +2,6 @@ import { PanelConfigurationRepository } from '../interfaces/panel-configuration-
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
-import { util } from 'zod'
-import Omit = util.Omit
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 
 const PANEL_CONFIGURATION_COLLECTION_NAME: string = 'panelConfigurations'
