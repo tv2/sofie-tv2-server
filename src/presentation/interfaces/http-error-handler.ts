@@ -11,7 +11,12 @@ export class HttpErrorHandler {
     this.logger = logger.tag(HttpErrorHandler.name)
   }
 
-  public async handleError(reply: FastifyReply, exception: Exception): Promise<void> {
+  public async handleError(reply: FastifyReply, exception: unknown): Promise<void> {
+    if (!(exception instanceof Exception)) {
+      this.logger.data(exception).error('Unknown exception type caught')
+      await reply.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send(exception)
+      return
+    }
     this.logger.data(exception).error(`Caught Exception "${exception.errorCode}. Message ${exception.message}`)
     await reply.status(this.mapErrorCodeToHttpStatusCode(exception.errorCode)).send(exception)
   }
