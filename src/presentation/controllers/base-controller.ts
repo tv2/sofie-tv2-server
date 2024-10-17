@@ -69,8 +69,8 @@ export function PostRequest(path?: string, validationSchema?: ZodType): MethodDe
   return (target: object, methodName: string) => setRoute(target, methodName, Method.POST, path, validationSchema)
 }
 
-export function PutRequest(path?: string): MethodDecorator {
-  return (target: object, methodName: string) => setRoute(target, methodName, Method.PUT, path)
+export function PutRequest(path?: string, validationSchema?: ZodType): MethodDecorator {
+  return (target: object, methodName: string) => setRoute(target, methodName, Method.PUT, path, validationSchema)
 }
 
 export function DeleteRequest(path?: string): MethodDecorator {
