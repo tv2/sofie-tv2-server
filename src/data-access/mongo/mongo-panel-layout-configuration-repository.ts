@@ -31,7 +31,7 @@ export class MongoPanelLayoutConfigurationRepository extends BaseMongoRepository
 
   public async getPanelLayoutConfigurations(): Promise<PanelLayoutConfiguration[]> {
     this.assertDatabaseConnection(this.getPanelLayoutConfigurations.name)
-    return await this.getCollection().find<PanelLayoutConfiguration>({}).toArray()
+    return this.getCollection().find<PanelLayoutConfiguration>({}).toArray()
   }
 
   public async createPanelLayoutConfiguration(panelLayoutConfiguration: Omit<PanelLayoutConfiguration, 'id'>): Promise<PanelLayoutConfiguration> {

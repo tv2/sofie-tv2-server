@@ -47,6 +47,14 @@ export class PanelServiceImplementation implements PanelService {
     }
   }
 
+  public getPanelConfiguration(panelConfigurationId: string): Promise<PanelConfiguration> {
+    return this.panelConfigurationRepository.getPanelConfiguration(panelConfigurationId)
+  }
+
+  public getPanelConfigurations(): Promise<PanelConfiguration[]> {
+    return this.panelConfigurationRepository.getPanelConfigurations()
+  }
+
   public async createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void> {
     let panelLayoutConfiguration: PanelLayoutConfiguration
     try {
