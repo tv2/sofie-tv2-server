@@ -1,13 +1,15 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { PanelLayoutConfigurationRepository } from '../interfaces/panel-layout-configuration-repository'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase, MongoId } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
 
 const PANEL_LAYOUT_CONFIGURATION_COLLECTION_NAME: string = 'panelLayoutConfigurations'
 
-export class MongoPanelLayoutConfigurationRepository extends BaseMongoRepository implements PanelLayoutConfigurationRepository {
+interface MongoPanelLayoutConfiguration extends PanelLayoutConfiguration, MongoId {}
+
+export class MongoPanelLayoutConfigurationRepository extends BaseMongoRepository<MongoPanelLayoutConfiguration> implements PanelLayoutConfigurationRepository {
   public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }

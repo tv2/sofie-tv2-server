@@ -2,12 +2,12 @@ import { DatabaseNotConnectedException } from '../../model/exceptions/database-n
 import { Collection } from 'mongodb'
 import { MongoDatabase, MongoId } from './mongo-database'
 
-export abstract class BaseMongoRepository {
+export abstract class BaseMongoRepository<Model extends MongoId> {
   protected constructor(protected mongoDatabase: MongoDatabase) {}
 
   protected abstract getCollectionName(): string
 
-  protected getCollection<Model extends MongoId>(): Collection<Model> {
+  protected getCollection(): Collection<Model> {
     return this.mongoDatabase.getCollection(this.getCollectionName())
   }
 

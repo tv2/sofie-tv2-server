@@ -28,6 +28,8 @@ export class HttpErrorHandler {
         return HttpStatusCode.NOT_FOUND
       case ErrorCode.DATABASE_NOT_CONNECTED:
         return HttpStatusCode.SERVICE_UNAVAILABLE
+      case ErrorCode.UNSUPPORTED_OPERATION:
+        return HttpStatusCode.BAD_REQUEST
       default:
         return HttpStatusCode.INTERNAL_SERVER_ERROR
     }

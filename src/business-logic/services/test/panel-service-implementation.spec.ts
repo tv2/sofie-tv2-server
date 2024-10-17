@@ -4,7 +4,7 @@ import {
 } from '../../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelConfigurationRepository } from '../../../data-access/interfaces/panel-configuration-repository'
 import { PanelEventEmitter } from '../interfaces/panel-event-emitter'
-import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { PanelService } from '../interfaces/panel-service'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { EntityTestFactory } from '../../../model/test/entity-test-factory'
@@ -43,14 +43,78 @@ describe(PanelServiceImplementation.name, () => {
   })
 
   describe(PanelServiceImplementation.prototype.deletePanelLayoutConfiguration.name, () => {
-    it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
-      const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
-      const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+    describe('no PanelConfigurations are using the PanelLayoutConfiguration', () => {
+      let panelConfigurationRepository: PanelConfigurationRepository
+      beforeEach(() => {
+        panelConfigurationRepository = mock<PanelConfigurationRepository>()
+        when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(anyString())).thenResolve([])
+      })
 
-      const testee: PanelService = createTestee({ panelEventEmitter })
-      await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+      it('deletes the PanelLayoutConfiguration', async() => {
+        const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+        const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
 
-      verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfiguration.id)).once()
+        const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+        await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+
+        verify(panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)).once()
+      })
+
+      it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
+        const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+        const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+        const testee: PanelService = createTestee({ panelEventEmitter, panelConfigurationRepository })
+        await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+
+        verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfiguration.id)).once()
+      })
+    })
+
+    describe('there are PanelConfigurations using the PanelLayoutConfiguration', () => {
+      let panelConfigurationRepository: PanelConfigurationRepository
+      beforeEach(() => {
+        panelConfigurationRepository = mock<PanelConfigurationRepository>()
+        when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(anyString())).thenResolve([
+          EntityTestFactory.createPanelConfiguration(),
+          EntityTestFactory.createPanelConfiguration()
+        ])
+      })
+
+      it('does not delete the PanelLayoutConfiguration', async() => {
+        const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+        const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+
+        const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+        try {
+          await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+        } catch (error) {
+          // The error is expected
+        }
+
+        verify(panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(anyString())).never()
+      })
+
+      it('does not emit a delete event', async() => {
+        const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+        const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+
+        const testee: PanelService = createTestee({ panelEventEmitter, panelConfigurationRepository })
+        try {
+          await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
+        } catch (error) {
+          // The error is expected
+        }
+
+        verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(anyString())).never()
+      })
+
+      it('throws an unsupported operation exception', async() => {
+        const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+
+        const testee: PanelService = createTestee({ panelConfigurationRepository })
+        await expect(() => testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)).rejects.toThrow(UnsupportedOperationException)
+      })
     })
   })
 
