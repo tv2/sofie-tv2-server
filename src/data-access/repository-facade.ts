@@ -6,6 +6,8 @@ import { MongoDatabase } from './mongo/mongo-database'
 import { LoggerFacade } from '../logger/logger-facade'
 import { UuidGenerator } from './interfaces/uuid-generator'
 import { CryptoUuidGenerator } from './crypto-uuid-generator'
+import { PanelConfigurationRepository } from './interfaces/panel-configuration-repository'
+import { MongoPanelConfigurationRepository } from './mongo/mongo-panel-configuration-repository'
 
 export class RepositoryFacade {
   public static createPhysicalPanelLayoutRepository(): PhysicalPanelLayoutRepository {
@@ -22,6 +24,10 @@ export class RepositoryFacade {
 
   public static createPanelLayoutConfigurationRepository(): PanelLayoutConfigurationRepository {
     return new MongoPanelLayoutConfigurationRepository(this.createMongoDatabase(), this.createUuidGenerator())
+  }
+
+  public static createPanelConfigurationRepository(): PanelConfigurationRepository {
+    return new MongoPanelConfigurationRepository(this.createMongoDatabase(), this.createUuidGenerator())
   }
 
   private static createUuidGenerator(): UuidGenerator {

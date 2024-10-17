@@ -5,6 +5,10 @@ import { EventEmitterFacade } from '../../../presentation/facades/event-emitter-
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
-    return new PanelServiceImplementation(RepositoryFacade.createPanelLayoutConfigurationRepository(), EventEmitterFacade.createPanelEventEmitter())
+    return new PanelServiceImplementation(
+      RepositoryFacade.createPanelLayoutConfigurationRepository(),
+      RepositoryFacade.createPanelConfigurationRepository(),
+      EventEmitterFacade.createPanelEventEmitter()
+    )
   }
 }

@@ -11,13 +11,17 @@ import { PanelService } from '../../business-logic/services/interfaces/panel-ser
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { HttpErrorHandler } from '../services/http-error-handler'
 import { HttpStatusCode } from '../enum/http-status-code'
+import {
+  PanelConfiguration,
+  ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID
+} from '../../model/interfaces/panel-configuration'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 
 @RestController('/panels')
 export class PanelController extends BaseController {
   public constructor(
     private readonly physicalPanelLayoutRepository: PhysicalPanelLayoutRepository,
-    private readonly panelLayoutConfigurationService: PanelService,
+    private readonly panelService: PanelService,
     private readonly httpResponseFormatter: HttpResponseFormatter,
     private readonly httpErrorHandler: HttpErrorHandler
   ) {
@@ -41,7 +45,7 @@ export class PanelController extends BaseController {
   @GetRequest('/panelLayoutConfigurations/:id')
   public async getPanelLayoutConfiguration(request: FastifyRequest<{ Params: Pick<PanelLayoutConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
-      const panelLayoutConfiguration: PanelLayoutConfiguration = await this.panelLayoutConfigurationService.getPanelLayoutConfiguration(request.params.id)
+      const panelLayoutConfiguration: PanelLayoutConfiguration = await this.panelService.getPanelLayoutConfiguration(request.params.id)
       await this.sendOkReply(reply, new PanelLayoutConfigurationDto(panelLayoutConfiguration))
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
@@ -51,7 +55,7 @@ export class PanelController extends BaseController {
   @GetRequest('/panelLayoutConfigurations')
   public async getPanelLayoutConfigurations(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
-      const panelLayoutConfigurations: PanelLayoutConfiguration[] = await this.panelLayoutConfigurationService.getPanelLayoutConfigurations()
+      const panelLayoutConfigurations: PanelLayoutConfiguration[] = await this.panelService.getPanelLayoutConfigurations()
       await this.sendOkReply(reply, panelLayoutConfigurations.map(panelLayoutConfiguration => new PanelLayoutConfigurationDto(panelLayoutConfiguration)))
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
@@ -62,8 +66,8 @@ export class PanelController extends BaseController {
   public async createPanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
-      await this.panelLayoutConfigurationService.createPanelLayoutConfiguration(panelLayoutConfiguration)
-      await this.sendOkReply(reply, panelLayoutConfiguration)
+      await this.panelService.createPanelLayoutConfiguration(panelLayoutConfiguration)
+      await this.sendOkReply(reply, 'Successfully created PanelLayoutConfiguration')
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }
@@ -73,7 +77,7 @@ export class PanelController extends BaseController {
   public async updatePanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body
-      await this.panelLayoutConfigurationService.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+      await this.panelService.updatePanelLayoutConfiguration(panelLayoutConfiguration)
       await this.sendOkReply(reply, `Successfully updated PanelLayoutConfiguration for ${panelLayoutConfiguration.id}`)
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
@@ -83,8 +87,19 @@ export class PanelController extends BaseController {
   @DeleteRequest('/panelLayoutConfigurations/:id')
   public async deletePanelLayoutConfiguration(request: FastifyRequest<{ Params: Pick<PanelLayoutConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
-      await this.panelLayoutConfigurationService.deletePanelLayoutConfiguration(request.params.id)
+      await this.panelService.deletePanelLayoutConfiguration(request.params.id)
       await this.sendOkReply(reply, `Successfully deleted PanelLayoutConfiguration for ${request.params.id}`)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @PostRequest('/panelConfigurations', ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID)
+  public async createPanelConfiguration(request: FastifyRequest<{ Body: PanelConfiguration }>, reply: FastifyReply): Promise<void> {
+    try {
+      const panelConfiguration: PanelConfiguration = request.body
+      await this.panelService.createPanelConfiguration(panelConfiguration)
+      await this.sendOkReply(reply, 'Successfully created PanelConfiguration')
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }

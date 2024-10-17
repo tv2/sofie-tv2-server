@@ -1,12 +1,15 @@
 import { PanelEventBuilder } from '../interfaces/panel-event-builder'
 import {
+  PanelConfigurationCreatedEvent,
   PanelLayoutConfigurationCreatedEvent,
-  PanelLayoutConfigurationDeletedEVent,
+  PanelLayoutConfigurationDeletedEvent,
   PanelLayoutConfigurationUpdatedEvent
 } from '../value-objects/panel-event'
 import { PanelEventType } from '../enum/event-type'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
+import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
+import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
 
 export class EventBuilder implements PanelEventBuilder {
   public buildPanelLayoutConfigurationCreatedEvent(panelLayoutConfiguration: PanelLayoutConfiguration): PanelLayoutConfigurationCreatedEvent {
@@ -25,11 +28,19 @@ export class EventBuilder implements PanelEventBuilder {
     }
   }
 
-  public buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId: string): PanelLayoutConfigurationDeletedEVent {
+  public buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId: string): PanelLayoutConfigurationDeletedEvent {
     return {
       type: PanelEventType.PANEL_LAYOUT_CONFIGURATION_DELETED,
       timestamp: Date.now(),
       panelLayoutConfigurationId
+    }
+  }
+
+  public buildPanelConfigurationCreatedEvent(panelConfiguration: PanelConfiguration): PanelConfigurationCreatedEvent {
+    return {
+      type: PanelEventType.PANEL_CONFIGURATION_CREATED,
+      timestamp: Date.now(),
+      panelConfiguration: new PanelConfigurationDto(panelConfiguration)
     }
   }
 }

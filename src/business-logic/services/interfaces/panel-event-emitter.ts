@@ -1,7 +1,10 @@
 import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
+import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
 
 export interface PanelEventEmitter {
   emitPanelLayoutConfigurationCreated(panelLayoutConfiguration: PanelLayoutConfiguration): void
   emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration: PanelLayoutConfiguration): void
   emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId: string): void
+
+  emitPanelConfigurationCreated(panelConfiguration: PanelConfiguration): void
 }
