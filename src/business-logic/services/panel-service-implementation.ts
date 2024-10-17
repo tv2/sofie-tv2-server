@@ -34,13 +34,17 @@ export class PanelServiceImplementation implements PanelService {
   }
 
   public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
+    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId)
+    await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
+    this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
+  }
+
+  private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
     const panelConfigurationsForPanelLayoutConfiguration: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId)
     if (panelConfigurationsForPanelLayoutConfiguration.length > 0) {
       const panelConfigurationIds: string[] = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.id)
       throw new UnsupportedOperationException(`Can't delete PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationIds}]`)
     }
-    await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
-    this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
   }
 
   public async createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void> {
