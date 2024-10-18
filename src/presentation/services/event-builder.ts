@@ -1,6 +1,7 @@
 import { PanelEventBuilder } from '../interfaces/panel-event-builder'
 import {
   PanelConfigurationCreatedEvent,
+  PanelConfigurationDeletedEvent,
   PanelConfigurationUpdatedEvent,
   PanelLayoutConfigurationCreatedEvent,
   PanelLayoutConfigurationDeletedEvent,
@@ -50,6 +51,14 @@ export class EventBuilder implements PanelEventBuilder {
       type: PanelEventType.PANEL_CONFIGURATION_UPDATED,
       timestamp: Date.now(),
       panelConfiguration: new PanelConfigurationDto(panelConfiguration)
+    }
+  }
+
+  public buildPanelConfigurationDeletedEvent(panelConfigurationId: string): PanelConfigurationDeletedEvent {
+    return {
+      type: PanelEventType.PANEL_CONFIGURATION_DELETED,
+      timestamp: Date.now(),
+      panelConfigurationId
     }
   }
 }

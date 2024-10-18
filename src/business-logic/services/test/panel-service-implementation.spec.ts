@@ -368,6 +368,30 @@ describe(PanelServiceImplementation.name, () => {
       })
     })
   })
+
+  describe(PanelServiceImplementation.prototype.deletePanelConfiguration.name, () => {
+    let panelConfiguration: PanelConfiguration
+    let panelConfigurationRepository: PanelConfigurationRepository
+    let panelEventEmitter: PanelEventEmitter
+
+    beforeEach(() => {
+      panelConfiguration = EntityTestFactory.createPanelConfiguration()
+      panelConfigurationRepository = mock<PanelConfigurationRepository>()
+      panelEventEmitter = mock<PanelEventEmitter>()
+    })
+
+    it('deletes the PanelConfiguration', async() => {
+      const testee: PanelService = createTestee({ panelConfigurationRepository })
+      await testee.deletePanelConfiguration(panelConfiguration.id)
+      verify(panelConfigurationRepository.deletePanelConfiguration(panelConfiguration.id)).once()
+    })
+
+    it('emits a deleted event', async() => {
+      const testee: PanelService = createTestee({ panelEventEmitter })
+      await testee.deletePanelConfiguration(panelConfiguration.id)
+      verify(panelEventEmitter.emitPanelConfigurationDeleted(panelConfiguration.id)).once()
+    })
+  })
 })
 
 function createTestee(params?: {

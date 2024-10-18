@@ -95,4 +95,9 @@ export class PanelServiceImplementation implements PanelService {
     await this.panelConfigurationRepository.updatePanelConfiguration(panelConfiguration)
     this.panelEventEmitter.emitPanelConfigurationUpdated(panelConfiguration)
   }
+
+  public async deletePanelConfiguration(panelConfigurationId: string): Promise<void> {
+    await this.panelConfigurationRepository.deletePanelConfiguration(panelConfigurationId)
+    this.panelEventEmitter.emitPanelConfigurationDeleted(panelConfigurationId)
+  }
 }

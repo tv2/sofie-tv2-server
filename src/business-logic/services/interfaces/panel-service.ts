@@ -12,4 +12,5 @@ export interface PanelService {
   getPanelConfigurations(): Promise<PanelConfiguration[]>
   createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void>
   updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void>
+  deletePanelConfiguration(panelConfigurationId: string): Promise<void>
 }

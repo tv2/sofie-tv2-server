@@ -51,4 +51,9 @@ export class MongoPanelConfigurationRepository extends BaseMongoRepository<Mongo
     this.assertDatabaseConnection(this.updatePanelConfiguration.name)
     await this.getCollection().updateOne({ id: panelConfiguration.id }, { $set: panelConfiguration })
   }
+
+  public async deletePanelConfiguration(panelConfigurationId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deletePanelConfiguration.name)
+    await this.getCollection().deleteOne({ id: panelConfigurationId })
+  }
 }

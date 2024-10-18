@@ -1,5 +1,6 @@
 import {
   PanelConfigurationCreatedEvent,
+  PanelConfigurationDeletedEvent,
   PanelConfigurationUpdatedEvent,
   PanelLayoutConfigurationCreatedEvent,
   PanelLayoutConfigurationDeletedEvent,
@@ -15,4 +16,5 @@ export interface PanelEventBuilder {
 
   buildPanelConfigurationCreatedEvent(panelConfiguration: PanelConfiguration): PanelConfigurationCreatedEvent
   buildPanelConfigurationUpdateEvent(panelConfiguration: PanelConfiguration): PanelConfigurationUpdatedEvent
+  buildPanelConfigurationDeletedEvent(panelConfigurationId: string): PanelConfigurationDeletedEvent
 }

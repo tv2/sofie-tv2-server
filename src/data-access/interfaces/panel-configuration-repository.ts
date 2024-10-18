@@ -6,4 +6,5 @@ export interface PanelConfigurationRepository {
   getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelConfiguration[]>
   createPanelConfiguration(panelConfigurationWithoutId: Omit<PanelConfiguration, 'id'>): Promise<PanelConfiguration>
   updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void>
+  deletePanelConfiguration(panelConfigurationId: string): Promise<void>
 }
