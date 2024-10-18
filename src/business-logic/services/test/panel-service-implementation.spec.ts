@@ -1,4 +1,4 @@
-import { PanelServiceImplementation } from '../panel-service-implementation'
+import { PanelConfigurationService } from '../panel-configuration-service'
 import {
   PanelLayoutConfigurationRepository
 } from '../../../data-access/interfaces/panel-layout-configuration-repository'
@@ -13,7 +13,7 @@ import { UnsupportedOperationException } from '../../../model/exceptions/unsuppo
 import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
 import { PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
 
-describe(PanelServiceImplementation.name, () => {
+describe(PanelConfigurationService.name, () => {
   let testee: PanelService
 
   let panelLayoutConfiguration: PanelLayoutConfiguration
@@ -34,7 +34,7 @@ describe(PanelServiceImplementation.name, () => {
     testee = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
   })
 
-  describe(PanelServiceImplementation.prototype.createPanelLayoutConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.createPanelLayoutConfiguration.name, () => {
     beforeEach(() => {
       when(panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)).thenReturn(Promise.resolve(panelLayoutConfiguration))
     })
@@ -50,7 +50,7 @@ describe(PanelServiceImplementation.name, () => {
     })
   })
 
-  describe(PanelServiceImplementation.prototype.updatePanelLayoutConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.updatePanelLayoutConfiguration.name, () => {
     describe('there are PanelConfigurations using the PanelLayoutConfiguration', () => {
       beforeEach(() => {
         when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve([
@@ -98,7 +98,7 @@ describe(PanelServiceImplementation.name, () => {
     })
   })
 
-  describe(PanelServiceImplementation.prototype.deletePanelLayoutConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.deletePanelLayoutConfiguration.name, () => {
     describe('no PanelConfigurations are using the PanelLayoutConfiguration', () => {
       beforeEach(() => {
         when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(anyString())).thenResolve([])
@@ -148,7 +148,7 @@ describe(PanelServiceImplementation.name, () => {
     })
   })
 
-  describe(PanelServiceImplementation.prototype.createPanelConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.createPanelConfiguration.name, () => {
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       beforeEach(() => {
         panelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingPanelLayoutConfigurationId' })
@@ -246,7 +246,7 @@ describe(PanelServiceImplementation.name, () => {
     })
   })
 
-  describe(PanelServiceImplementation.prototype.updatePanelConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.updatePanelConfiguration.name, () => {
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       beforeEach(() => {
         panelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingId' })
@@ -342,7 +342,7 @@ describe(PanelServiceImplementation.name, () => {
     })
   })
 
-  describe(PanelServiceImplementation.prototype.deletePanelConfiguration.name, () => {
+  describe(PanelConfigurationService.prototype.deletePanelConfiguration.name, () => {
     it('deletes the PanelConfiguration', async() => {
       await testee.deletePanelConfiguration(panelConfiguration.id)
       verify(panelConfigurationRepository.deletePanelConfiguration(panelConfiguration.id)).once()
@@ -359,8 +359,8 @@ function createTestee(params?: {
   panelLayoutConfigurationRepository?: PanelLayoutConfigurationRepository
   panelConfigurationRepository?: PanelConfigurationRepository
   panelEventEmitter?: PanelEventEmitter
-}): PanelServiceImplementation {
-  return new PanelServiceImplementation(
+}): PanelConfigurationService {
+  return new PanelConfigurationService(
     instance(params?.panelLayoutConfigurationRepository ?? mock<PanelLayoutConfigurationRepository>()),
     instance(params?.panelConfigurationRepository ?? mock<PanelConfigurationRepository>()),
     instance(params?.panelEventEmitter ?? mock<PanelEventEmitter>())
