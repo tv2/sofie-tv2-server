@@ -32,6 +32,11 @@ export class MongoPanelConfigurationRepository extends BaseMongoRepository<Mongo
     return this.getCollection().find<PanelConfiguration>({}).toArray()
   }
 
+  public async getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelConfiguration[]> {
+    this.assertDatabaseConnection(this.getPanelConfigurationsForPanelLayoutConfiguration.name)
+    return await this.getCollection().find({ panelLayoutConfigurationId: panelLayoutConfigurationId }).toArray()
+  }
+
   public async createPanelConfiguration(panelConfigurationWithoutId: Omit<PanelConfiguration, 'id'>): Promise<PanelConfiguration> {
     this.assertDatabaseConnection(this.createPanelConfiguration.name)
     const panelConfigurationToBeInserted: PanelConfiguration = {
@@ -42,8 +47,8 @@ export class MongoPanelConfigurationRepository extends BaseMongoRepository<Mongo
     return panelConfigurationToBeInserted
   }
 
-  public async getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelConfiguration[]> {
-    this.assertDatabaseConnection(this.getPanelConfigurationsForPanelLayoutConfiguration.name)
-    return await this.getCollection().find({ panelLayoutConfigurationId: panelLayoutConfigurationId }).toArray()
+  public async updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void> {
+    this.assertDatabaseConnection(this.updatePanelConfiguration.name)
+    await this.getCollection().updateOne({ id: panelConfiguration.id }, { $set: panelConfiguration })
   }
 }

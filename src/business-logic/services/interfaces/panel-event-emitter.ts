@@ -7,4 +7,5 @@ export interface PanelEventEmitter {
   emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId: string): void
 
   emitPanelConfigurationCreated(panelConfiguration: PanelConfiguration): void
+  emitPanelConfigurationUpdated(panelConfiguration: PanelConfiguration): void
 }

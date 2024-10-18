@@ -40,6 +40,10 @@ export class PanelEventService implements PanelEventEmitter, PanelEventObserver 
     this.emitPanelEvent(this.panelEventBuilder.buildPanelConfigurationCreatedEvent(panelConfiguration))
   }
 
+  public emitPanelConfigurationUpdated(panelConfiguration: PanelConfiguration): void {
+    this.emitPanelEvent(this.panelEventBuilder.buildPanelConfigurationUpdateEvent(panelConfiguration))
+  }
+
   public subscribeToPanelEvents(onPanelEventCallback: (panelEvent: PanelEvent) => void): void {
     this.callbacks.push(onPanelEventCallback)
   }
