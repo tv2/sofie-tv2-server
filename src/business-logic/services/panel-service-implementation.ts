@@ -29,21 +29,22 @@ export class PanelServiceImplementation implements PanelService {
   }
 
   public async updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
+    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfiguration.id, 'update')
     await this.panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(panelLayoutConfiguration)
     this.panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)
   }
 
   public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
-    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId)
+    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId, 'delete')
     await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
     this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
   }
 
-  private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
+  private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string, verb: string): Promise<void> {
     const panelConfigurationsForPanelLayoutConfiguration: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId)
     if (panelConfigurationsForPanelLayoutConfiguration.length > 0) {
       const panelConfigurationIds: string[] = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.id)
-      throw new UnsupportedOperationException(`Can't delete PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationIds}]`)
+      throw new UnsupportedOperationException(`Can't ${verb} PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationIds}]`)
     }
   }
 

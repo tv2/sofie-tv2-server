@@ -31,14 +31,68 @@ describe(PanelServiceImplementation.name, () => {
   })
 
   describe(PanelServiceImplementation.prototype.updatePanelLayoutConfiguration.name, () => {
-    it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
-      const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
-      const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
+    let testee: PanelService
 
-      const testee: PanelService = createTestee({ panelEventEmitter })
-      await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+    let panelLayoutConfiguration: PanelLayoutConfiguration
 
-      verify(panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
+    let panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository
+    let panelConfigurationRepository: PanelConfigurationRepository
+    let panelEventEmitter: PanelEventEmitter
+
+    beforeEach(() => {
+      panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+
+      panelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+      panelConfigurationRepository = mock<PanelConfigurationRepository>()
+      panelEventEmitter = mock<PanelEventEmitter>()
+
+      testee = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
+    })
+
+    describe('there are PanelConfigurations using the PanelLayoutConfiguration', () => {
+      beforeEach(() => {
+        when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve([
+          EntityTestFactory.createPanelConfiguration()
+        ])
+      })
+
+      it('does not update the PanelLayoutConfiguration', async() => {
+        try {
+          await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+        } catch (error) {
+          // Expected error
+        }
+        verify(panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(anything())).never()
+      })
+
+      it('does not emit an update event', async() => {
+        try {
+          await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+        } catch (error) {
+          // Expected error
+        }
+        verify(panelEventEmitter.emitPanelLayoutConfigurationUpdated(anything())).never()
+      })
+
+      it('throws an unsupported operation exception', () => {
+        expect(() => testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)).rejects.toThrow(UnsupportedOperationException)
+      })
+    })
+
+    describe('there are no PanelConfigurations using the PanelLayoutConfiguration', () => {
+      beforeEach(() => {
+        when(panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve([])
+      })
+
+      it('updates the panelLayoutConfiguration', async() => {
+        await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+        verify(panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(panelLayoutConfiguration)).once()
+      })
+
+      it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
+        await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+        verify(panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
+      })
     })
   })
 
