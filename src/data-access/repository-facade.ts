@@ -8,6 +8,8 @@ import { UuidGenerator } from './interfaces/uuid-generator'
 import { CryptoUuidGenerator } from './crypto-uuid-generator'
 import { PanelConfigurationRepository } from './interfaces/panel-configuration-repository'
 import { MongoPanelConfigurationRepository } from './mongo/mongo-panel-configuration-repository'
+import { StatusMessageRepository } from './interfaces/status-message-repository'
+import { InMemoryStatusMessageRepository } from './in-memory/in-memory-status-message-repository'
 
 export class RepositoryFacade {
   public static createPhysicalPanelLayoutRepository(): PhysicalPanelLayoutRepository {
@@ -32,5 +34,9 @@ export class RepositoryFacade {
 
   private static createUuidGenerator(): UuidGenerator {
     return new CryptoUuidGenerator()
+  }
+
+  public static createStatusMessageRepository(): StatusMessageRepository {
+    return new InMemoryStatusMessageRepository()
   }
 }

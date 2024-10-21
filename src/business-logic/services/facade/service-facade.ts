@@ -6,6 +6,7 @@ import { PanelManager } from '../interfaces/panel-manager'
 import { PanelManagerImplementation } from '../panel-manager-implementation'
 import { LoggerFacade } from '../../../logger/logger-facade'
 import { PanelFactory } from '../panel-factory'
+import { StatusMessageService } from '../../status-message-service'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -18,9 +19,20 @@ export class ServiceFacade {
 
   public static createPanelManager(): PanelManager {
     return new PanelManagerImplementation(
-      new PanelFactory(LoggerFacade.createLogger()),
+      ServiceFacade.createPanelFactory(),
       RepositoryFacade.createPanelConfigurationRepository(),
       LoggerFacade.createLogger()
+    )
+  }
+
+  public static createPanelFactory(): PanelFactory {
+    return new PanelFactory(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
+  }
+
+  public static createStatusMessageService(): StatusMessageService {
+    return new StatusMessageService(
+      RepositoryFacade.createStatusMessageRepository(),
+      EventEmitterFacade.createStatusMessageEventEmitter()
     )
   }
 }

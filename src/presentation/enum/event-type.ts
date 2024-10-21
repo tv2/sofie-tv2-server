@@ -1,4 +1,4 @@
-export type EventType = PanelEventType
+export type EventType = PanelEventType | StatusMessageEventType
 
 export enum PanelEventType {
   PANEL_LAYOUT_CONFIGURATION_CREATED = 'PANEL_LAYOUT_CONFIGURATION_CREATED',
@@ -8,4 +8,8 @@ export enum PanelEventType {
   PANEL_CONFIGURATION_CREATED = 'PANEL_CONFIGURATION_CREATED',
   PANEL_CONFIGURATION_UPDATED = 'PANEL_CONFIGURATION_UPDATED',
   PANEL_CONFIGURATION_DELETED = 'PANEL_CONFIGURATION_DELETED'
+}
+
+export enum StatusMessageEventType {
+  STATUS_MESSAGE = 'STATUS_MESSAGE'
 }

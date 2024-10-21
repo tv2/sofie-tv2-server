@@ -16,12 +16,17 @@ const controllers: BaseController[] = ControllerFacade.getControllers()
 
 async function startAlbaTv2Server(logger: Logger): Promise<void> {
   await connectToDatabase(logger)
+  await startProxyServer(logger).catch(error => logger.data(error).error('Failed to start proxy server'))
   await startSystemServices()
-  startProxyServer(logger).catch(error => logger.data(error).error('Failed to start proxy server'))
 }
 
 async function startProxyServer(logger: Logger): Promise<void> {
-  const proxyServer: ProxyServer = new FastifyServer(logger, controllers, EventEmitterFacade.createPanelEventObserver())
+  const proxyServer: ProxyServer = new FastifyServer(
+    logger,
+    controllers,
+    EventEmitterFacade.createPanelEventObserver(),
+    EventEmitterFacade.createStatusMessageEventObserver()
+  )
   await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: SOFIE_REST_URL, websocketUrl: SOFIE_WEBSOCKET_URL })
 }
 
