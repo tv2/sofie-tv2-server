@@ -8,5 +8,7 @@ export interface PanelService {
   updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void>
   deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void>
 
+  getPanelConfiguration(panelConfigurationId: string): Promise<PanelConfiguration>
+  getPanelConfigurations(): Promise<PanelConfiguration[]>
   createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void>
 }

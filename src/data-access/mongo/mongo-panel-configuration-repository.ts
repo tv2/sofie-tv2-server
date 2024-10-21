@@ -3,6 +3,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase, MongoId } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
+import { NotFoundException } from '../../model/exceptions/not-found-exception'
 
 const PANEL_CONFIGURATION_COLLECTION_NAME: string = 'panelConfigurations'
 
@@ -15,6 +16,20 @@ export class MongoPanelConfigurationRepository extends BaseMongoRepository<Mongo
 
   protected override getCollectionName(): string {
     return PANEL_CONFIGURATION_COLLECTION_NAME
+  }
+
+  public async getPanelConfiguration(panelConfigurationId: string): Promise<PanelConfiguration> {
+    this.assertDatabaseConnection(this.getPanelConfiguration.name)
+    const panelConfiguration: PanelConfiguration | null = await this.getCollection().findOne({ id: panelConfigurationId })
+    if (!panelConfiguration) {
+      throw new NotFoundException(`No PanelConfiguration found in database for: ${panelConfigurationId}`)
+    }
+    return panelConfiguration
+  }
+
+  public getPanelConfigurations(): Promise<PanelConfiguration[]> {
+    this.assertDatabaseConnection(this.getPanelConfigurations.name)
+    return this.getCollection().find<PanelConfiguration>({}).toArray()
   }
 
   public async createPanelConfiguration(panelConfigurationWithoutId: Omit<PanelConfiguration, 'id'>): Promise<PanelConfiguration> {

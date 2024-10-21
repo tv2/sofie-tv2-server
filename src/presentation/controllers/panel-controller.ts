@@ -16,6 +16,7 @@ import {
   ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID
 } from '../../model/interfaces/panel-configuration'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
 
 @RestController('/panels')
 export class PanelController extends BaseController {
@@ -89,6 +90,26 @@ export class PanelController extends BaseController {
     try {
       await this.panelService.deletePanelLayoutConfiguration(request.params.id)
       await this.sendOkReply(reply, `Successfully deleted PanelLayoutConfiguration for ${request.params.id}`)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @GetRequest('/panelConfigurations/:id')
+  public async getPanelConfiguration(request: FastifyRequest<{ Params: Pick<PanelConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
+    try {
+      const panelConfiguration: PanelConfiguration = await this.panelService.getPanelConfiguration(request.params.id)
+      await this.sendOkReply(reply, new PanelConfigurationDto(panelConfiguration))
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @GetRequest('/panelConfigurations')
+  public async getPanelConfigurations(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    try {
+      const panelConfigurations: PanelConfiguration[] = await this.panelService.getPanelConfigurations()
+      await this.sendOkReply(reply, panelConfigurations.map(panelConfiguration => new PanelConfigurationDto(panelConfiguration)))
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }
