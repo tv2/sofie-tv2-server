@@ -1,12 +1,14 @@
 import { PanelConfigurationRepository } from '../interfaces/panel-configuration-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase, MongoId } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 
 const PANEL_CONFIGURATION_COLLECTION_NAME: string = 'panelConfigurations'
 
-export class MongoPanelConfigurationRepository extends BaseMongoRepository implements PanelConfigurationRepository {
+interface MongoPanelConfiguration extends PanelConfiguration, MongoId {}
+
+export class MongoPanelConfigurationRepository extends BaseMongoRepository<MongoPanelConfiguration> implements PanelConfigurationRepository {
   public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
@@ -23,5 +25,10 @@ export class MongoPanelConfigurationRepository extends BaseMongoRepository imple
     }
     await this.getCollection().updateOne({ id: panelConfigurationToBeInserted.id }, { $set: panelConfigurationToBeInserted }, { upsert: true })
     return panelConfigurationToBeInserted
+  }
+
+  public async getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelConfiguration[]> {
+    this.assertDatabaseConnection(this.getPanelConfigurationsForPanelLayoutConfiguration.name)
+    return this.getCollection().find({ panelLayoutConfigurationId: panelLayoutConfigurationId }).toArray()
   }
 }
