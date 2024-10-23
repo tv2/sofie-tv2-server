@@ -1,12 +1,12 @@
-import { Panel } from '../interfaces/panel'
-import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
-import { PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { Panel } from '../services/interfaces/panel'
+import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
+import { PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
-import { Logger } from '../../../logger/logger'
-import { StatusMessageService } from '../../status-message-service'
-import { StatusMessage } from '../../../model/entities/status-message'
-import { StatusCode } from '../../../model/enums/status-code'
+import { Logger } from '../../logger/logger'
+import { StatusMessageService } from '../services/status-message-service'
+import { StatusMessage } from '../../model/entities/status-message'
+import { StatusCode } from '../../model/enums/status-code'
 
 const SKAARHOJ_PORT: number = 9923
 

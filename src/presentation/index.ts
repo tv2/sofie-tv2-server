@@ -6,7 +6,7 @@ import { ControllerFacade } from './facades/controller-facade'
 import { LoggerFacade } from '../logger/logger-facade'
 import { RepositoryFacade } from '../data-access/repository-facade'
 import { EventEmitterFacade } from './facades/event-emitter-facade'
-import { ServiceFacade } from '../business-logic/services/facade/service-facade'
+import { ServiceFacade } from '../business-logic/facades/service-facade'
 
 const SOFIE_REST_URL: string = 'http://localhost:3005'
 const SOFIE_WEBSOCKET_URL: string = 'ws://localhost:3006'

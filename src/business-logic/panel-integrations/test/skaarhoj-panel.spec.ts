@@ -1,11 +1,11 @@
 import { SkaarhojPanel } from '../skaarhoj-panel'
-import { PanelConfiguration } from '../../../../model/interfaces/panel-configuration'
-import { EntityTestFactory } from '../../../../model/test/entity-test-factory'
-import { PanelModel, PanelType, SkaarhojModel } from '../../../../model/enums/panel-enums'
-import { UnsupportedOperationException } from '../../../../model/exceptions/unsupported-operation-exception'
-import { Logger } from '../../../../logger/logger'
+import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
+import { EntityTestFactory } from '../../../model/test/entity-test-factory'
+import { PanelModel, PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
+import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { Logger } from '../../../logger/logger'
 import { instance, mock } from '@typestrong/ts-mockito'
-import { StatusMessageService } from '../../../status-message-service'
+import { StatusMessageService } from '../../services/status-message-service'
 
 describe(SkaarhojPanel.name, () => {
   let panelConfiguration: PanelConfiguration

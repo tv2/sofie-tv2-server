@@ -2,7 +2,7 @@ import { StatusMessageEventEmitter } from '../../business-logic/services/interfa
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
-import { StatusMessageEventType } from '../enum/event-type'
+import { StatusMessageEventType } from '../enums/event-type'
 
 export class StatusMessageEventService implements StatusMessageEventEmitter, StatusMessageEventObserver {
   private static instance: StatusMessageEventService

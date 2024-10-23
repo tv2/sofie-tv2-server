@@ -1,10 +1,10 @@
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { Panel } from './interfaces/panel'
+import { Panel } from '../services/interfaces/panel'
 import { PanelType } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
-import { SkaarhojPanel } from './panel-integrations/skaarhoj-panel'
+import { SkaarhojPanel } from './skaarhoj-panel'
 import { Logger } from '../../logger/logger'
-import { StatusMessageService } from '../status-message-service'
+import { StatusMessageService } from '../services/status-message-service'
 
 export class PanelFactory {
   public constructor(private readonly statusMessageService: StatusMessageService, private readonly logger: Logger) {}

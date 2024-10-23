@@ -1,5 +1,5 @@
 import { TypedEvent } from './typed-event'
-import { EventType, PanelEventType } from '../enum/event-type'
+import { EventType, PanelEventType } from '../enums/event-type'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
 

@@ -1,6 +1,8 @@
 import { PanelConfiguration } from '../interfaces/panel-configuration'
 import { PanelType, SkaarhojModel } from '../enums/panel-enums'
 import { PanelLayoutConfiguration } from '../interfaces/panel-layout-configuration'
+import { StatusMessage } from '../entities/status-message'
+import { StatusCode } from '../enums/status-code'
 
 export class EntityTestFactory {
   public static createPanelLayoutConfiguration(panelLayoutConfiguration?: Partial<PanelLayoutConfiguration>): PanelLayoutConfiguration {
@@ -22,6 +24,16 @@ export class EntityTestFactory {
       hostname: 'randomHostName',
       panelLayoutConfigurationId: 'randomPanelLayoutConfigurationId',
       ...panelConfiguration
+    }
+  }
+
+  public static createStatusMessage(statusMessage?: Partial<StatusMessage>): StatusMessage {
+    return {
+      id: 'randomStatusMessageId',
+      title: 'randomTitle',
+      message: 'randomMessage',
+      statusCode: StatusCode.UNKNOWN,
+      ...statusMessage
     }
   }
 }

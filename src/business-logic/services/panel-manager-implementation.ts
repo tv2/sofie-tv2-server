@@ -2,7 +2,7 @@ import { PanelManager } from './interfaces/panel-manager'
 import { Logger } from '../../logger/logger'
 import { PanelConfigurationRepository } from '../../data-access/interfaces/panel-configuration-repository'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { PanelFactory } from './panel-factory'
+import { PanelFactory } from '../panel-integrations/panel-factory'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger

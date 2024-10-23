@@ -7,7 +7,7 @@ import {
   PanelLayoutConfigurationDeletedEvent,
   PanelLayoutConfigurationUpdatedEvent
 } from '../value-objects/panel-event'
-import { PanelEventType } from '../enum/event-type'
+import { PanelEventType } from '../enums/event-type'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'

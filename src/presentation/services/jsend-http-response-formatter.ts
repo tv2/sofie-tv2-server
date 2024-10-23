@@ -1,11 +1,6 @@
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { ErrorCode } from '../../model/enums/error-code'
-
-enum RequestStatus {
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
-  ERROR = 'ERROR'
-}
+import { RequestStatus } from '../../business-logic/enums/request-status'
 
 export class JsendHttpResponseFormatter implements HttpResponseFormatter {
   public formatSuccessResponse(data?: unknown): object {
