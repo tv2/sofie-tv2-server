@@ -13,6 +13,7 @@ import { HttpErrorHandler } from '../services/http-error-handler'
 import { HttpStatusCode } from '../enum/http-status-code'
 import {
   PanelConfiguration,
+  ZOD_PANEL_CONFIGURATION_SCHEMA,
   ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID
 } from '../../model/interfaces/panel-configuration'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
@@ -121,6 +122,17 @@ export class PanelController extends BaseController {
       const panelConfiguration: PanelConfiguration = request.body
       await this.panelService.createPanelConfiguration(panelConfiguration)
       await this.sendOkReply(reply, 'Successfully created PanelConfiguration')
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @PutRequest('/panelConfigurations', ZOD_PANEL_CONFIGURATION_SCHEMA)
+  public async updatePanelConfiguration(request: FastifyRequest<{ Body: PanelConfiguration }>, reply: FastifyReply): Promise<void> {
+    try {
+      const panelConfiguration: PanelConfiguration = request.body
+      await this.panelService.updatePanelConfiguration(panelConfiguration)
+      await this.sendOkReply(reply, 'Successfully updated PanelConfiguration')
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }

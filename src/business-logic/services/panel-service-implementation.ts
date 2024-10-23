@@ -56,25 +56,35 @@ export class PanelServiceImplementation implements PanelService {
   }
 
   public async createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void> {
-    let panelLayoutConfiguration: PanelLayoutConfiguration
+    const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfigurationWithoutId.panelLayoutConfigurationId, 'create')
+    this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfigurationWithoutId, 'create')
+
+    const panelConfiguration: PanelConfiguration = await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
+    this.panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)
+  }
+
+  private assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration: PanelLayoutConfiguration, panelConfiguration: PanelConfiguration, operation: string): void {
+    if (panelLayoutConfiguration.model !== panelConfiguration.model || panelLayoutConfiguration.type !== panelConfiguration.type) {
+      throw new UnsupportedOperationException(`Unable to ${operation} panel, since panel model and/or panel type are incompatible with the chosen panel layout`)
+    }
+  }
+
+  private async fetchPanelLayoutConfiguration(panelLayoutConfigurationId: string, operation: string): Promise<PanelLayoutConfiguration> {
     try {
-      panelLayoutConfiguration = await this.panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfigurationWithoutId.panelLayoutConfigurationId)
+      return await this.panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfigurationId)
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error
       }
-      throw new UnsupportedOperationException(`Can't create PanelConfiguration. No PanelLayoutConfiguration exist for ${panelConfigurationWithoutId.panelLayoutConfigurationId}`)
+      throw new UnsupportedOperationException(`Can't ${operation} PanelConfiguration. No PanelLayoutConfiguration exist for ${panelLayoutConfigurationId}`)
     }
+  }
 
-    if (panelLayoutConfiguration.model !== panelConfigurationWithoutId.model || panelLayoutConfiguration.type !== panelConfigurationWithoutId.type) {
-      throw new UnsupportedOperationException(
-        'Can\'t create PanelConfiguration. Both PanelModel and PanelType needs to match on PanelConfiguration and PanelLayoutConfiguration.'
-        + `PanelConfiguration: Model ${panelConfigurationWithoutId.model}, Type: ${panelConfigurationWithoutId.type} - `
-        + `PanelLayoutConfiguration: Model: ${panelLayoutConfiguration.model}, Type: ${panelLayoutConfiguration.type}`
-      )
-    }
+  public async updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void> {
+    const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId, 'update')
+    this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfiguration, 'update')
 
-    const panelConfiguration: PanelConfiguration = await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
-    this.panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)
+    await this.panelConfigurationRepository.updatePanelConfiguration(panelConfiguration)
+    this.panelEventEmitter.emitPanelConfigurationUpdated(panelConfiguration)
   }
 }

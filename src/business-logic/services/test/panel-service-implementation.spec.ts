@@ -11,7 +11,7 @@ import { EntityTestFactory } from '../../../model/test/entity-test-factory'
 import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
-import { PanelModel, PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
+import { PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
 
 describe(PanelServiceImplementation.name, () => {
   describe(PanelServiceImplementation.prototype.createPanelLayoutConfiguration.name, () => {
@@ -119,11 +119,25 @@ describe(PanelServiceImplementation.name, () => {
   })
 
   describe(PanelServiceImplementation.prototype.createPanelConfiguration.name, () => {
+    let panelConfiguration: PanelConfiguration
+    let panelLayoutConfiguration: PanelLayoutConfiguration
+
+    let panelEventEmitter: PanelEventEmitter
+    let panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository
+    let panelConfigurationRepository: PanelConfigurationRepository
+
+    beforeEach(() => {
+      panelConfiguration = EntityTestFactory.createPanelConfiguration()
+      panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+
+      panelConfigurationRepository = mock<PanelConfigurationRepository>()
+      panelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+      panelEventEmitter = mock<PanelEventEmitter>()
+    })
+
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       it('throws an Unsupported Operation error', async() => {
         const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingPanelLayoutConfigurationId' })
-
-        const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
         when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenThrow(new NotFoundException(''))
 
         const testee: PanelService = createTestee({ panelLayoutConfigurationRepository })
@@ -132,44 +146,25 @@ describe(PanelServiceImplementation.name, () => {
       })
     })
 
-    describe('a PanelLayoutConfiguration exits', () => {
+    describe('a PanelLayoutConfiguration exists', () => {
       describe('the PanelLayoutConfiguration conforms to the PanelConfiguration', () => {
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ model: SkaarhojModel.MK48, type: PanelType.SKAARHOJ })
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
+
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ model: panelLayoutConfiguration.model, type: panelLayoutConfiguration.type, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+          when(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).thenResolve(panelConfiguration)
+        })
+
         it('saves the PanelConfiguration', async() => {
-          const panelType: PanelType = PanelType.SKAARHOJ
-          const panelModel: PanelModel = SkaarhojModel.MKT1A
-
-          const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: panelType, model: panelModel })
-          const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ type: panelType, model: panelModel, panelLayoutConfigurationId: panelLayoutConfiguration.id })
-
-          const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
-          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenReturn(Promise.resolve(panelLayoutConfiguration))
-
-          const panelConfigurationRepository: PanelConfigurationRepository = mock<PanelConfigurationRepository>()
-
           const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
-
           await testee.createPanelConfiguration(panelConfiguration)
 
           verify(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).once()
         })
 
         it('emits a PanelConfigurationCreatedEvent', async() => {
-          const panelType: PanelType = PanelType.SKAARHOJ
-          const panelModel: PanelModel = SkaarhojModel.MKT1A
-
-          const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: panelType, model: panelModel })
-          const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ type: panelType, model: panelModel, panelLayoutConfigurationId: panelLayoutConfiguration.id })
-
-          const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
-          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenReturn(Promise.resolve(panelLayoutConfiguration))
-
-          const panelConfigurationRepository: PanelConfigurationRepository = mock<PanelConfigurationRepository>()
-          when(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).thenReturn(Promise.resolve(panelConfiguration))
-
-          const panelEventEmitter: PanelEventEmitter = mock<PanelEventEmitter>()
-
           const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
-
           await testee.createPanelConfiguration(panelConfiguration)
 
           verify(panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)).once()
@@ -177,38 +172,198 @@ describe(PanelServiceImplementation.name, () => {
       })
 
       describe('the PanelLayoutConfiguration.model is not equal to PanelConfiguration.model', () => {
-        it('does not save the PanelConfiguration and throws an Unsupported Operation exception', async() => {
-          const panelType: PanelType = PanelType.SKAARHOJ
-          const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: panelType, model: SkaarhojModel.MKT1A })
-          const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ type: panelType, model: SkaarhojModel.MK48, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ model: SkaarhojModel.MK48 })
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
 
-          const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
-          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenReturn(Promise.resolve(panelLayoutConfiguration))
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ model: SkaarhojModel.MKT1A, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+          when(panelConfigurationRepository.createPanelConfiguration(panelConfiguration)).thenResolve(panelConfiguration)
+        })
 
-          const panelConfigurationRepository: PanelConfigurationRepository = mock<PanelConfigurationRepository>()
-
+        it('does not save the PanelConfiguration', async() => {
           const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+          try {
+            await testee.createPanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
 
-          await expect(() => testee.createPanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
           verify(panelConfigurationRepository.createPanelConfiguration(anything())).never()
+        })
+
+        it('does not emit a created event', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
+          try {
+            await testee.createPanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+
+          verify(panelEventEmitter.emitPanelConfigurationCreated(anything())).never()
+        })
+
+        it('throws an unsupported operation exception', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository })
+          await expect(() => testee.createPanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
         })
       })
 
       describe('the PanelLayoutConfiguration.type is not equal to the PanelConfiguration.type', () => {
-        it('does not save the PanelConfiguration and throws an Unsupported Operation exception', async() => {
-          const panelModel: PanelModel = SkaarhojModel.MK48
-          const panelLayoutConfiguration: PanelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: PanelType.SKAARHOJ, model: panelModel })
-          const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ type: 'RANDOM_PANEL_TYPE' as PanelType, model: panelModel, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: PanelType.SKAARHOJ })
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
 
-          const panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
-          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenReturn(Promise.resolve(panelLayoutConfiguration))
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ type: 'RANDOM_PANEL_TYPE' as PanelType, model: panelLayoutConfiguration.model, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        })
 
-          const panelConfigurationRepository: PanelConfigurationRepository = mock<PanelConfigurationRepository>()
-
+        it('does not save the PanelConfiguration', async() => {
           const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
-
-          await expect(() => testee.createPanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+          try {
+            await testee.createPanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
           verify(panelConfigurationRepository.createPanelConfiguration(anything())).never()
+        })
+
+        it('does not emit a created event', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
+          try {
+            await testee.createPanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+          verify(panelEventEmitter.emitPanelConfigurationCreated(anything())).never()
+        })
+
+        it('throws an unsupported operation exception', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+          await expect(() => testee.createPanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+        })
+      })
+    })
+  })
+
+  describe(PanelServiceImplementation.prototype.updatePanelConfiguration.name, () => {
+    let panelConfiguration: PanelConfiguration
+    let panelLayoutConfiguration: PanelLayoutConfiguration
+
+    let panelConfigurationRepository: PanelConfigurationRepository
+    let panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository
+    let panelEventEmitter: PanelEventEmitter
+
+    beforeEach(() => {
+      panelConfiguration = EntityTestFactory.createPanelConfiguration()
+      panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+
+      panelConfigurationRepository = mock<PanelConfigurationRepository>()
+      panelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
+      panelEventEmitter = mock<PanelEventEmitter>()
+    })
+
+    describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
+      it('throws an Unsupported Operation error', async() => {
+        const panelConfiguration: PanelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingId' })
+        when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenThrow(new NotFoundException(''))
+
+        const testee: PanelService = createTestee({ panelLayoutConfigurationRepository })
+        await expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+      })
+    })
+
+    describe('a PanelLayoutConfiguration exists', () => {
+      describe('the PanelLayout conforms to the PanelConfiguration', () => {
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
+
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ model: panelLayoutConfiguration.model, type: panelLayoutConfiguration.type, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        })
+
+        it('updates the PanelConfiguration', async() => {
+          const testee: PanelService = createTestee({ panelConfigurationRepository, panelLayoutConfigurationRepository })
+          await testee.updatePanelConfiguration(panelConfiguration)
+
+          verify(panelConfigurationRepository.updatePanelConfiguration(panelConfiguration)).once()
+        })
+
+        it('emits an Updated event', async() => {
+          const testee: PanelService = createTestee({ panelEventEmitter, panelLayoutConfigurationRepository })
+          await testee.updatePanelConfiguration(panelConfiguration)
+
+          verify(panelEventEmitter.emitPanelConfigurationUpdated(panelConfiguration)).once()
+        })
+      })
+
+      describe('the PanelLayoutConfiguration.model is not equal to the PanelConfiguration.model', () => {
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ model: SkaarhojModel.MK48 })
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
+
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ model: SkaarhojModel.MKT1A, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        })
+
+        it('does not update the PanelConfiguration', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+          try {
+            await testee.updatePanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+
+          verify(panelConfigurationRepository.updatePanelConfiguration(anything())).never()
+        })
+
+        it('does not emit an updated event', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelEventEmitter })
+          try {
+            await testee.updatePanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+
+          verify(panelEventEmitter.emitPanelConfigurationUpdated(anything())).never()
+        })
+
+        it('throws an unsupported operation exception', () => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository })
+          expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+        })
+      })
+
+      describe('the PanelLayoutConfiguration.type is not equal to the PanelConfiguration.type', () => {
+        beforeEach(() => {
+          panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration({ type: PanelType.SKAARHOJ })
+          when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)).thenResolve(panelLayoutConfiguration)
+
+          panelConfiguration = EntityTestFactory.createPanelConfiguration({ type: 'RANDOM_PANEL_TYPE' as PanelType, panelLayoutConfigurationId: panelLayoutConfiguration.id })
+        })
+
+        it('does not update the PanelConfiguration', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository })
+          try {
+            await testee.updatePanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+
+          verify(panelConfigurationRepository.updatePanelConfiguration(anything())).never()
+        })
+
+        it('does not emit an update event', async() => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository, panelEventEmitter })
+          try {
+            await testee.updatePanelConfiguration(panelConfiguration)
+          } catch (error) {
+            // Expected error
+          }
+
+          verify(panelEventEmitter.emitPanelConfigurationUpdated(anything())).never()
+        })
+
+        it('throws an unsupported operation exception', () => {
+          const testee: PanelService = createTestee({ panelLayoutConfigurationRepository })
+          expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
         })
       })
     })

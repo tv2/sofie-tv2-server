@@ -26,3 +26,8 @@ export interface PanelConfigurationCreatedEvent extends PanelEvent {
   type: PanelEventType.PANEL_CONFIGURATION_CREATED
   panelConfiguration: PanelConfigurationDto
 }
+
+export interface PanelConfigurationUpdatedEvent extends PanelEvent {
+  type: PanelEventType.PANEL_CONFIGURATION_UPDATED
+  panelConfiguration: PanelConfigurationDto
+}
