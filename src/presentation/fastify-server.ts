@@ -31,6 +31,7 @@ export class FastifyServer implements ProxyServer {
 
   public async start(port: number, proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.configureProxy(proxyConfiguration)
+    this.addCors()
     await this.setupWebSocketServer(proxyConfiguration)
     this.setupControllers()
     await this.fastifyServer.listen({ port })
@@ -41,6 +42,21 @@ export class FastifyServer implements ProxyServer {
   private async configureProxy(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyHttpProxy, {
       upstream: proxyConfiguration.httpUrl,
+    })
+  }
+
+  // The below eslint-disable is necessary.
+  // If we add 'await' or .then().catch() we will get a 'MaxListenerExceededWarning: Possible EventEmitter memory leak detected.'
+  /* eslint-disable @typescript-eslint/no-floating-promises */
+  private addCors(): void {
+    this.fastifyServer.addHook('onRequest', async(request, reply) => {
+      reply.header('Access-Control-Allow-Origin', '*')
+      reply.header('Access-Control-Allow-Credentials', true)
+      reply.header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Slug, X-UID')
+      reply.header('Access-Control-Allow-Methods', 'OPTIONS, POST, PUT, PATCH, GET, DELETE')
+      if (request.method === 'OPTIONS') {
+        reply.send()
+      }
     })
   }
 

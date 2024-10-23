@@ -37,6 +37,6 @@ export class RepositoryFacade {
   }
 
   public static createStatusMessageRepository(): StatusMessageRepository {
-    return new InMemoryStatusMessageRepository()
+    return InMemoryStatusMessageRepository.getInstance()
   }
 }
