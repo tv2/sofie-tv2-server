@@ -31,3 +31,8 @@ export interface PanelConfigurationUpdatedEvent extends PanelEvent {
   type: PanelEventType.PANEL_CONFIGURATION_UPDATED
   panelConfiguration: PanelConfigurationDto
 }
+
+export interface PanelConfigurationDeletedEvent extends PanelEvent {
+  type: PanelEventType.PANEL_CONFIGURATION_DELETED
+  panelConfigurationId: string
+}

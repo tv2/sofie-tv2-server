@@ -8,4 +8,5 @@ export interface PanelEventEmitter {
 
   emitPanelConfigurationCreated(panelConfiguration: PanelConfiguration): void
   emitPanelConfigurationUpdated(panelConfiguration: PanelConfiguration): void
+  emitPanelConfigurationDeleted(panelConfigurationId: string): void
 }

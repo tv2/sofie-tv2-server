@@ -137,4 +137,14 @@ export class PanelController extends BaseController {
       await this.httpErrorHandler.handleError(reply, error)
     }
   }
+
+  @DeleteRequest('/panelConfigurations/:id')
+  public async deletePanelConfiguration(request: FastifyRequest<{ Params: Pick<PanelConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
+    try {
+      await this.panelService.deletePanelConfiguration(request.params.id)
+      await this.sendOkReply(reply, `Successfully deleted PanelConfiguration for ${request.params.id}`)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
 }
