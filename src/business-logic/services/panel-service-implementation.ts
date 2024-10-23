@@ -65,7 +65,7 @@ export class PanelServiceImplementation implements PanelService {
 
   private assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration: PanelLayoutConfiguration, panelConfiguration: PanelConfiguration, operation: string): void {
     if (panelLayoutConfiguration.model !== panelConfiguration.model || panelLayoutConfiguration.type !== panelConfiguration.type) {
-      this.throwUnsupportedOperationWithIncompatibleMessage(panelConfiguration, panelLayoutConfiguration, operation)
+      throw new UnsupportedOperationException(`Unable to ${operation} panel, since panel model and/or panel type are incompatible with the chosen panel layout`)
     }
   }
 
@@ -78,14 +78,6 @@ export class PanelServiceImplementation implements PanelService {
       }
       throw new UnsupportedOperationException(`Can't ${operation} PanelConfiguration. No PanelLayoutConfiguration exist for ${panelLayoutConfigurationId}`)
     }
-  }
-
-  private throwUnsupportedOperationWithIncompatibleMessage(panelConfiguration: PanelConfiguration, panelLayoutConfiguration: PanelLayoutConfiguration, operation: string): void {
-    throw new UnsupportedOperationException(
-      `Can't ${operation} PanelConfiguration. Both PanelModel and PanelType needs to match on PanelConfiguration and PanelLayoutConfiguration.`
-      + `PanelConfiguration: Model ${panelConfiguration.model}, Type: ${panelConfiguration.type} - `
-      + `PanelLayoutConfiguration: Model: ${panelLayoutConfiguration.model}, Type: ${panelLayoutConfiguration.type}`
-    )
   }
 
   public async updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void> {
