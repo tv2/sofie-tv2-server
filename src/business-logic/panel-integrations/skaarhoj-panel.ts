@@ -52,6 +52,11 @@ export class SkaarhojPanel implements Panel {
     this.socket.on('data', (data) => {
       this.logger.data(data).info(`Received input from ${SkaarhojPanel.name}:${this.panelConfiguration.hostname}`)
     })
+
+    this.socket.on('close', () => {
+      this.logger.debug(`Disconnected from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
+      this.statusMessageService.sendStatusMessage(this.createDisconnectedStatusMessage())
+    })
   }
 
   private createConnectionSuccessStatusMessage(): StatusMessage {
@@ -76,5 +81,24 @@ export class SkaarhojPanel implements Panel {
       statusCode: StatusCode.WARNING,
       lastUpdatedTimestamp: Date.now()
     }
+  }
+
+  private createDisconnectedStatusMessage(): StatusMessage {
+    return {
+      id: this.getStatusMessageId(),
+      title: 'Disconnected from Skaarhoj panel',
+      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected`,
+      statusCode: StatusCode.GOOD,
+      lastUpdatedTimestamp: Date.now()
+    }
+  }
+
+  public disconnect(): void {
+    this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
+    this.socket.end()
+  }
+
+  public getPanelConfiguration(): PanelConfiguration {
+    return this.panelConfiguration
   }
 }
