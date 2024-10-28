@@ -33,6 +33,7 @@ export class EntityTestFactory {
       title: 'randomTitle',
       message: 'randomMessage',
       statusCode: StatusCode.UNKNOWN,
+      lastUpdatedTimestamp: Date.now(),
       ...statusMessage
     }
   }
