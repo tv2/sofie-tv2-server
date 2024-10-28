@@ -11,6 +11,8 @@ import { PanelEventType } from '../../presentation/enums/event-type'
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
 
+  private readonly panels: Map<string, Panel> = new Map()
+
   public constructor(
     private readonly panelFactory: PanelFactory,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
@@ -44,7 +46,14 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private connectToPanel(panelConfiguration: PanelConfiguration): void {
+    if (this.panels.has(panelConfiguration.hostname)) {
+      this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
+      return
+    }
+
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration)
     panel.initialize()
+
+    this.panels.set(panelConfiguration.hostname, panel)
   }
 }
