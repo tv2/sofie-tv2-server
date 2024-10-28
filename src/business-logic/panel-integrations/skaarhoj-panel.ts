@@ -21,7 +21,6 @@ export class SkaarhojPanel implements Panel {
   ) {
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
     this.assertValidPanelConfiguration(panelConfiguration)
-    this.connectToSocket()
   }
 
   private assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
@@ -31,6 +30,10 @@ export class SkaarhojPanel implements Panel {
     if (!Object.values(SkaarhojModel).includes(panelConfiguration.model)) {
       throw new UnsupportedOperationException(`Can't create a Skaarhoj Panel for a ${panelConfiguration.model}`)
     }
+  }
+
+  public initialize(): void {
+    this.connectToSocket()
   }
 
   private connectToSocket(): void {

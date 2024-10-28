@@ -3,6 +3,7 @@ import { Logger } from '../../logger/logger'
 import { PanelConfigurationRepository } from '../../data-access/interfaces/panel-configuration-repository'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelFactory } from '../panel-integrations/panel-factory'
+import { Panel } from './interfaces/panel'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -25,6 +26,9 @@ export class PanelManagerImplementation implements PanelManager {
 
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(panelConfiguration => this.panelFactory.createPanel(panelConfiguration))
+    panelConfigurations.map((panelConfiguration) => {
+      const panel: Panel = this.panelFactory.createPanel(panelConfiguration)
+      panel.initialize()
+    })
   }
 }
