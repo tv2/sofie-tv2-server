@@ -29,7 +29,6 @@ export class PanelConfigurationService implements PanelService {
   }
 
   public async updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
-    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfiguration.id, 'update')
     await this.panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(panelLayoutConfiguration)
     this.panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)
   }

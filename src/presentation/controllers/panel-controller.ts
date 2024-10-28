@@ -4,8 +4,8 @@ import { PhysicalPanelLayoutRepository } from '../../data-access/physical-panel-
 import { PhysicalPanelLayout } from '../../model/interfaces/physical-panel-layout'
 import {
   PanelLayoutConfiguration,
-  ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA,
   ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID,
+  ZOD_UPDATE_PANEL_LAYOUT_CONFIGURATION_SCHEMA,
 } from '../../model/interfaces/panel-layout-configuration'
 import { PanelService } from '../../business-logic/services/interfaces/panel-service'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
@@ -75,7 +75,7 @@ export class PanelController extends BaseController {
     }
   }
 
-  @PutRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
+  @PutRequest('/panelLayoutConfigurations', ZOD_UPDATE_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
   public async updatePanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
       const panelLayoutConfiguration: PanelLayoutConfiguration = request.body

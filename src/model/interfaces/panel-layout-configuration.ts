@@ -17,6 +17,8 @@ export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<Pa
   inputConfigurations: z.record(z.string(), ZOD_INPUT_CONFIGURATION_SCHEMA),
 })
 
-export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<PanelLayoutConfiguration> = ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({
-  id: z.string()
-}))
+export const ZOD_UPDATE_PANEL_LAYOUT_CONFIGURATION_SCHEMA: ZodSchema<Omit<PanelLayoutConfiguration, 'model' | 'type'>> = z.object({
+  id: z.string(),
+  name: z.string(),
+  inputConfigurations: z.record(z.string(), ZOD_INPUT_CONFIGURATION_SCHEMA),
+})
