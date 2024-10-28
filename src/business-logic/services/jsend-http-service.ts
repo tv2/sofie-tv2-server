@@ -13,7 +13,7 @@ interface JsendErrorResponse {
 }
 
 interface JsendValidResponse {
-  status: RequestStatus.SUCCESS | RequestStatus.FAIL
+  status: RequestStatus.SUCCESS
   data: unknown
 }
 
@@ -22,14 +22,11 @@ export class JsendHttpService implements HttpService {
   }
 
   public async get(url: string): Promise<unknown> {
-    const response = await this.httpService.get(url)
-    this.validate(response)
+    const response: unknown = await this.httpService.get(url)
+    this.assertJsendResponse(response)
     switch (response.status) {
       case RequestStatus.SUCCESS: {
         return response.data
-      }
-      case RequestStatus.FAIL: {
-        throw new HttpException(HttpStatusCode.BAD_REQUEST, JSON.stringify(response.data))
       }
       case RequestStatus.ERROR: {
         throw new HttpException(response.code, response.message)
@@ -40,13 +37,13 @@ export class JsendHttpService implements HttpService {
     }
   }
 
-  private validate(data: unknown): asserts data is JsendResponse {
+  private assertJsendResponse(data: unknown): asserts data is JsendResponse {
     if (typeof data !== 'object' || data === null) {
-      throw new UnsupportedOperationException('Expected object')
+      throw new UnsupportedOperationException(`Expected JSend response to be an object, but received ${typeof data}`)
     }
 
     if (!('status' in data)) {
-      throw new UnsupportedOperationException('Response had not attribute.adsfasf')
+      throw new UnsupportedOperationException('Expected JSend response to have the attribute \'status\'')
     }
   }
 }

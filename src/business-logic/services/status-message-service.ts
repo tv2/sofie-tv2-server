@@ -10,8 +10,7 @@ export class StatusMessageService {
     private readonly statusMessageRepository: StatusMessageRepository,
     private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly httpService: HttpService
-  ) {
-  }
+  ) { }
 
   public async getStatusMessages(): Promise<StatusMessage[]> {
     const statusMessageFromAlbaServer: StatusMessage[] = await this.httpService.get(STATUS_MESSAGE_URL) as StatusMessage[]

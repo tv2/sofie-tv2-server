@@ -54,9 +54,10 @@ export class SkaarhojPanel implements Panel {
   private createConnectionSuccessStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Connection complete',
-      message: `Successfully connected to Skaarhoj Panel on: ${this.panelConfiguration.hostname}`,
+      title: 'Connected to Skaarhoj Panel',
+      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}`,
       statusCode: StatusCode.GOOD,
+      lastUpdatedTimestamp: Date.now()
     }
   }
 
@@ -67,9 +68,10 @@ export class SkaarhojPanel implements Panel {
   private createUnableToConnectStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Unable to connect',
-      message: `Unable to connect to the Skaarhoj Panel on: ${this.panelConfiguration.hostname}`,
-      statusCode: StatusCode.WARNING
+      title: 'Skaarhoj panel is unreachable',
+      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      statusCode: StatusCode.WARNING,
+      lastUpdatedTimestamp: Date.now()
     }
   }
 }

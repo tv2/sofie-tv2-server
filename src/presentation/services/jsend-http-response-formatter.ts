@@ -10,13 +10,6 @@ export class JsendHttpResponseFormatter implements HttpResponseFormatter {
     }
   }
 
-  public formatFailResponse(data?: unknown): object {
-    return {
-      status: RequestStatus.FAIL,
-      data
-    }
-  }
-
   public formatErrorResponse(errorCode: ErrorCode, data: unknown): object {
     return {
       status: RequestStatus.ERROR,

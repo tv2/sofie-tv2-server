@@ -16,8 +16,7 @@ export class StatusMessageEventService implements StatusMessageEventEmitter, Sta
 
   private readonly callbacks: ((statusMessageEvent: StatusMessageEvent) => void)[] = []
 
-  private constructor() {
-  }
+  private constructor() { }
 
   public emitStatusMessage(statusMessage: StatusMessage): void {
     const statusMessageEvent: StatusMessageEvent = {

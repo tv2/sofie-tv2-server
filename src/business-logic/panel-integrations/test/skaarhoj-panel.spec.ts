@@ -33,12 +33,9 @@ describe(SkaarhojPanel.name, () => {
     describe('it receives a PanelConfiguration with Skaarhoj type and model', () => {
       it('does not throw any exception', () => {
         panelConfiguration = EntityTestFactory.createPanelConfiguration({ type: PanelType.SKAARHOJ, model: SkaarhojModel.MK48 })
-        try {
+        expect(() => {
           new SkaarhojPanel(panelConfiguration, instance(mock(StatusMessageService)), logger)
-        } catch (error) {
-          // If we come in here, we had an error thrown which means we should fail the test.
-          expect(true).toBeFalsy()
-        }
+        }).not.throws()
       })
     })
   })
