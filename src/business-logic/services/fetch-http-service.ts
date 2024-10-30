@@ -1,4 +1,4 @@
-import { HttpService } from './interfaces/http-service'
+import { HttpService } from '../interfaces/http-service'
 import { HttpException } from '../../model/exceptions/http-exception'
 
 export class FetchHttpService implements HttpService {

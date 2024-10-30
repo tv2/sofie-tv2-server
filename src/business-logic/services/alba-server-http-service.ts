@@ -1,4 +1,4 @@
-import { HttpService } from './interfaces/http-service'
+import { HttpService } from '../interfaces/http-service'
 
 const ALBA_API_BASE_URL: string = process.env.ALBA_API_BASE_URL ?? 'http://localhost:3005/api'
 

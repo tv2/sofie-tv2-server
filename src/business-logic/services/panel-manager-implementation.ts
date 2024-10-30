@@ -1,17 +1,10 @@
-import { PanelManager } from './interfaces/panel-manager'
+import { PanelManager } from '../interfaces/panel-manager'
 import { Logger } from '../../logger/logger'
 import { PanelConfigurationRepository } from '../../data-access/interfaces/panel-configuration-repository'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelFactory } from '../panel-integrations/panel-factory'
-import { Panel } from './interfaces/panel'
-import { PanelEventObserver } from '../../presentation/interfaces/panel-event-observer'
-import {
-  PanelConfigurationCreatedEvent,
-  PanelConfigurationDeletedEvent,
-  PanelConfigurationUpdatedEvent,
-  PanelEvent
-} from '../../presentation/value-objects/panel-event'
-import { PanelEventType } from '../../presentation/enums/event-type'
+import { Panel } from '../interfaces/panel'
+import { PanelObserver } from '../interfaces/panel-observer'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -21,7 +14,7 @@ export class PanelManagerImplementation implements PanelManager {
   public constructor(
     private readonly panelFactory: PanelFactory,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
-    private readonly panelEventObserver: PanelEventObserver,
+    private readonly panelObserver: PanelObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
@@ -55,32 +48,9 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private subscribeToPanelEvents(): void {
-    this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => {
-      if (this.isPanelConfigurationCreatedEvent(panelEvent)) {
-        this.connectToPanel(panelEvent.panelConfiguration)
-        return
-      }
-      if (this.isPanelConfigurationDeletedEvent(panelEvent)) {
-        this.disconnectFromPanel(panelEvent.panelConfigurationId)
-        return
-      }
-      if (this.isPanelConfigurationUpdatedEvent(panelEvent)) {
-        this.reconnectToPanel(panelEvent.panelConfiguration)
-        return
-      }
-    })
-  }
-
-  private isPanelConfigurationCreatedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationCreatedEvent {
-    return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_CREATED
-  }
-
-  private isPanelConfigurationDeletedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationDeletedEvent {
-    return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_DELETED
-  }
-
-  private isPanelConfigurationUpdatedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationUpdatedEvent {
-    return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_UPDATED
+    this.panelObserver.subscribeToPanelConfigurationCreated(panelConfiguration => this.connectToPanel(panelConfiguration))
+    this.panelObserver.subscribeToPanelConfigurationUpdated(panelConfiguration => this.reconnectToPanel(panelConfiguration))
+    this.panelObserver.subscribeToPanelConfigurationDeleted(panelConfigurationId => this.disconnectFromPanel(panelConfigurationId))
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {

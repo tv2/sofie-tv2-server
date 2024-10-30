@@ -1,4 +1,4 @@
-import { HttpService } from './interfaces/http-service'
+import { HttpService } from '../interfaces/http-service'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { RequestStatus } from '../enums/request-status'
 import { HttpException } from '../../model/exceptions/http-exception'

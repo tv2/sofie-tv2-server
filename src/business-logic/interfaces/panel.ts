@@ -1,4 +1,4 @@
-import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
+import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 
 export interface Panel {
   initialize(): void

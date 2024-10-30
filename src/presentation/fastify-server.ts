@@ -9,10 +9,13 @@ import { Logger } from '../logger/logger'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { fastifyWebsocket } from '@fastify/websocket'
 import WebSocket, { MessageEvent } from 'ws'
-import { PanelEventObserver } from './interfaces/panel-event-observer'
-import { PanelEvent } from './value-objects/panel-event'
-import { StatusMessageEventObserver } from './interfaces/status-message-event-observer'
+import { PanelObserver } from '../business-logic/interfaces/panel-observer'
+import { StatusMessageObserver } from '../business-logic/interfaces/status-message-observer'
 import { StatusMessageEvent } from './value-objects/status-message-event'
+import { PanelEventBuilder } from './interfaces/panel-event-builder'
+import { TypedEvent } from './value-objects/typed-event'
+import { StatusMessageEventType } from './enums/event-type'
+import { StatusMessage } from '../model/entities/status-message'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
@@ -23,8 +26,9 @@ export class FastifyServer implements ProxyServer {
   public constructor(
     logger: Logger,
     private readonly controllers: BaseController[],
-    private readonly panelEventObserver: PanelEventObserver,
-    private readonly statusMessageObserver: StatusMessageEventObserver
+    private readonly panelObserver: PanelObserver,
+    private readonly panelEventBuilder: PanelEventBuilder,
+    private readonly statusMessageObserver: StatusMessageObserver
   ) {
     this.logger = logger.tag(this.constructor.name)
   }
@@ -60,11 +64,33 @@ export class FastifyServer implements ProxyServer {
   private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
     this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
-      this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => socket.send(JSON.stringify(panelEvent)))
-      this.statusMessageObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => socket.send(JSON.stringify(statusMessageEvent)))
+      this.subscribeToPanelEvents(socket)
+      this.statusMessageObserver.subscribeToStatusMessages(statusMessage => this.sendEvent(this.buildStatusMessageEvent(statusMessage), socket))
     })
 
     this.connectToAlbaServer(proxyConfiguration)
+  }
+
+  private subscribeToPanelEvents(socket: WebSocket): void {
+    this.panelObserver.subscribeToPanelConfigurationCreated(panelConfiguration => this.sendEvent(this.panelEventBuilder.buildPanelConfigurationCreatedEvent(panelConfiguration), socket))
+    this.panelObserver.subscribeToPanelConfigurationUpdated(panelConfiguration => this.sendEvent(this.panelEventBuilder.buildPanelConfigurationUpdateEvent(panelConfiguration), socket))
+    this.panelObserver.subscribeToPanelConfigurationDeleted(panelConfigurationId => this.sendEvent(this.panelEventBuilder.buildPanelConfigurationDeletedEvent(panelConfigurationId), socket))
+
+    this.panelObserver.subscribeToPanelLayoutConfigurationCreated(panelLayoutConfiguration => this.sendEvent(this.panelEventBuilder.buildPanelLayoutConfigurationCreatedEvent(panelLayoutConfiguration), socket))
+    this.panelObserver.subscribeToPanelLayoutConfigurationUpdated(panelLayoutConfiguration => this.sendEvent(this.panelEventBuilder.buildPanelLayoutConfigurationUpdatedEvent(panelLayoutConfiguration), socket))
+    this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.sendEvent(this.panelEventBuilder.buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId), socket))
+  }
+
+  private sendEvent(event: TypedEvent, socket: WebSocket): void {
+    socket.send(JSON.stringify(event))
+  }
+
+  private buildStatusMessageEvent(statusMessage: StatusMessage): StatusMessageEvent {
+    return {
+      type: StatusMessageEventType.STATUS_MESSAGE,
+      timestamp: Date.now(),
+      statusMessage
+    }
   }
 
   private connectToAlbaServer(proxyConfiguration: ProxyConfiguration): void {

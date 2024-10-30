@@ -1,5 +1,5 @@
-import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
-import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
+import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
+import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 
 export interface PanelService {
   getPanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<PanelLayoutConfiguration>

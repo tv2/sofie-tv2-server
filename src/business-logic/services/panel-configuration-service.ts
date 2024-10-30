@@ -1,7 +1,7 @@
-import { PanelEventEmitter } from './interfaces/panel-event-emitter'
+import { PanelEmitter } from '../interfaces/panel-emitter'
 import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
-import { PanelService } from './interfaces/panel-service'
+import { PanelService } from '../interfaces/panel-service'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelConfigurationRepository } from '../../data-access/interfaces/panel-configuration-repository'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
@@ -11,7 +11,7 @@ export class PanelConfigurationService implements PanelService {
   public constructor(
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
-    private readonly panelEventEmitter: PanelEventEmitter
+    private readonly panelEmitter: PanelEmitter
   ) {
   }
 
@@ -25,18 +25,18 @@ export class PanelConfigurationService implements PanelService {
 
   public async createPanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
     const panelLayoutConfigurationWithId: PanelLayoutConfiguration = await this.panelLayoutConfigurationRepository.createPanelLayoutConfiguration(panelLayoutConfiguration)
-    this.panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfigurationWithId)
+    this.panelEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfigurationWithId)
   }
 
   public async updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
     await this.panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-    this.panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)
+    this.panelEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)
   }
 
   public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
     await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId, 'delete')
     await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
-    this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
+    this.panelEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
   }
 
   private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string, operation: string): Promise<void> {
@@ -60,7 +60,7 @@ export class PanelConfigurationService implements PanelService {
     this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfigurationWithoutId, 'create')
 
     const panelConfiguration: PanelConfiguration = await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
-    this.panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)
+    this.panelEmitter.emitPanelConfigurationCreated(panelConfiguration)
   }
 
   private assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration: PanelLayoutConfiguration, panelConfiguration: PanelConfiguration, operation: string): void {
@@ -85,11 +85,11 @@ export class PanelConfigurationService implements PanelService {
     this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfiguration, 'update')
 
     await this.panelConfigurationRepository.updatePanelConfiguration(panelConfiguration)
-    this.panelEventEmitter.emitPanelConfigurationUpdated(panelConfiguration)
+    this.panelEmitter.emitPanelConfigurationUpdated(panelConfiguration)
   }
 
   public async deletePanelConfiguration(panelConfigurationId: string): Promise<void> {
     await this.panelConfigurationRepository.deletePanelConfiguration(panelConfigurationId)
-    this.panelEventEmitter.emitPanelConfigurationDeleted(panelConfigurationId)
+    this.panelEmitter.emitPanelConfigurationDeleted(panelConfigurationId)
   }
 }

@@ -7,7 +7,7 @@ import {
   ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID,
   ZOD_UPDATE_PANEL_LAYOUT_CONFIGURATION_SCHEMA,
 } from '../../model/interfaces/panel-layout-configuration'
-import { PanelService } from '../../business-logic/services/interfaces/panel-service'
+import { PanelService } from '../../business-logic/interfaces/panel-service'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { HttpErrorHandler } from '../services/http-error-handler'
 import { HttpStatusCode } from '../enums/http-status-code'
