@@ -34,16 +34,16 @@ export class PanelServiceImplementation implements PanelService {
   }
 
   public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
-    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId)
+    await this.assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId, 'delete')
     await this.panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(panelLayoutConfigurationId)
     this.panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfigurationId)
   }
 
-  private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
+  private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string, operation: string): Promise<void> {
     const panelConfigurationsForPanelLayoutConfiguration: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId)
     if (panelConfigurationsForPanelLayoutConfiguration.length > 0) {
-      const panelConfigurationIds: string[] = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.id)
-      throw new UnsupportedOperationException(`Can't delete PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationIds}]`)
+      const panelConfigurationHostNames: string = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.hostname).join(', ')
+      throw new UnsupportedOperationException(`Can't ${operation} PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationHostNames}]`)
     }
   }
 
