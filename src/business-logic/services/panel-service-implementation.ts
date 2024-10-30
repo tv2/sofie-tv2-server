@@ -42,8 +42,8 @@ export class PanelServiceImplementation implements PanelService {
   private async assertNoPanelConfigurationIsUsingThePanelLayoutConfiguration(panelLayoutConfigurationId: string, operation: string): Promise<void> {
     const panelConfigurationsForPanelLayoutConfiguration: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurationsForPanelLayoutConfiguration(panelLayoutConfigurationId)
     if (panelConfigurationsForPanelLayoutConfiguration.length > 0) {
-      const panelConfigurationIds: string[] = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.id)
-      throw new UnsupportedOperationException(`Can't ${operation} PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationIds}]`)
+      const panelConfigurationHostNames: string = panelConfigurationsForPanelLayoutConfiguration.map(panelConfiguration => panelConfiguration.hostname).join(', ')
+      throw new UnsupportedOperationException(`Can't ${operation} PanelLayoutConfiguration for ${panelLayoutConfigurationId}. It's in use by the ConfigurationPanels [${panelConfigurationHostNames}]`)
     }
   }
 
