@@ -5,7 +5,11 @@ import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelFactory } from '../panel-integrations/panel-factory'
 import { Panel } from './interfaces/panel'
 import { PanelEventObserver } from '../../presentation/interfaces/panel-event-observer'
-import { PanelConfigurationCreatedEvent, PanelEvent } from '../../presentation/value-objects/panel-event'
+import {
+  PanelConfigurationCreatedEvent,
+  PanelConfigurationDeletedEvent,
+  PanelEvent
+} from '../../presentation/value-objects/panel-event'
 import { PanelEventType } from '../../presentation/enums/event-type'
 
 export class PanelManagerImplementation implements PanelManager {
@@ -24,12 +28,30 @@ export class PanelManagerImplementation implements PanelManager {
     this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => {
       if (this.isPanelConfigurationCreatedEvent(panelEvent)) {
         this.connectToPanel(panelEvent.panelConfiguration)
+        return
+      }
+      if (this.isPanelConfigurationDeletedEvent(panelEvent)) {
+        this.disconnectFromPanel(panelEvent.panelConfigurationId)
+        return
       }
     })
   }
 
   private isPanelConfigurationCreatedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationCreatedEvent {
     return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_CREATED
+  }
+
+  private isPanelConfigurationDeletedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationDeletedEvent {
+    return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_DELETED
+  }
+
+  private disconnectFromPanel(panelConfigurationId: string): void {
+    const panel: Panel | undefined = [...this.panels.values()].find(panel => panel.getPanelConfiguration().id === panelConfigurationId)
+    if (!panel) {
+      return
+    }
+    panel.disconnect()
+    this.panels.delete(panel.getPanelConfiguration().hostname)
   }
 
   public async initialize(): Promise<void> {
