@@ -5,14 +5,15 @@ import { UnsupportedOperationException } from '../../model/exceptions/unsupporte
 import { SkaarhojPanel } from './skaarhoj-panel'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from '../services/status-message-service'
+import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 
 export class PanelFactory {
   public constructor(private readonly statusMessageService: StatusMessageService, private readonly logger: Logger) {}
 
-  public createPanel(panelConfiguration: PanelConfiguration): Panel {
+  public createPanel(panelConfiguration: PanelConfiguration, panelLayoutConfiguration: PanelLayoutConfiguration): Panel {
     switch (panelConfiguration.type) {
       case PanelType.SKAARHOJ: {
-        return new SkaarhojPanel(panelConfiguration, this.statusMessageService, this.logger)
+        return new SkaarhojPanel(panelConfiguration, panelLayoutConfiguration, this.statusMessageService, this.logger)
       }
       default: {
         throw new UnsupportedOperationException(`No Panel implementation found for ${panelConfiguration.type}`)

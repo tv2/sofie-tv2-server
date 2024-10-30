@@ -5,15 +5,19 @@ import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelFactory } from '../panel-integrations/panel-factory'
 import { Panel } from '../interfaces/panel'
 import { PanelObserver } from '../interfaces/panel-observer'
+import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
+import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
 
   private readonly panels: Map<string, Panel> = new Map()
+  private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
 
   public constructor(
     private readonly panelFactory: PanelFactory,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
+    private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelObserver: PanelObserver,
     logger: Logger
   ) {
@@ -21,6 +25,7 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   public async initialize(): Promise<void> {
+    await this.updatePanelLayoutConfigurations()
     this.subscribeToPanelEvents()
     try {
       await this.connectToPanels()
@@ -29,9 +34,20 @@ export class PanelManagerImplementation implements PanelManager {
     }
   }
 
-  private async connectToPanels(): Promise<void> {
-    const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(this.connectToPanel.bind(this))
+  private async updatePanelLayoutConfigurations(): Promise<void> {
+    const panelLayoutConfigurations: PanelLayoutConfiguration[] = await this.panelLayoutConfigurationRepository.getPanelLayoutConfigurations()
+    this.panelLayoutConfigurations.clear()
+    panelLayoutConfigurations.forEach(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
+  }
+
+  private subscribeToPanelEvents(): void {
+    this.panelObserver.subscribeToPanelConfigurationCreated(panelConfiguration => this.connectToPanel(panelConfiguration))
+    this.panelObserver.subscribeToPanelConfigurationUpdated(panelConfiguration => this.reconnectToPanel(panelConfiguration))
+    this.panelObserver.subscribeToPanelConfigurationDeleted(panelConfigurationId => this.disconnectFromPanel(panelConfigurationId))
+
+    this.panelObserver.subscribeToPanelLayoutConfigurationCreated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
+    this.panelObserver.subscribeToPanelLayoutConfigurationUpdated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
+    this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.panelLayoutConfigurations.delete(panelLayoutConfigurationId))
   }
 
   private connectToPanel(panelConfiguration: PanelConfiguration): void {
@@ -41,16 +57,16 @@ export class PanelManagerImplementation implements PanelManager {
       return
     }
 
-    const panel: Panel = this.panelFactory.createPanel(panelConfiguration)
+    const panelLayoutConfiguration: PanelLayoutConfiguration | undefined = this.panelLayoutConfigurations.get(panelConfiguration.panelLayoutConfigurationId)
+    if (!panelLayoutConfiguration) {
+      this.logger.data(panelConfiguration).warn(`No PanelLayoutConfiguration found for PanelConfiguration ${panelConfiguration.hostname}. Skipping connecting to Panel`)
+      return
+    }
+
+    const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
     panel.initialize()
 
     this.panels.set(panelConfiguration.id, panel)
-  }
-
-  private subscribeToPanelEvents(): void {
-    this.panelObserver.subscribeToPanelConfigurationCreated(panelConfiguration => this.connectToPanel(panelConfiguration))
-    this.panelObserver.subscribeToPanelConfigurationUpdated(panelConfiguration => this.reconnectToPanel(panelConfiguration))
-    this.panelObserver.subscribeToPanelConfigurationDeleted(panelConfigurationId => this.disconnectFromPanel(panelConfigurationId))
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {
@@ -69,5 +85,10 @@ export class PanelManagerImplementation implements PanelManager {
       this.panels.delete(panelConfiguration.id)
     }
     this.connectToPanel(panelConfiguration)
+  }
+
+  private async connectToPanels(): Promise<void> {
+    const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
+    panelConfigurations.map(this.connectToPanel.bind(this))
   }
 }

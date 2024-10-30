@@ -25,6 +25,7 @@ export class ServiceFacade {
     return new PanelManagerImplementation(
       ServiceFacade.createPanelFactory(),
       RepositoryFacade.createPanelConfigurationRepository(),
+      RepositoryFacade.createPanelLayoutConfigurationRepository(),
       DomainEventFacade.createPanelObserver(),
       LoggerFacade.createLogger()
     )

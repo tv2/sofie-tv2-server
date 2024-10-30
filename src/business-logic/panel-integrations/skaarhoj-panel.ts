@@ -7,6 +7,7 @@ import { Logger } from '../../logger/logger'
 import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
+import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 
 const SKAARHOJ_PORT: number = 9923
 const RECONNECTION_TIMEOUT_MS: number = 5000
@@ -22,6 +23,7 @@ export class SkaarhojPanel implements Panel {
 
   public constructor(
     private readonly panelConfiguration: PanelConfiguration,
+    private panelLayoutConfiguration: PanelLayoutConfiguration,
     private readonly statusMessageService: StatusMessageService,
     logger: Logger
   ) {
@@ -144,5 +146,9 @@ export class SkaarhojPanel implements Panel {
 
   public getPanelConfiguration(): PanelConfiguration {
     return this.panelConfiguration
+  }
+
+  public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
+    this.panelLayoutConfiguration = panelLayoutConfiguration
   }
 }
