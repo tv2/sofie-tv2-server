@@ -7,7 +7,7 @@ import { PanelConfigurationRepository } from '../../data-access/interfaces/panel
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
 
-export class PanelServiceImplementation implements PanelService {
+export class PanelConfigurationService implements PanelService {
   public constructor(
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,

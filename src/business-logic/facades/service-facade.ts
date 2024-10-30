@@ -1,0 +1,47 @@
+import { PanelService } from '../services/interfaces/panel-service'
+import { PanelConfigurationService } from '../services/panel-configuration-service'
+import { RepositoryFacade } from '../../data-access/repository-facade'
+import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
+import { PanelManager } from '../services/interfaces/panel-manager'
+import { PanelManagerImplementation } from '../services/panel-manager-implementation'
+import { LoggerFacade } from '../../logger/logger-facade'
+import { PanelFactory } from '../panel-integrations/panel-factory'
+import { StatusMessageService } from '../services/status-message-service'
+import { HttpService } from '../services/interfaces/http-service'
+import { FetchHttpService } from '../services/fetch-http-service'
+import { JsendHttpService } from '../services/jsend-http-service'
+import { AlbaServerHttpService } from '../services/alba-server-http-service'
+
+export class ServiceFacade {
+  public static createPanelService(): PanelService {
+    return new PanelConfigurationService(
+      RepositoryFacade.createPanelLayoutConfigurationRepository(),
+      RepositoryFacade.createPanelConfigurationRepository(),
+      EventEmitterFacade.createPanelEventEmitter()
+    )
+  }
+
+  public static createPanelManager(): PanelManager {
+    return new PanelManagerImplementation(
+      ServiceFacade.createPanelFactory(),
+      RepositoryFacade.createPanelConfigurationRepository(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createPanelFactory(): PanelFactory {
+    return new PanelFactory(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
+  }
+
+  public static createStatusMessageService(): StatusMessageService {
+    return new StatusMessageService(
+      RepositoryFacade.createStatusMessageRepository(),
+      EventEmitterFacade.createStatusMessageEventEmitter(),
+      ServiceFacade.createHttpService()
+    )
+  }
+
+  public static createHttpService(): HttpService {
+    return new AlbaServerHttpService(new JsendHttpService(new FetchHttpService()))
+  }
+}

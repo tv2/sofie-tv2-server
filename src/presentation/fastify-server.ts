@@ -11,6 +11,8 @@ import { fastifyWebsocket } from '@fastify/websocket'
 import WebSocket, { MessageEvent } from 'ws'
 import { PanelEventObserver } from './interfaces/panel-event-observer'
 import { PanelEvent } from './value-objects/panel-event'
+import { StatusMessageEventObserver } from './interfaces/status-message-event-observer'
+import { StatusMessageEvent } from './value-objects/status-message-event'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
@@ -18,12 +20,18 @@ export class FastifyServer implements ProxyServer {
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
   private readonly logger: Logger
 
-  public constructor(logger: Logger, private readonly controllers: BaseController[], private readonly panelEventObserver: PanelEventObserver) {
+  public constructor(
+    logger: Logger,
+    private readonly controllers: BaseController[],
+    private readonly panelEventObserver: PanelEventObserver,
+    private readonly statusMessageObserver: StatusMessageEventObserver
+  ) {
     this.logger = logger.tag(this.constructor.name)
   }
 
   public async start(port: number, proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.configureProxy(proxyConfiguration)
+    this.addCors()
     await this.setupWebSocketServer(proxyConfiguration)
     this.setupControllers()
     await this.fastifyServer.listen({ port })
@@ -37,10 +45,23 @@ export class FastifyServer implements ProxyServer {
     })
   }
 
+  private addCors(): void {
+    this.fastifyServer.addHook('onRequest', async(request, reply) => {
+      reply.header('Access-Control-Allow-Origin', '*')
+        .header('Access-Control-Allow-Credentials', true)
+        .header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Slug, X-UID')
+        .header('Access-Control-Allow-Methods', 'OPTIONS, POST, PUT, PATCH, GET, DELETE').then(() => {}, () => {})
+      if (request.method === 'OPTIONS') {
+        reply.send().then(() => {}, () => {})
+      }
+    })
+  }
+
   private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
     this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
       this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => socket.send(JSON.stringify(panelEvent)))
+      this.statusMessageObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => socket.send(JSON.stringify(statusMessageEvent)))
     })
 
     this.connectToAlbaServer(proxyConfiguration)

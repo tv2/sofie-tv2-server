@@ -10,7 +10,7 @@ import {
 import { PanelService } from '../../business-logic/services/interfaces/panel-service'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { HttpErrorHandler } from '../services/http-error-handler'
-import { HttpStatusCode } from '../enum/http-status-code'
+import { HttpStatusCode } from '../enums/http-status-code'
 import {
   PanelConfiguration,
   ZOD_PANEL_CONFIGURATION_SCHEMA,
