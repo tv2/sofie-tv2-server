@@ -14,7 +14,8 @@ import { PanelCommandType } from '../../model/enums/panel-enums'
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
 
-  private readonly panels: Map<string, Panel> = new Map()
+  // The first key is the 'panelGroupId'. The second key is `panelConfigurationId`.
+  private readonly panelGroups: Map<string, Map<string, Panel>> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
 
   public constructor(
@@ -52,17 +53,19 @@ export class PanelManagerImplementation implements PanelManager {
     this.panelObserver.subscribeToPanelLayoutConfigurationCreated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
     this.panelObserver.subscribeToPanelLayoutConfigurationUpdated((panelLayoutConfiguration) => {
       this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration)
-      this.panels.forEach((panel) => {
-        if (panel.getPanelConfiguration().panelLayoutConfigurationId === panelLayoutConfiguration.id) {
-          panel.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-        }
+      this.panelGroups.forEach((panels) => {
+        panels.forEach((panel) => {
+          if (panel.getPanelConfiguration().panelLayoutConfigurationId === panelLayoutConfiguration.id) {
+            panel.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+          }
+        })
       })
     })
     this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.panelLayoutConfigurations.delete(panelLayoutConfigurationId))
   }
 
   private connectToPanel(panelConfiguration: PanelConfiguration): void {
-    const existingPanelForHostname: Panel | undefined = [...this.panels.values()].find(panel => panel.getPanelConfiguration().hostname === panelConfiguration.hostname)
+    const existingPanelForHostname: Panel | undefined = [...this.panelGroups.values()].flatMap(panelGroup => [...panelGroup.values()]).find(panel => panel.getPanelConfiguration().hostname === panelConfiguration.hostname)
     if (existingPanelForHostname) {
       this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
       return
@@ -78,7 +81,14 @@ export class PanelManagerImplementation implements PanelManager {
     panel.initialize()
     panel.registerOnCommand(command => this.handleCommand(command))
 
-    this.panels.set(panelConfiguration.id, panel)
+    this.setPanel(panelConfiguration, panel)
+  }
+
+  private setPanel(panelConfiguration: PanelConfiguration, panel: Panel): void {
+    if (!this.panelGroups.has(panelConfiguration.panelGroupId)) {
+      this.panelGroups.set(panelConfiguration.panelGroupId, new Map())
+    }
+    this.panelGroups.get(panelConfiguration.panelGroupId)?.set(panelConfiguration.id, panel)
   }
 
   private handleCommand(command: PanelCommand): void {
@@ -92,28 +102,31 @@ export class PanelManagerImplementation implements PanelManager {
         return
       }
       case PanelCommandType.MODIFIER: {
-        // TODO: Update modifiers. To be implemented in SOF-2262
         return
       }
     }
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {
-    const panel: Panel | undefined = this.panels.get(panelConfigurationId)
-    if (!panel) {
-      return
-    }
-    panel.disconnect()
-    this.panels.delete(panel.getPanelConfiguration().id)
+    this.panelGroups.forEach((panels) => {
+      const panel: Panel | undefined = panels.get(panelConfigurationId)
+      if (!panel) {
+        return
+      }
+      panel.disconnect()
+      panels.delete(panel.getPanelConfiguration().id)
+    })
   }
 
   private reconnectToPanel(panelConfiguration: PanelConfiguration): void {
-    const panel: Panel | undefined = this.panels.get(panelConfiguration.id)
-    if (panel) {
-      panel.disconnect()
-      this.panels.delete(panelConfiguration.id)
-    }
-    this.connectToPanel(panelConfiguration)
+    this.panelGroups.forEach((panels) => {
+      const panel: Panel | undefined = panels.get(panelConfiguration.id)
+      if (panel) {
+        panel.disconnect()
+        panels.delete(panelConfiguration.id)
+      }
+      this.connectToPanel(panelConfiguration)
+    })
   }
 
   private async connectToPanels(): Promise<void> {

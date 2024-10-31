@@ -6,6 +6,7 @@ export interface PanelConfiguration {
   type: PanelType
   model: PanelModel
   hostname: string
+  panelGroupId: string
   panelLayoutConfigurationId: string
 }
 
@@ -13,6 +14,7 @@ export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConf
   type: z.nativeEnum(PanelType),
   model: z.nativeEnum(SkaarhojModel),
   hostname: z.string(),
+  panelGroupId: z.string(),
   panelLayoutConfigurationId: z.string()
 })
 
