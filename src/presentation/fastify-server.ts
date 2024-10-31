@@ -17,6 +17,7 @@ import { StatusMessageEvent } from './value-objects/status-message-event'
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
 export class FastifyServer implements ProxyServer {
+  private albaWebsocket?: WebSocket
   private readonly fastifyServer: fastify.FastifyInstance = createFastifyServer()
   private readonly logger: Logger
 
@@ -62,21 +63,23 @@ export class FastifyServer implements ProxyServer {
     this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
       this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => socket.send(JSON.stringify(panelEvent)))
       this.statusMessageObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => socket.send(JSON.stringify(statusMessageEvent)))
+      socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
     })
 
     this.connectToAlbaServer(proxyConfiguration)
   }
 
   private connectToAlbaServer(proxyConfiguration: ProxyConfiguration): void {
-    const albaWebSocket: WebSocket = new WebSocket(proxyConfiguration.websocketUrl)
-    albaWebSocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
+    this.albaWebsocket?.close()
+    this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
+    this.albaWebsocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
 
-    albaWebSocket.addEventListener('close', () => {
+    this.albaWebsocket.addEventListener('close', () => {
       this.logger.debug('Disconnected from Alba Server')
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
-    albaWebSocket.addEventListener('message', (message: MessageEvent) => {
+    this.albaWebsocket.addEventListener('message', (message: MessageEvent) => {
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
 
