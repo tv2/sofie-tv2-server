@@ -46,4 +46,8 @@ export class JsendHttpService implements HttpService {
       throw new UnsupportedOperationException('Expected JSend response to have the attribute \'status\'')
     }
   }
+
+  public put(url: string, body?: unknown): Promise<void> {
+    return this.httpService.put(url, body)
+  }
 }

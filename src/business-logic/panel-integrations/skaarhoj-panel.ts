@@ -1,6 +1,6 @@
 import { Panel } from '../interfaces/panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import { PanelCommandType, InputType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
 import { Logger } from '../../logger/logger'
@@ -8,11 +8,35 @@ import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
+import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
+
+const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
+
+/**
+ * Regex to extract the different information in a command received from a Skaarhoj panel.
+ *
+ * A typical Skaarhoj input looks like this:
+ * - HWC#1=UP
+ * - HWC#21=DOWN
+ * - HWC#50=Abs:50
+ *
+ * The 'HWC' is a prefix given to all Skaarhoj inputs. That's the 'inputType' group of the regex.
+ * The number after the '#' is the id of the input i.e., which id it is. That's the 'id' group of the regex.
+ * The right side of the equals sign corresponds to what happened to the input. It could be that the input is a button that was pressed or released.
+ * It could also be that the input is a fader, and it tells us what is the new numeric value of the fader. That's the 'data' group of the regex.
+ */
+const SKAARHOJ_INPUT_REGEX: RegExp = /(?<inputType>[a-z]+)#(?<id>(\d+)|(\d+.\d+))=(?<data>.*)/i
 
 const SKAARHOJ_PORT: number = 9923
 const RECONNECTION_TIMEOUT_MS: number = 5000
 
 const DISABLE_SLEEP_MODE_COMMAND: string = 'SleepTimer=0'
+
+enum SkaarhojInputType {
+  BUTTON_PRESSED = 'DOWN',
+  BUTTON_RELEASED = 'UP',
+  FADER = 'ABS'
+}
 
 export class SkaarhojPanel implements Panel {
   private readonly logger: Logger
@@ -20,6 +44,8 @@ export class SkaarhojPanel implements Panel {
 
   private keepAlive: boolean = true
   private reconnectionTimeout: NodeJS.Timeout | undefined
+
+  private onCommandCallback?: (command: PanelCommand) => void
 
   public constructor(
     private readonly panelConfiguration: PanelConfiguration,
@@ -59,7 +85,10 @@ export class SkaarhojPanel implements Panel {
 
     this.socket.setEncoding('utf8')
     this.socket.on('data', (data) => {
-      this.logger.data(data).info(`Received input from ${SkaarhojPanel.name}:${this.panelConfiguration.hostname}`)
+      const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(data.toString())
+      if (inputData && this.onCommandCallback) {
+        this.onCommandCallback(inputData)
+      }
     })
 
     this.socket.on('close', () => {
@@ -150,5 +179,56 @@ export class SkaarhojPanel implements Panel {
 
   public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
     this.panelLayoutConfiguration = panelLayoutConfiguration
+  }
+
+  public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
+    this.onCommandCallback = onCommandCallback
+  }
+
+  private mapPanelInputToCommand(input: string): PanelCommand | undefined {
+    // It's possible for Skaarhoj to send an array of commands separated by '\n'. We want the last entry of that array
+    const commandArray: string[] = input.split('\n').filter(s => s !== '')
+    const match = commandArray[commandArray.length - 1]?.match(SKAARHOJ_INPUT_REGEX)
+    if (!match || !match.groups) {
+      return
+    }
+
+    if (match.groups.inputType !== SKAARHOJ_INPUT_PREFIX) {
+      return
+    }
+
+    // It's possible to get an id like "3.4", so the Math.floor is to turn that into "3" for now since we don't support multiple functions for a single button.
+    const id: number = Math.floor(Number.parseFloat(match.groups.id!))
+    const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[id]
+    if (!inputConfiguration) {
+      return
+    }
+
+    switch (inputConfiguration.type) {
+      case InputType.BUTTON: {
+        const isButtonPressed: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED) && !!inputConfiguration.onPress
+        const isButtonReleased: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED) && !!inputConfiguration.onRelease
+
+        if (!isButtonPressed && !isButtonReleased) {
+          return
+        }
+        return inputConfiguration.command
+      }
+      case InputType.FADER: {
+        if (!input.toUpperCase().match(SkaarhojInputType.FADER)) {
+          return
+        }
+        const regexValue = match.groups.data?.match(/Abs:(?<value>\d+)/)
+        if (!regexValue) {
+          return
+        }
+        const value: number = Number.parseFloat(regexValue[0].replace('Abs:', ''))
+        if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
+          return
+        }
+        inputConfiguration.command.value = value
+        return inputConfiguration.command
+      }
+    }
   }
 }

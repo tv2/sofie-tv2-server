@@ -11,6 +11,7 @@ import { FetchHttpService } from '../services/fetch-http-service'
 import { JsendHttpService } from '../services/jsend-http-service'
 import { AlbaServerHttpService } from '../services/alba-server-http-service'
 import { DomainEventFacade } from './domain-event-facade'
+import { PanelCommandExecutor } from '../services/panel-command-executor'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -27,6 +28,7 @@ export class ServiceFacade {
       RepositoryFacade.createPanelConfigurationRepository(),
       RepositoryFacade.createPanelLayoutConfigurationRepository(),
       DomainEventFacade.createPanelObserver(),
+      ServiceFacade.createPanelCommandExecutor(),
       LoggerFacade.createLogger()
     )
   }
@@ -45,5 +47,9 @@ export class ServiceFacade {
 
   public static createHttpService(): HttpService {
     return new AlbaServerHttpService(new JsendHttpService(new FetchHttpService()))
+  }
+
+  public static createPanelCommandExecutor(): PanelCommandExecutor {
+    return new PanelCommandExecutor(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
   }
 }

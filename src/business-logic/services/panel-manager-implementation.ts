@@ -7,6 +7,9 @@ import { Panel } from '../interfaces/panel'
 import { PanelObserver } from '../interfaces/panel-observer'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
+import { PanelCommandExecutor } from './panel-command-executor'
+import { PanelCommand } from '../../model/interfaces/input-configuration'
+import { PanelCommandType } from '../../model/enums/panel-enums'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -19,6 +22,7 @@ export class PanelManagerImplementation implements PanelManager {
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelObserver: PanelObserver,
+    private readonly panelCommandExecutor: PanelCommandExecutor,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
@@ -46,7 +50,14 @@ export class PanelManagerImplementation implements PanelManager {
     this.panelObserver.subscribeToPanelConfigurationDeleted(panelConfigurationId => this.disconnectFromPanel(panelConfigurationId))
 
     this.panelObserver.subscribeToPanelLayoutConfigurationCreated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
-    this.panelObserver.subscribeToPanelLayoutConfigurationUpdated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
+    this.panelObserver.subscribeToPanelLayoutConfigurationUpdated((panelLayoutConfiguration) => {
+      this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration)
+      this.panels.forEach((panel) => {
+        if (panel.getPanelConfiguration().panelLayoutConfigurationId === panelLayoutConfiguration.id) {
+          panel.updatePanelLayoutConfiguration(panelLayoutConfiguration)
+        }
+      })
+    })
     this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.panelLayoutConfigurations.delete(panelLayoutConfigurationId))
   }
 
@@ -65,8 +76,26 @@ export class PanelManagerImplementation implements PanelManager {
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
     panel.initialize()
+    panel.registerOnCommand(command => this.handleCommand(command))
 
     this.panels.set(panelConfiguration.id, panel)
+  }
+
+  private handleCommand(command: PanelCommand): void {
+    switch (command.type) {
+      case PanelCommandType.ACTION: {
+        this.panelCommandExecutor.executeActionCommand(command)
+        return
+      }
+      case PanelCommandType.T_BAR: {
+        this.panelCommandExecutor.executeTBarCommand(command)
+        return
+      }
+      case PanelCommandType.MODIFIER: {
+        // TODO: Update modifiers. To be implemented in SOF-2262
+        return
+      }
+    }
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {

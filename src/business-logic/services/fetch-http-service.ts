@@ -9,4 +9,17 @@ export class FetchHttpService implements HttpService {
     }
     return response.json()
   }
+
+  public async put(url: string, body?: unknown): Promise<void> {
+    const response: Response = await fetch(url, {
+      body: JSON.stringify(body),
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    if (!response.ok) {
+      throw new HttpException(response.status, await response.text())
+    }
+  }
 }

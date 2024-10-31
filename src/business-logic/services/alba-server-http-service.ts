@@ -7,9 +7,17 @@ export class AlbaServerHttpService implements HttpService {
   }
 
   public get(url: string): Promise<unknown> {
+    return this.httpService.get(`${ALBA_API_BASE_URL}${this.prefixUrlWithSlash(url)}`)
+  }
+
+  private prefixUrlWithSlash(url: string): string {
     if (!url.startsWith('/')) {
-      url = `/${url}`
+      return `/${url}`
     }
-    return this.httpService.get(`${ALBA_API_BASE_URL}${url}`)
+    return url
+  }
+
+  public put(url: string, body?: unknown): Promise<void> {
+    return this.httpService.put(`${ALBA_API_BASE_URL}${this.prefixUrlWithSlash(url)}`, body)
   }
 }

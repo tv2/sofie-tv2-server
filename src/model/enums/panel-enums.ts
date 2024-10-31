@@ -17,8 +17,8 @@ export enum InputType {
   FADER = 'FADER',
 }
 
-export enum InputDataType {
-  HTTP_ENDPOINT = 'HTTP_ENDPOINT',
+export enum PanelCommandType {
+  ACTION = 'ACTION',
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
 }

@@ -1,12 +1,11 @@
-import { InputDataType, InputType } from '../enums/panel-enums'
-import { HttpMethod } from '../enums/http-method'
+import { PanelCommandType, InputType } from '../enums/panel-enums'
 import z, { ZodSchema } from 'zod'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration
 
 export interface BaseInputConfiguration {
   type: InputType
-  data: InputData
+  command: PanelCommand
 }
 
 export interface ButtonConfiguration extends BaseInputConfiguration {
@@ -19,56 +18,57 @@ export interface FaderConfiguration extends BaseInputConfiguration {
   type: InputType.FADER
 }
 
-export type InputData = HttpEndpointInputData | ModifierInputData | TBarInputData
+export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand
 
-export interface BaseInputData {
-  type: InputDataType
+export interface BasePanelCommand {
+  type: PanelCommandType
 }
 
-export interface HttpEndpointInputData extends BaseInputData {
-  type: InputDataType.HTTP_ENDPOINT
-  url: string
-  httpMethod: HttpMethod
+export interface ActionPanelCommand extends BasePanelCommand {
+  type: PanelCommandType.ACTION
+  actionId: string
+  actionArguments?: unknown
 }
 
-export interface ModifierInputData extends BaseInputData {
-  type: InputDataType.MODIFIER
+export interface ModifierPanelCommand extends BasePanelCommand {
+  type: PanelCommandType.MODIFIER
   modifier: string
 }
 
-export interface TBarInputData extends BaseInputData {
-  type: InputDataType.T_BAR
+export interface TBarPanelCommand extends BasePanelCommand {
+  type: PanelCommandType.T_BAR
+  value?: number
 }
 
-const ZOD_HTTP_ENDPOINT_INPUT_DATA_SCHEMA: ZodSchema<HttpEndpointInputData> = z.object({
-  type: z.literal(InputDataType.HTTP_ENDPOINT),
-  url: z.string(),
-  httpMethod: z.nativeEnum(HttpMethod),
+const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({
+  type: z.literal(PanelCommandType.ACTION),
+  actionId: z.string(),
+  actionArguments: z.unknown().optional()
 })
 
-const ZOD_MODIFIER_INPUT_DATA_SCHEMA: ZodSchema<ModifierInputData> = z.object({
-  type: z.literal(InputDataType.MODIFIER),
+const ZOD_MODIFIER_PANEL_COMMAND_SCHEMA: ZodSchema<ModifierPanelCommand> = z.object({
+  type: z.literal(PanelCommandType.MODIFIER),
   modifier: z.string(),
 })
 
-export const ZOD_T_BAR_INPUT_DATA_SCHEMA: ZodSchema<TBarInputData> = z.object({
-  type: z.literal(InputDataType.T_BAR),
+export const ZOD_T_BAR_PANEL_COMMAND_SCHEMA: ZodSchema<TBarPanelCommand> = z.object({
+  type: z.literal(PanelCommandType.T_BAR),
 })
 
-export const ZOD_INPUT_DATA_SCHEMA: ZodSchema<InputData> = z.union([
-  ZOD_HTTP_ENDPOINT_INPUT_DATA_SCHEMA,
-  ZOD_MODIFIER_INPUT_DATA_SCHEMA,
-  ZOD_T_BAR_INPUT_DATA_SCHEMA,
+export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
+  ZOD_ACTION_PANEL_COMMAND_SCHEMA,
+  ZOD_MODIFIER_PANEL_COMMAND_SCHEMA,
+  ZOD_T_BAR_PANEL_COMMAND_SCHEMA,
 ])
 
 const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z.object({
   type: z.nativeEnum(InputType),
-  data: ZOD_INPUT_DATA_SCHEMA,
+  command: ZOD_PANEL_COMMAND_SCHEMA,
 })
 
 const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.object({
   type: z.literal(InputType.BUTTON),
-  data: ZOD_INPUT_DATA_SCHEMA,
+  command: ZOD_PANEL_COMMAND_SCHEMA,
   onPress: z.boolean(),
   onRelease: z.boolean(),
 })
