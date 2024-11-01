@@ -8,8 +8,9 @@ import { PanelObserver } from '../interfaces/panel-observer'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelCommandExecutor } from './panel-command-executor'
-import { PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType } from '../../model/enums/panel-enums'
+import { ModifierPanelCommand, PanelCommand } from '../../model/interfaces/input-configuration'
+import { PanelCommandType, PanelInputModifier } from '../../model/enums/panel-enums'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -17,6 +18,7 @@ export class PanelManagerImplementation implements PanelManager {
   // The first key is the 'panelGroupId'. The second key is `panelConfigurationId`.
   private readonly panelGroups: Map<string, Map<string, Panel>> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
+  private readonly activePanelGroupModifiers: Map<string, Set<PanelInputModifier>> = new Map()
 
   public constructor(
     private readonly panelFactory: PanelFactory,
@@ -102,9 +104,40 @@ export class PanelManagerImplementation implements PanelManager {
         return
       }
       case PanelCommandType.MODIFIER: {
+        this.updateActiveModifiersFromPanelCommand(command)
+        this.updatePanelsWithActiveModifiers()
         return
       }
     }
+  }
+
+  private updateActiveModifiersFromPanelCommand(command: ModifierPanelCommand): void {
+    if (!command.panelGroupId) {
+      throw new UnsupportedOperationException('A modifier command is missing its \'PanelGroupId')
+    }
+    if (!this.activePanelGroupModifiers.has(command.panelGroupId)) {
+      this.activePanelGroupModifiers.set(command.panelGroupId, new Set())
+    }
+    const activeModifiersForGroup: Set<PanelInputModifier> = this.activePanelGroupModifiers.get(command.panelGroupId)!
+
+    const isModifierAlreadyActiveInGroup: boolean = activeModifiersForGroup.has(command.modifier)
+    if (isModifierAlreadyActiveInGroup) {
+      activeModifiersForGroup.delete(command.modifier)
+    } else {
+      activeModifiersForGroup.add(command.modifier)
+    }
+  }
+
+  private updatePanelsWithActiveModifiers(): void {
+    this.panelGroups.forEach((panels: Map<string, Panel>, panelGroupId: string) => {
+      panels.forEach((panel: Panel) => {
+        const activeModifiersForGroup: Set<PanelInputModifier> | undefined = this.activePanelGroupModifiers.get(panelGroupId)
+        if (!activeModifiersForGroup) {
+          return
+        }
+        panel.updateActiveModifiers(activeModifiersForGroup)
+      })
+    })
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {

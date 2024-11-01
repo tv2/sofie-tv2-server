@@ -1,4 +1,4 @@
-import { PanelCommandType, InputType } from '../enums/panel-enums'
+import { PanelCommandType, InputType, PanelInputModifier } from '../enums/panel-enums'
 import z, { ZodSchema } from 'zod'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration
@@ -32,7 +32,8 @@ export interface ActionPanelCommand extends BasePanelCommand {
 
 export interface ModifierPanelCommand extends BasePanelCommand {
   type: PanelCommandType.MODIFIER
-  modifier: string
+  modifier: PanelInputModifier
+  panelGroupId?: string
 }
 
 export interface TBarPanelCommand extends BasePanelCommand {
@@ -48,7 +49,7 @@ const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object(
 
 const ZOD_MODIFIER_PANEL_COMMAND_SCHEMA: ZodSchema<ModifierPanelCommand> = z.object({
   type: z.literal(PanelCommandType.MODIFIER),
-  modifier: z.string(),
+  modifier: z.nativeEnum(PanelInputModifier),
 })
 
 export const ZOD_T_BAR_PANEL_COMMAND_SCHEMA: ZodSchema<TBarPanelCommand> = z.object({

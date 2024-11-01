@@ -1,6 +1,12 @@
 import { Panel } from '../interfaces/panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { PanelCommandType, InputType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import {
+  InputType,
+  PanelCommandType,
+  PanelInputModifier,
+  PanelType,
+  SkaarhojModel
+} from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
 import { Logger } from '../../logger/logger'
@@ -9,6 +15,8 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
+
+const MODIFIER_DELIMITER: string = ';'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -46,6 +54,8 @@ export class SkaarhojPanel implements Panel {
   private reconnectionTimeout: NodeJS.Timeout | undefined
 
   private onCommandCallback?: (command: PanelCommand) => void
+  private activeModifiers: Set<PanelInputModifier> = new Set()
+  private modifierInputKeys: Set<string> = new Set()
 
   public constructor(
     private readonly panelConfiguration: PanelConfiguration,
@@ -55,6 +65,7 @@ export class SkaarhojPanel implements Panel {
   ) {
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
     this.assertValidPanelConfiguration(panelConfiguration)
+    this.updateModifierInputKeys()
   }
 
   private assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
@@ -179,10 +190,23 @@ export class SkaarhojPanel implements Panel {
 
   public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
     this.panelLayoutConfiguration = panelLayoutConfiguration
+    this.updateModifierInputKeys()
+  }
+
+  private updateModifierInputKeys(): void {
+    const keysForModifierInputs: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).filter((key) => {
+      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[key]
+      return inputConfiguration?.command.type === PanelCommandType.MODIFIER
+    })
+    this.modifierInputKeys = new Set(keysForModifierInputs)
   }
 
   public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
     this.onCommandCallback = onCommandCallback
+  }
+
+  public updateActiveModifiers(activeModifiers: Set<PanelInputModifier>): void {
+    this.activeModifiers = activeModifiers
   }
 
   private mapPanelInputToCommand(input: string): PanelCommand | undefined {
@@ -197,9 +221,27 @@ export class SkaarhojPanel implements Panel {
       return
     }
 
+    let inputConfiguration: InputConfiguration | undefined
+
     // It's possible to get an id like "3.4", so the Math.floor is to turn that into "3" for now since we don't support multiple functions for a single button.
     const id: number = Math.floor(Number.parseFloat(match.groups.id!))
-    const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[id]
+    if (this.modifierInputKeys.has(`${id}`)) {
+      inputConfiguration = this.panelLayoutConfiguration.inputConfigurations[id]
+    } else {
+      const inputConfigurationKeys: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations)
+      const inputKey: string | undefined = inputConfigurationKeys.find((key) => {
+        const separatedKey: string[] = key.split(MODIFIER_DELIMITER)
+        const doesKeyIncludeAllModifiers: boolean = Array.from(this.activeModifiers).every(activeModifier => separatedKey.includes(activeModifier))
+        const doesKeyIncludeInput: boolean = separatedKey.some(key => key === `${id}`)
+        return doesKeyIncludeAllModifiers && doesKeyIncludeInput
+      })
+      if (!inputKey) {
+        return
+      }
+
+      inputConfiguration = this.panelLayoutConfiguration.inputConfigurations[inputKey]
+    }
+
     if (!inputConfiguration) {
       return
     }
@@ -212,6 +254,14 @@ export class SkaarhojPanel implements Panel {
         if (!isButtonPressed && !isButtonReleased) {
           return
         }
+
+        if (inputConfiguration.command.type === PanelCommandType.MODIFIER) {
+          return {
+            ...inputConfiguration.command,
+            panelGroupId: this.panelConfiguration.panelGroupId
+          }
+        }
+
         return inputConfiguration.command
       }
       case InputType.FADER: {

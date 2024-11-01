@@ -1,6 +1,7 @@
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelCommand } from '../../model/interfaces/input-configuration'
+import { PanelInputModifier } from '../../model/enums/panel-enums'
 
 export interface Panel {
   initialize(): void
@@ -8,4 +9,5 @@ export interface Panel {
   getPanelConfiguration(): PanelConfiguration
   updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void
   registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void
+  updateActiveModifiers(activeModifiers: Set<PanelInputModifier>): void
 }

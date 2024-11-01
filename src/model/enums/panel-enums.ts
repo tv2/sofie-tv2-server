@@ -22,3 +22,10 @@ export enum PanelCommandType {
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
 }
+
+export enum PanelInputModifier {
+  MODIFIER_ONE = 'MODIFIER_ONE',
+  MODIFIER_TWO = 'MODIFIER_TWO',
+  MODIFIER_THREE = 'MODIFIER_THREE',
+  MODIFIER_FOUR = 'MODIFIER_FOUR'
+}
