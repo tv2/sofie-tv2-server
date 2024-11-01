@@ -9,10 +9,14 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 
 const SKAARHOJ_PORT: number = 9923
+const RECONNECTION_TIMEOUT_MS: number = 5000
 
 export class SkaarhojPanel implements Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
+
+  private keepAlive: boolean = true
+  private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   public constructor(
     private readonly panelConfiguration: PanelConfiguration,
@@ -56,6 +60,9 @@ export class SkaarhojPanel implements Panel {
     this.socket.on('close', () => {
       this.logger.debug(`Disconnected from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
       this.statusMessageService.sendStatusMessage(this.createDisconnectedStatusMessage())
+      if (this.keepAlive) {
+        this.reconnect()
+      }
     })
   }
 
@@ -63,7 +70,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Connected to Skaarhoj Panel',
-      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -77,7 +84,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Skaarhoj panel is unreachable',
-      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.WARNING,
       lastUpdatedTimestamp: Date.now()
     }
@@ -87,7 +94,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Disconnected from Skaarhoj panel',
-      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected`,
+      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -95,7 +102,36 @@ export class SkaarhojPanel implements Panel {
 
   public disconnect(): void {
     this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
+    this.keepAlive = false
     this.socket.end()
+  }
+
+  private reconnect(): void {
+    if (this.reconnectTimeoutIdentifier) {
+      return
+    }
+    this.statusMessageService.sendStatusMessage(this.createReconnectingStatusMessage())
+
+    this.reconnectTimeoutIdentifier = setTimeout(() => {
+      clearTimeout(this.reconnectTimeoutIdentifier)
+      this.reconnectTimeoutIdentifier = undefined
+
+      if (this.socket.readyState !== 'closed') {
+        return
+      }
+
+      this.connectToSocket()
+    }, RECONNECTION_TIMEOUT_MS)
+  }
+
+  private createReconnectingStatusMessage(): StatusMessage {
+    return {
+      id: this.getStatusMessageId(),
+      title: 'Reconnecting to Skaarhoj panel',
+      message: `Attempting to reconnect to the Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      statusCode: StatusCode.WARNING,
+      lastUpdatedTimestamp: Date.now()
+    }
   }
 
   public getPanelConfiguration(): PanelConfiguration {
