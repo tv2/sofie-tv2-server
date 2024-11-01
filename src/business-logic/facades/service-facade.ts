@@ -12,6 +12,8 @@ import { JsendHttpService } from '../services/jsend-http-service'
 import { AlbaServerHttpService } from '../services/alba-server-http-service'
 import { DomainEventFacade } from './domain-event-facade'
 import { PanelCommandExecutor } from '../services/panel-command-executor'
+import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
+import { AtemVideoMixer } from '../panel-integrations/atem-video-mixer'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -50,6 +52,14 @@ export class ServiceFacade {
   }
 
   public static createPanelCommandExecutor(): PanelCommandExecutor {
-    return new PanelCommandExecutor(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
+    return new PanelCommandExecutor(
+      ServiceFacade.createHttpService(),
+      ServiceFacade.createVideoMixer(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createVideoMixer(): VideoMixer {
+    return new AtemVideoMixer(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
   }
 }

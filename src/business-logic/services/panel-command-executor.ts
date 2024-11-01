@@ -2,6 +2,7 @@ import { ActionPanelCommand, TBarPanelCommand } from '../../model/interfaces/inp
 import { HttpService } from '../interfaces/http-service'
 import { Logger } from '../../logger/logger'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 
 // TODO: Refactor to follow active Rundown in SOF-2268
 const RUNDOWN_ID: string = 'jSXbtcsHTPjebGXurMzP401Z3u0_'
@@ -18,7 +19,7 @@ enum PseudoActionId {
 export class PanelCommandExecutor {
   private readonly logger: Logger
 
-  public constructor(private readonly httpService: HttpService, logger: Logger) {
+  public constructor(private readonly httpService: HttpService, private readonly videoMixer: VideoMixer, logger: Logger) {
     this.logger = logger.tag(PanelCommandExecutor.name)
   }
 

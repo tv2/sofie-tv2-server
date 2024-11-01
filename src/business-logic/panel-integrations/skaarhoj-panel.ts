@@ -1,4 +1,4 @@
-import { Panel } from '../interfaces/panel'
+import { Panel } from './panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { InputType, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'

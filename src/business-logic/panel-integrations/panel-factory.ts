@@ -1,5 +1,5 @@
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { Panel } from '../interfaces/panel'
+import { Panel } from './panel'
 import { PanelType } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { SkaarhojPanel } from './skaarhoj-panel'
