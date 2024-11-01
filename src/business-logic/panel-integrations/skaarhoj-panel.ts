@@ -1,12 +1,6 @@
 import { Panel } from '../interfaces/panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import {
-  InputType,
-  PanelCommandType,
-  PanelInputModifier,
-  PanelType,
-  SkaarhojModel
-} from '../../model/enums/panel-enums'
+import { InputType, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
 import { Logger } from '../../logger/logger'
@@ -15,8 +9,6 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
-
-const MODIFIER_DELIMITER: string = ';'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -46,29 +38,24 @@ enum SkaarhojInputType {
   FADER = 'ABS'
 }
 
-export class SkaarhojPanel implements Panel {
+export class SkaarhojPanel extends Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
   private keepAlive: boolean = true
   private reconnectionTimeout: NodeJS.Timeout | undefined
 
-  private onCommandCallback?: (command: PanelCommand) => void
-  private activeModifiers: Set<PanelInputModifier> = new Set()
-  private modifierInputKeys: Set<string> = new Set()
-
   public constructor(
-    private readonly panelConfiguration: PanelConfiguration,
-    private panelLayoutConfiguration: PanelLayoutConfiguration,
-    private readonly statusMessageService: StatusMessageService,
+    panelConfiguration: PanelConfiguration,
+    panelLayoutConfiguration: PanelLayoutConfiguration,
+    statusMessageService: StatusMessageService,
     logger: Logger
   ) {
+    super(panelConfiguration, panelLayoutConfiguration, statusMessageService)
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
-    this.assertValidPanelConfiguration(panelConfiguration)
-    this.updateModifierInputKeys()
   }
 
-  private assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
+  protected assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
     if (panelConfiguration.type !== PanelType.SKAARHOJ) {
       throw new UnsupportedOperationException(`Can't create a Skaarhoj Panel for a ${panelConfiguration.type}`)
     }
@@ -86,12 +73,12 @@ export class SkaarhojPanel implements Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
-      this.statusMessageService.sendStatusMessage(this.createConnectionSuccessStatusMessage())
+      this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
     this.socket.on('error', (error) => {
       this.logger.data(error).error(`Error from ${SkaarhojPanel.name}:${this.panelConfiguration.hostname}`)
-      this.statusMessageService.sendStatusMessage(this.createUnableToConnectStatusMessage())
+      this.sendStatusMessage(this.createUnableToConnectStatusMessage())
     })
 
     this.socket.setEncoding('utf8')
@@ -104,7 +91,7 @@ export class SkaarhojPanel implements Panel {
 
     this.socket.on('close', () => {
       this.logger.debug(`Disconnected from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
-      this.statusMessageService.sendStatusMessage(this.createDisconnectedStatusMessage())
+      this.sendStatusMessage(this.createDisconnectedStatusMessage())
       if (this.keepAlive) {
         this.reconnect()
       }
@@ -160,7 +147,7 @@ export class SkaarhojPanel implements Panel {
     if (this.reconnectionTimeout) {
       return
     }
-    this.statusMessageService.sendStatusMessage(this.createReconnectingStatusMessage())
+    this.sendStatusMessage(this.createReconnectingStatusMessage())
 
     this.reconnectionTimeout = setTimeout(() => {
       clearTimeout(this.reconnectionTimeout)
@@ -184,31 +171,6 @@ export class SkaarhojPanel implements Panel {
     }
   }
 
-  public getPanelConfiguration(): PanelConfiguration {
-    return this.panelConfiguration
-  }
-
-  public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
-    this.panelLayoutConfiguration = panelLayoutConfiguration
-    this.updateModifierInputKeys()
-  }
-
-  private updateModifierInputKeys(): void {
-    const keysForModifierInputs: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).filter((key) => {
-      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[key]
-      return inputConfiguration?.command.type === PanelCommandType.MODIFIER
-    })
-    this.modifierInputKeys = new Set(keysForModifierInputs)
-  }
-
-  public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
-    this.onCommandCallback = onCommandCallback
-  }
-
-  public updateActiveModifiers(activeModifiers: Set<PanelInputModifier>): void {
-    this.activeModifiers = activeModifiers
-  }
-
   private mapPanelInputToCommand(input: string): PanelCommand | undefined {
     // It's possible for Skaarhoj to send an array of commands separated by '\n'. We want the last entry of that array
     const commandArray: string[] = input.split('\n').filter(s => s !== '')
@@ -221,27 +183,9 @@ export class SkaarhojPanel implements Panel {
       return
     }
 
-    let inputConfiguration: InputConfiguration | undefined
-
     // It's possible to get an id like "3.4", so the Math.floor is to turn that into "3" for now since we don't support multiple functions for a single button.
     const id: number = Math.floor(Number.parseFloat(match.groups.id!))
-    if (this.modifierInputKeys.has(`${id}`)) {
-      inputConfiguration = this.panelLayoutConfiguration.inputConfigurations[id]
-    } else {
-      const inputConfigurationKeys: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations)
-      const inputKey: string | undefined = inputConfigurationKeys.find((key) => {
-        const separatedKey: string[] = key.split(MODIFIER_DELIMITER)
-        const doesKeyIncludeAllModifiers: boolean = Array.from(this.activeModifiers).every(activeModifier => separatedKey.includes(activeModifier))
-        const doesKeyIncludeInput: boolean = separatedKey.some(key => key === `${id}`)
-        return doesKeyIncludeAllModifiers && doesKeyIncludeInput
-      })
-      if (!inputKey) {
-        return
-      }
-
-      inputConfiguration = this.panelLayoutConfiguration.inputConfigurations[inputKey]
-    }
-
+    const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(id + '')
     if (!inputConfiguration) {
       return
     }
