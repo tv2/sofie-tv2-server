@@ -60,8 +60,9 @@ export abstract class Panel {
       const separatedKey: string[] = key.split(MODIFIER_DELIMITER)
       const doesKeyIncludeAllModifiers: boolean = Array.from(this.activeModifiers).every(activeModifier => separatedKey.includes(activeModifier))
       const doesKeyIncludeInput: boolean = separatedKey.some(key => key === inputConfigurationKey)
-      // TODO: Inputs with more modifiers than the active ones are still selected in this...
-      return doesKeyIncludeAllModifiers && doesKeyIncludeInput
+      const doesKeyHaveOtherModifiersThanActiveModifiers: boolean = separatedKey.length !== this.activeModifiers.size + 1
+
+      return doesKeyIncludeAllModifiers && doesKeyIncludeInput && !doesKeyHaveOtherModifiersThanActiveModifiers
     })
 
     if (!inputKey) {
