@@ -11,6 +11,8 @@ import { StatusCode } from '../../model/enums/status-code'
 const SKAARHOJ_PORT: number = 9923
 const RECONNECTION_TIMEOUT_MS: number = 5000
 
+const DISABLE_SLEEP_MODE_COMMAND: string = 'SleepTimer=0'
+
 export class SkaarhojPanel implements Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
@@ -43,7 +45,8 @@ export class SkaarhojPanel implements Panel {
   private connectToSocket(): void {
     this.socket = net.createConnection(SKAARHOJ_PORT, this.panelConfiguration.hostname, () => {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
-      this.socket.write('list\n')
+      this.writeCommand('list')
+      this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
       this.statusMessageService.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
@@ -64,6 +67,11 @@ export class SkaarhojPanel implements Panel {
         this.reconnect()
       }
     })
+  }
+
+  private writeCommand(command: string): void {
+    // The \n is quite important. Without Skaarhoj won't interpret any of the commands.
+    this.socket.write(`${command}\n`)
   }
 
   private createConnectionSuccessStatusMessage(): StatusMessage {
