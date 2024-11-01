@@ -118,6 +118,6 @@ export class PanelManagerImplementation implements PanelManager {
 
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(this.connectToPanel.bind(this))
+    panelConfigurations.forEach(this.connectToPanel.bind(this))
   }
 }
