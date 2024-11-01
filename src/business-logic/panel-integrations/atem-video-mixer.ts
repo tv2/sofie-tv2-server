@@ -1,5 +1,4 @@
 import { VideoMixer } from './interfaces/video-mixer'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { Atem, AtemConnectionStatus } from 'atem-connection'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from '../services/status-message-service'
@@ -11,6 +10,8 @@ const ATEM_IP: string = '10.6.26.26' // Atem in Zero
 const ATEM_PORT: number = 9910
 
 const RECONNECTION_TIMEOUT_MS: number = 5000
+
+const ATEM_TRANSITION_MULTIPLICATION_FACTOR: number = 10
 
 export class AtemVideoMixer implements VideoMixer {
   private readonly logger: Logger
@@ -81,7 +82,7 @@ export class AtemVideoMixer implements VideoMixer {
     }
   }
 
-  public sendTBarCommand(): void {
-    throw new UnsupportedOperationException('Not implemented')
+  public sendTBarCommand(tBarPosition: number): void {
+    this.atem.setTransitionPosition(tBarPosition * ATEM_TRANSITION_MULTIPLICATION_FACTOR).catch(error => this.logger.data(error).error('Failed to update Transition Position for Atem'))
   }
 }

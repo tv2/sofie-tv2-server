@@ -38,12 +38,22 @@ enum SkaarhojInputType {
   FADER = 'ABS'
 }
 
+enum TBarDirection {
+  UP = 'UP',
+  DOWN = 'DOWN'
+}
+
+const T_BAR_UPPER_BOUND: number = 1000
+const T_BAR_LOWER_BOUND: number = 0
+
 export class SkaarhojPanel extends Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
   private keepAlive: boolean = true
   private reconnectionTimeout: NodeJS.Timeout | undefined
+
+  private tBarDirection: TBarDirection = TBarDirection.DOWN
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -220,9 +230,34 @@ export class SkaarhojPanel extends Panel {
         if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
           return
         }
-        inputConfiguration.command.value = value
+        inputConfiguration.command.value = this.getTBarValue(value)
+        this.updateTBarDirection(value)
         return inputConfiguration.command
       }
+    }
+  }
+
+  private getTBarValue(value: number): number {
+    if (this.tBarDirection === TBarDirection.DOWN) {
+      value = T_BAR_UPPER_BOUND - value
+    }
+
+    if (value > T_BAR_UPPER_BOUND) {
+      return T_BAR_UPPER_BOUND
+    }
+
+    if (value < T_BAR_LOWER_BOUND) {
+      return T_BAR_LOWER_BOUND
+    }
+    return value
+  }
+
+  private updateTBarDirection(value: number): void {
+    const upperBoundReached: boolean = value === T_BAR_UPPER_BOUND && this.tBarDirection === TBarDirection.UP
+    const lowerBoundReached: boolean = value === T_BAR_LOWER_BOUND && this.tBarDirection === TBarDirection.DOWN
+
+    if (upperBoundReached || lowerBoundReached) {
+      this.tBarDirection = upperBoundReached ? TBarDirection.DOWN : TBarDirection.UP
     }
   }
 }

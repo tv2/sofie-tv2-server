@@ -1,7 +1,6 @@
 import { ActionPanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
 import { HttpService } from '../interfaces/http-service'
 import { Logger } from '../../logger/logger'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 
 // TODO: Refactor to follow active Rundown in SOF-2268
@@ -63,8 +62,10 @@ export class PanelCommandExecutor {
     }
   }
 
-  public executeTBarCommand(_command: TBarPanelCommand): void {
-    // TODO: To be implemented in SOF-2264
-    throw new UnsupportedOperationException('Not implemented yet')
+  public executeTBarCommand(command: TBarPanelCommand): void {
+    if (!command.value) {
+      return
+    }
+    this.videoMixer.sendTBarCommand(command.value)
   }
 }

@@ -38,7 +38,7 @@ export interface ModifierPanelCommand extends BasePanelCommand {
 
 export interface TBarPanelCommand extends BasePanelCommand {
   type: PanelCommandType.T_BAR
-  value?: number
+  value?: number // The number range should go from 0 to 1.000
 }
 
 const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({
