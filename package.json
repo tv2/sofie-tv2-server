@@ -27,7 +27,7 @@
     "@types/license-checker": "^25",
     "@types/node": "^22.7.5",
     "@types/ws": "^8.5.12",
-    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
     "@typescript-eslint/parser": "^7.8.0",
     "@typestrong/ts-mockito": "^2.7.12",
     "@vitest/coverage-v8": "^1.5.3",
