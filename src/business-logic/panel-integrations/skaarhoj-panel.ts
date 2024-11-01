@@ -231,7 +231,8 @@ export class SkaarhojPanel extends Panel {
           return
         }
         inputConfiguration.command.value = this.getTBarValue(value)
-        this.updateTBarDirection(value)
+        const upperLowerBoundReached: boolean = this.updateTBarDirection(value)
+        inputConfiguration.command.shouldExecuteTake = upperLowerBoundReached
         return inputConfiguration.command
       }
     }
@@ -252,12 +253,14 @@ export class SkaarhojPanel extends Panel {
     return value
   }
 
-  private updateTBarDirection(value: number): void {
+  private updateTBarDirection(value: number): boolean {
     const upperBoundReached: boolean = value === T_BAR_UPPER_BOUND && this.tBarDirection === TBarDirection.UP
     const lowerBoundReached: boolean = value === T_BAR_LOWER_BOUND && this.tBarDirection === TBarDirection.DOWN
 
     if (upperBoundReached || lowerBoundReached) {
       this.tBarDirection = upperBoundReached ? TBarDirection.DOWN : TBarDirection.UP
+      return true
     }
+    return false
   }
 }

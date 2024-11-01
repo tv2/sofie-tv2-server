@@ -25,9 +25,7 @@ export class PanelCommandExecutor {
   public executeActionCommand(command: ActionPanelCommand): void {
     switch (command.actionId) {
       case PseudoActionId.TAKE: {
-        this.httpService.put(`/rundowns/${RUNDOWN_ID}/takeNext`).catch((error) => {
-          this.logger.data(error).error('Error executing TAKE')
-        })
+        this.executeTake()
         return
       }
       case PseudoActionId.SET_NEXT_PART: {
@@ -62,10 +60,19 @@ export class PanelCommandExecutor {
     }
   }
 
+  private executeTake(): void {
+    this.httpService.put(`/rundowns/${RUNDOWN_ID}/takeNext`).catch((error) => {
+      this.logger.data(error).error('Error executing TAKE')
+    })
+  }
+
   public executeTBarCommand(command: TBarPanelCommand): void {
     if (!command.value) {
       return
     }
     this.videoMixer.sendTBarCommand(command.value)
+    if (command.shouldExecuteTake) {
+      this.executeTake()
+    }
   }
 }
