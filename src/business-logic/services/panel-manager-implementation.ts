@@ -8,6 +8,7 @@ import { PanelEventObserver } from '../../presentation/interfaces/panel-event-ob
 import {
   PanelConfigurationCreatedEvent,
   PanelConfigurationDeletedEvent,
+  PanelConfigurationUpdatedEvent,
   PanelEvent
 } from '../../presentation/value-objects/panel-event'
 import { PanelEventType } from '../../presentation/enums/event-type'
@@ -24,7 +25,36 @@ export class PanelManagerImplementation implements PanelManager {
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
+  }
 
+  public async initialize(): Promise<void> {
+    this.subscribeToPanelEvents()
+    try {
+      await this.connectToPanels()
+    } catch (error) {
+      this.logger.data(error).error('Error while connecting to Panels')
+    }
+  }
+
+  private async connectToPanels(): Promise<void> {
+    const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
+    panelConfigurations.forEach(this.connectToPanel.bind(this))
+  }
+
+  private connectToPanel(panelConfiguration: PanelConfiguration): void {
+    const existingPanelForHostname: Panel | undefined = [...this.panels.values()].find(panel => panel.getPanelConfiguration().hostname === panelConfiguration.hostname)
+    if (existingPanelForHostname) {
+      this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
+      return
+    }
+
+    const panel: Panel = this.panelFactory.createPanel(panelConfiguration)
+    panel.initialize()
+
+    this.panels.set(panelConfiguration.id, panel)
+  }
+
+  private subscribeToPanelEvents(): void {
     this.panelEventObserver.subscribeToPanelEvents((panelEvent: PanelEvent) => {
       if (this.isPanelConfigurationCreatedEvent(panelEvent)) {
         this.connectToPanel(panelEvent.panelConfiguration)
@@ -32,6 +62,10 @@ export class PanelManagerImplementation implements PanelManager {
       }
       if (this.isPanelConfigurationDeletedEvent(panelEvent)) {
         this.disconnectFromPanel(panelEvent.panelConfigurationId)
+        return
+      }
+      if (this.isPanelConfigurationUpdatedEvent(panelEvent)) {
+        this.reconnectToPanel(panelEvent.panelConfiguration)
         return
       }
     })
@@ -45,37 +79,25 @@ export class PanelManagerImplementation implements PanelManager {
     return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_DELETED
   }
 
+  private isPanelConfigurationUpdatedEvent(panelEvent: PanelEvent): panelEvent is PanelConfigurationUpdatedEvent {
+    return panelEvent.type === PanelEventType.PANEL_CONFIGURATION_UPDATED
+  }
+
   private disconnectFromPanel(panelConfigurationId: string): void {
-    const panel: Panel | undefined = [...this.panels.values()].find(panel => panel.getPanelConfiguration().id === panelConfigurationId)
+    const panel: Panel | undefined = this.panels.get(panelConfigurationId)
     if (!panel) {
       return
     }
     panel.disconnect()
-    this.panels.delete(panel.getPanelConfiguration().hostname)
+    this.panels.delete(panel.getPanelConfiguration().id)
   }
 
-  public async initialize(): Promise<void> {
-    try {
-      await this.connectToPanels()
-    } catch (error) {
-      this.logger.data(error).error('Error while connecting to Panels')
+  private reconnectToPanel(panelConfiguration: PanelConfiguration): void {
+    const panel: Panel | undefined = this.panels.get(panelConfiguration.id)
+    if (panel) {
+      panel.disconnect()
+      this.panels.delete(panelConfiguration.id)
     }
-  }
-
-  private async connectToPanels(): Promise<void> {
-    const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(this.connectToPanel.bind(this))
-  }
-
-  private connectToPanel(panelConfiguration: PanelConfiguration): void {
-    if (this.panels.has(panelConfiguration.hostname)) {
-      this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
-      return
-    }
-
-    const panel: Panel = this.panelFactory.createPanel(panelConfiguration)
-    panel.initialize()
-
-    this.panels.set(panelConfiguration.hostname, panel)
+    this.connectToPanel(panelConfiguration)
   }
 }
