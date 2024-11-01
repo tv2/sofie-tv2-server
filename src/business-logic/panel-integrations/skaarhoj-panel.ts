@@ -16,7 +16,7 @@ export class SkaarhojPanel implements Panel {
   private socket: Socket = new Socket()
 
   private keepAlive: boolean = true
-  private reconnectionTimeout: NodeJS.Timeout | undefined
+  private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   public constructor(
     private readonly panelConfiguration: PanelConfiguration,
@@ -70,7 +70,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Connected to Skaarhoj Panel',
-      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -84,7 +84,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Skaarhoj panel is unreachable',
-      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.WARNING,
       lastUpdatedTimestamp: Date.now()
     }
@@ -94,7 +94,7 @@ export class SkaarhojPanel implements Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Disconnected from Skaarhoj panel',
-      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected`,
+      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -107,14 +107,14 @@ export class SkaarhojPanel implements Panel {
   }
 
   private reconnect(): void {
-    if (this.reconnectionTimeout) {
+    if (this.reconnectTimeoutIdentifier) {
       return
     }
     this.statusMessageService.sendStatusMessage(this.createReconnectingStatusMessage())
 
-    this.reconnectionTimeout = setTimeout(() => {
-      clearTimeout(this.reconnectionTimeout)
-      this.reconnectionTimeout = undefined
+    this.reconnectTimeoutIdentifier = setTimeout(() => {
+      clearTimeout(this.reconnectTimeoutIdentifier)
+      this.reconnectTimeoutIdentifier = undefined
 
       if (this.socket.readyState !== 'closed') {
         return
