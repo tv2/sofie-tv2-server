@@ -9,6 +9,14 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
+import {
+  SkaarhojButtonState,
+  SkaarhojColorCommand,
+  SkaarhojCommand,
+  SkaarhojStateCommand,
+  SkaarhojTextCommand
+} from './skaarhoj-command'
+import { Color } from '../../model/enums/color'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -89,6 +97,8 @@ export class SkaarhojPanel extends Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
+      this.clearAllInputsInSkaarhoj()
+      this.sendPanelState()
       this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
@@ -118,9 +128,13 @@ export class SkaarhojPanel extends Panel {
     })
   }
 
-  private writeCommand(command: string): void {
+  private writeCommand(command: SkaarhojCommand | string): void {
     // The \n is quite important. Without Skaarhoj won't interpret any of the commands.
-    this.socket.write(`${command}\n`)
+    this.socket.write(`${command.toString()}\n`)
+  }
+
+  private writeCommands(commands: SkaarhojCommand[]): void {
+    commands.forEach(this.writeCommand.bind(this))
   }
 
   private createConnectionSuccessStatusMessage(): StatusMessage {
@@ -253,6 +267,7 @@ export class SkaarhojPanel extends Panel {
         return inputConfiguration.command
       }
     }
+    return
   }
 
   private mapSkaarhojInputToKeyEvent(skaarhojInput: SkaarhojInput): KeyEvent | undefined {
@@ -291,5 +306,42 @@ export class SkaarhojPanel extends Panel {
       return true
     }
     return false
+  }
+
+  private clearAllInputsInSkaarhoj(): void {
+    const clearCommands: SkaarhojCommand[] = Array(200).flatMap((_value, index) => {
+      return [
+        new SkaarhojStateCommand(`${index}`, SkaarhojButtonState.OFF),
+        new SkaarhojTextCommand(`${index}`, '')
+      ]
+    })
+    this.writeCommands(clearCommands)
+  }
+
+  protected sendPanelState(): void {
+    const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((key) => {
+      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[key]
+      if (!inputConfiguration) {
+        return []
+      }
+
+      if (inputConfiguration.type === InputType.BUTTON) {
+        return [
+          new SkaarhojStateCommand(key, SkaarhojButtonState.ON),
+          new SkaarhojColorCommand(key, inputConfiguration.color ?? Color.DEFAULT),
+          new SkaarhojTextCommand(key, inputConfiguration.text ?? '')
+        ] as SkaarhojCommand[]
+      }
+
+      if (inputConfiguration.type === InputType.DISPLAY) {
+        return [
+          new SkaarhojTextCommand(key, inputConfiguration.text)
+        ] as SkaarhojCommand[]
+      }
+
+      return []
+    })
+
+    this.writeCommands(commands)
   }
 }
