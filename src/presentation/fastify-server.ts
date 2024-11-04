@@ -14,10 +14,12 @@ import { StatusMessageObserver } from '../business-logic/interfaces/status-messa
 import { StatusMessageEvent } from './value-objects/status-message-event'
 import { PanelEventBuilder } from './interfaces/panel-event-builder'
 import { TypedEvent } from './value-objects/typed-event'
-import { DeviceEventType, StatusMessageEventType } from './enums/event-type'
+import { DeviceEventType, RundownEventType, StatusMessageEventType } from './enums/event-type'
 import { StatusMessage } from '../model/entities/status-message'
 import { DeviceEmitter } from '../business-logic/interfaces/device-emitter'
 import { VideoMixerConfigurationUpdatedEvent } from './value-objects/device-event'
+import { RundownEvent } from './value-objects/rundown-event'
+import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
@@ -32,7 +34,8 @@ export class FastifyServer implements ProxyServer {
     private readonly panelObserver: PanelObserver,
     private readonly panelEventBuilder: PanelEventBuilder,
     private readonly statusMessageObserver: StatusMessageObserver,
-    private readonly deviceEmitter: DeviceEmitter
+    private readonly deviceEmitter: DeviceEmitter,
+    private readonly rundownEmitter: RundownEmitter
   ) {
     this.logger = logger.tag(this.constructor.name)
   }
@@ -127,6 +130,15 @@ export class FastifyServer implements ProxyServer {
     if (this.isEventVideoMixerConfigurationUpdatedEvent(parsedData)) {
       this.deviceEmitter.emitVideoMixerConfigurationUpdated(parsedData.videoMixer)
     }
+
+    if (this.isRundownEvent(parsedData)) {
+      if (parsedData.type === RundownEventType.ACTIVATED || parsedData.type === RundownEventType.REHEARSE) {
+        this.rundownEmitter.emitActiveRundownId(parsedData.rundownId)
+      }
+      if (parsedData.type === RundownEventType.DEACTIVATED) {
+        this.rundownEmitter.emitActiveRundownId(undefined)
+      }
+    }
   }
 
   private isTypedEvent(data: unknown): data is TypedEvent {
@@ -138,6 +150,10 @@ export class FastifyServer implements ProxyServer {
 
   private isEventVideoMixerConfigurationUpdatedEvent(event: TypedEvent): event is VideoMixerConfigurationUpdatedEvent {
     return event.type === DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED
+  }
+
+  private isRundownEvent(event: TypedEvent): event is RundownEvent {
+    return event.type in RundownEventType
   }
 
   private setupControllers(): void {

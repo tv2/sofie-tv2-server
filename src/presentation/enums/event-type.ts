@@ -1,4 +1,4 @@
-export type EventType = PanelEventType | StatusMessageEventType | DeviceEventType
+export type EventType = PanelEventType | StatusMessageEventType | DeviceEventType | RundownEventType
 
 export enum PanelEventType {
   PANEL_LAYOUT_CONFIGURATION_CREATED = 'PANEL_LAYOUT_CONFIGURATION_CREATED',
@@ -16,4 +16,10 @@ export enum StatusMessageEventType {
 
 export enum DeviceEventType {
   VIDEO_MIXER_CONFIGURATION_UPDATED = 'VIDEO_MIXER_CONFIGURATION_UPDATED'
+}
+
+export enum RundownEventType {
+  ACTIVATED = 'ACTIVATED',
+  REHEARSE = 'REHEARSE',
+  DEACTIVATED = 'DEACTIVATED'
 }
