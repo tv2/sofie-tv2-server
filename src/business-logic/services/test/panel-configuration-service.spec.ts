@@ -94,7 +94,7 @@ describe(PanelConfigurationService.name, () => {
       it('does not delete the PanelLayoutConfiguration', async() => {
         try {
           await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
-        } catch (error) {
+        } catch {
           // The error is expected
         }
         verify(panelLayoutConfigurationRepository.deletePanelLayoutConfiguration(anyString())).never()
@@ -103,7 +103,7 @@ describe(PanelConfigurationService.name, () => {
       it('does not emit a delete event', async() => {
         try {
           await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
-        } catch (error) {
+        } catch {
           // The error is expected
         }
         verify(panelEmitter.emitPanelLayoutConfigurationDeleted(anyString())).never()
@@ -161,7 +161,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not save the PanelConfiguration', async() => {
           try {
             await testee.createPanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelConfigurationRepository.createPanelConfiguration(anything())).never()
@@ -170,7 +170,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not emit a created event', async() => {
           try {
             await testee.createPanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelEmitter.emitPanelConfigurationCreated(anything())).never()
@@ -192,7 +192,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not save the PanelConfiguration', async() => {
           try {
             await testee.createPanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelConfigurationRepository.createPanelConfiguration(anything())).never()
@@ -201,7 +201,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not emit a created event', async() => {
           try {
             await testee.createPanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelEmitter.emitPanelConfigurationCreated(anything())).never()
@@ -257,7 +257,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not update the PanelConfiguration', async() => {
           try {
             await testee.updatePanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelConfigurationRepository.updatePanelConfiguration(anything())).never()
@@ -266,7 +266,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not emit an updated event', async() => {
           try {
             await testee.updatePanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
@@ -288,7 +288,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not update the PanelConfiguration', async() => {
           try {
             await testee.updatePanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelConfigurationRepository.updatePanelConfiguration(anything())).never()
@@ -297,7 +297,7 @@ describe(PanelConfigurationService.name, () => {
         it('does not emit an update event', async() => {
           try {
             await testee.updatePanelConfiguration(panelConfiguration)
-          } catch (error) {
+          } catch {
             // Expected error
           }
           verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
