@@ -4,6 +4,9 @@ import { Logger } from '../../logger/logger'
 import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 import { RundownObserver } from '../interfaces/rundown-observer'
 import { NoActiveRundownException } from '../../model/exceptions/no-active-rundown-exception'
+import { Rundown, RundownMode } from '../../model/entities/rundown'
+
+const BASIC_RUNDOWN_ENDPOINT: string = '/rundowns/basic'
 
 enum PseudoActionId {
   TAKE = 'TAKE',
@@ -27,6 +30,13 @@ export class PanelCommandExecutor {
   ) {
     this.logger = logger.tag(PanelCommandExecutor.name)
     this.rundownObserver.subscribeToRundownActiveRundownId(rundownId => this.activeRundownId = rundownId)
+    this.fetchActiveRundown().catch(error => this.logger.data(error).error('Failed to fetch active Rundown'))
+  }
+
+  private async fetchActiveRundown(): Promise<void> {
+    const rundowns: Rundown[] = await this.httpService.get(BASIC_RUNDOWN_ENDPOINT) as Rundown[]
+    const activeRundown: Rundown | undefined = rundowns.find(rundown => rundown.mode === RundownMode.ACTIVE || rundown.mode === RundownMode.REHEARSAL)
+    this.activeRundownId = activeRundown?.id
   }
 
   public executeActionCommand(command: ActionPanelCommand): void {
