@@ -9,7 +9,7 @@ import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-co
 import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelCommandExecutor } from './panel-command-executor'
 import { ModifierPanelCommand, PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType, PanelInputModifier } from '../../model/enums/panel-enums'
+import { PanelCommandType } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 export class PanelManagerImplementation implements PanelManager {
@@ -18,7 +18,7 @@ export class PanelManagerImplementation implements PanelManager {
   // The first key is the 'panelGroupId'. The second key is `panelConfigurationId`.
   private readonly panelGroups: Map<string, Map<string, Panel>> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
-  private readonly activePanelGroupModifiers: Map<string, Set<PanelInputModifier>> = new Map()
+  private readonly activePanelGroupModifiers: Map<string, Set<string>> = new Map()
 
   public constructor(
     private readonly panelFactory: PanelFactory,
@@ -118,7 +118,7 @@ export class PanelManagerImplementation implements PanelManager {
     if (!this.activePanelGroupModifiers.has(command.panelGroupId)) {
       this.activePanelGroupModifiers.set(command.panelGroupId, new Set())
     }
-    const activeModifiersForGroup: Set<PanelInputModifier> = this.activePanelGroupModifiers.get(command.panelGroupId)!
+    const activeModifiersForGroup: Set<string> = this.activePanelGroupModifiers.get(command.panelGroupId)!
 
     const isModifierAlreadyActiveInGroup: boolean = activeModifiersForGroup.has(command.modifier)
     if (isModifierAlreadyActiveInGroup) {
@@ -131,7 +131,7 @@ export class PanelManagerImplementation implements PanelManager {
   private updatePanelsWithActiveModifiers(): void {
     this.panelGroups.forEach((panels: Map<string, Panel>, panelGroupId: string) => {
       panels.forEach((panel: Panel) => {
-        const activeModifiersForGroup: Set<PanelInputModifier> | undefined = this.activePanelGroupModifiers.get(panelGroupId)
+        const activeModifiersForGroup: Set<string> | undefined = this.activePanelGroupModifiers.get(panelGroupId)
         if (!activeModifiersForGroup) {
           return
         }

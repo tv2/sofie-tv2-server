@@ -1,7 +1,7 @@
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType, PanelInputModifier } from '../../model/enums/panel-enums'
+import { PanelCommandType } from '../../model/enums/panel-enums'
 import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 
@@ -12,15 +12,16 @@ export abstract class Panel {
   public abstract disconnect(): void
   protected abstract assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void
 
-  protected activeModifiers: Set<PanelInputModifier> = new Set()
-  private modifierInputKeys: Set<string> = new Set()
+  protected activeModifiers: ReadonlySet<string> = new Set()
+  private modifierInputKeys: ReadonlySet<string> = new Set()
 
   protected onCommandCallback?: (command: PanelCommand) => void
 
   protected constructor(
     protected readonly panelConfiguration: PanelConfiguration,
     protected panelLayoutConfiguration: PanelLayoutConfiguration,
-    private readonly statusMessageService: StatusMessageService) {
+    private readonly statusMessageService: StatusMessageService
+  ) {
     this.assertValidPanelConfiguration(panelConfiguration)
     this.updateModifierInputKeys()
   }
@@ -33,7 +34,7 @@ export abstract class Panel {
     return this.panelConfiguration
   }
 
-  public updateActiveModifiers(activeModifiers: Set<PanelInputModifier>): void {
+  public updateActiveModifiers(activeModifiers: ReadonlySet<string>): void {
     this.activeModifiers = activeModifiers
   }
 
