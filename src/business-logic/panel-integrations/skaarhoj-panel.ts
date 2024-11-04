@@ -38,6 +38,12 @@ enum SkaarhojInputType {
   FADER = 'ABS'
 }
 
+interface SkaarhojInput {
+  id: string
+  inputType: string
+  data: string
+}
+
 export class SkaarhojPanel implements Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
@@ -85,7 +91,11 @@ export class SkaarhojPanel implements Panel {
 
     this.socket.setEncoding('utf8')
     this.socket.on('data', (data: Buffer) => {
-      const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(data.toString())
+      const skaarhojInput: SkaarhojInput | undefined = this.parseSkaarhojInput(data.toString())
+      if (!skaarhojInput) {
+        return
+      }
+      const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(skaarhojInput)
       if (inputData && this.onCommandCallback) {
         this.onCommandCallback(inputData)
       }
@@ -185,29 +195,37 @@ export class SkaarhojPanel implements Panel {
     this.onCommandCallback = onCommandCallback
   }
 
-  private mapPanelInputToCommand(input: string): PanelCommand | undefined {
+  private parseSkaarhojInput(textInput: string): SkaarhojInput | undefined {
     // It's possible for Skaarhoj to send an array of commands separated by '\n'. We want the last entry of that array
-    const match = input.split('\n').findLast(s => s !== '')?.match(SKAARHOJ_INPUT_REGEX)
-    if (!match?.groups) {
+    const skaarhojInput: SkaarhojInput | undefined = textInput.split('\n').findLast(s => s !== '')?.match(SKAARHOJ_INPUT_REGEX)?.groups as SkaarhojInput | undefined
+    if (!skaarhojInput) {
       return
     }
 
-    if (match.groups.inputType !== SKAARHOJ_INPUT_PREFIX) {
+    if (skaarhojInput.inputType !== SKAARHOJ_INPUT_PREFIX) {
       return
     }
 
     // It's possible to get an id like "3.4", which indicates a specific area of buttton 3 is pressed.
     // Since we currently treat the areas as one button, we strip the ".x" part of the id.
-    const id: string = match.groups.id!.replace(/\..*$/, '')
-    const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[id]
+    const id: string = skaarhojInput.id!.replace(/\..*$/, '')
+
+    return {
+      ...skaarhojInput,
+      id
+    }
+  }
+
+  private mapPanelInputToCommand(skaarhojInput: SkaarhojInput): PanelCommand | undefined {
+    const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[skaarhojInput.id]
     if (!inputConfiguration) {
       return
     }
 
     switch (inputConfiguration.type) {
       case InputType.BUTTON: {
-        const isButtonPressed: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED) && !!inputConfiguration.onPress
-        const isButtonReleased: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED) && !!inputConfiguration.onRelease
+        const isButtonPressed: boolean = !!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED) && !!inputConfiguration.onPress
+        const isButtonReleased: boolean = !!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED) && !!inputConfiguration.onRelease
 
         if (!isButtonPressed && !isButtonReleased) {
           return
@@ -215,10 +233,10 @@ export class SkaarhojPanel implements Panel {
         return inputConfiguration.command
       }
       case InputType.FADER: {
-        if (!input.toUpperCase().match(SkaarhojInputType.FADER)) {
+        if (!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.FADER)) {
           return
         }
-        const regexMatchForFaderValue: RegExpMatchArray | null | undefined = match.groups.data?.match(/Abs:(?<value>\d+)/)
+        const regexMatchForFaderValue: RegExpMatchArray | null | undefined = skaarhojInput.data?.match(/Abs:(?<value>\d+)/)
         if (!regexMatchForFaderValue) {
           return
         }
