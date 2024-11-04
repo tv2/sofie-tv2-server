@@ -11,10 +11,7 @@ export class AlbaServerHttpService implements HttpService {
   }
 
   private prefixUrlWithSlash(url: string): string {
-    if (!url.startsWith('/')) {
-      return `/${url}`
-    }
-    return url
+    return url.replace(/^\/*/, '/')
   }
 
   public put(url: string, body?: unknown): Promise<void> {

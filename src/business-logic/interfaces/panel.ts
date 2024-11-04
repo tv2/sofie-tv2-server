@@ -3,7 +3,7 @@ import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-co
 import { PanelCommand } from '../../model/interfaces/input-configuration'
 
 export interface Panel {
-  initialize(): void
+  connect(): void
   disconnect(): void
   getPanelConfiguration(): PanelConfiguration
   updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void

@@ -75,7 +75,7 @@ export class PanelManagerImplementation implements PanelManager {
     }
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
-    panel.initialize()
+    panel.connect()
     panel.registerOnCommand(command => this.handleCommand(command))
 
     this.panels.set(panelConfiguration.id, panel)

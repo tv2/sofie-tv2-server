@@ -66,7 +66,7 @@ export class SkaarhojPanel implements Panel {
     }
   }
 
-  public initialize(): void {
+  public connect(): void {
     this.connectToSocket()
   }
 
@@ -84,7 +84,7 @@ export class SkaarhojPanel implements Panel {
     })
 
     this.socket.setEncoding('utf8')
-    this.socket.on('data', (data) => {
+    this.socket.on('data', (data: Buffer) => {
       const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(data.toString())
       if (inputData && this.onCommandCallback) {
         this.onCommandCallback(inputData)
@@ -187,9 +187,8 @@ export class SkaarhojPanel implements Panel {
 
   private mapPanelInputToCommand(input: string): PanelCommand | undefined {
     // It's possible for Skaarhoj to send an array of commands separated by '\n'. We want the last entry of that array
-    const commandArray: string[] = input.split('\n').filter(s => s !== '')
-    const match = commandArray[commandArray.length - 1]?.match(SKAARHOJ_INPUT_REGEX)
-    if (!match || !match.groups) {
+    const match = input.split('\n').findLast(s => s !== '')?.match(SKAARHOJ_INPUT_REGEX)
+    if (!match?.groups) {
       return
     }
 
@@ -197,8 +196,9 @@ export class SkaarhojPanel implements Panel {
       return
     }
 
-    // It's possible to get an id like "3.4", so the Math.floor is to turn that into "3" for now since we don't support multiple functions for a single button.
-    const id: number = Math.floor(Number.parseFloat(match.groups.id!))
+    // It's possible to get an id like "3.4", which indicates a specific area of buttton 3 is pressed.
+    // Since we currently treat the areas as one button, we strip the ".x" part of the id.
+    const id: string = match.groups.id!.replace(/\..*$/, '')
     const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[id]
     if (!inputConfiguration) {
       return
@@ -218,11 +218,11 @@ export class SkaarhojPanel implements Panel {
         if (!input.toUpperCase().match(SkaarhojInputType.FADER)) {
           return
         }
-        const regexValue = match.groups.data?.match(/Abs:(?<value>\d+)/)
-        if (!regexValue) {
+        const regexMatchForFaderValue: RegExpMatchArray | null | undefined = match.groups.data?.match(/Abs:(?<value>\d+)/)
+        if (!regexMatchForFaderValue) {
           return
         }
-        const value: number = Number.parseFloat(regexValue[0].replace('Abs:', ''))
+        const value: number = Number.parseFloat(regexMatchForFaderValue[0].replace('Abs:', ''))
         if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
           return
         }
