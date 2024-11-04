@@ -8,17 +8,15 @@ import { PanelObserver } from '../interfaces/panel-observer'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelLayoutConfigurationRepository } from '../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelCommandExecutor } from './panel-command-executor'
-import { ModifierPanelCommand, PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType, PanelInputModifier } from '../../model/enums/panel-enums'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { PanelCommand } from '../../model/interfaces/input-configuration'
+import { PanelCommandType } from '../../model/enums/panel-enums'
+import { PanelGroup } from '../panel-integrations/panel-group'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
 
-  // The first key is the 'panelGroupId'. The second key is `panelConfigurationId`.
-  private readonly panelGroups: Map<string, Map<string, Panel>> = new Map()
+  private readonly panelGroups: Map<string, PanelGroup> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
-  private readonly activePanelGroupModifiers: Map<string, Set<PanelInputModifier>> = new Map()
 
   public constructor(
     private readonly panelFactory: PanelFactory,
@@ -55,19 +53,13 @@ export class PanelManagerImplementation implements PanelManager {
     this.panelObserver.subscribeToPanelLayoutConfigurationCreated(panelLayoutConfiguration => this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration))
     this.panelObserver.subscribeToPanelLayoutConfigurationUpdated((panelLayoutConfiguration) => {
       this.panelLayoutConfigurations.set(panelLayoutConfiguration.id, panelLayoutConfiguration)
-      this.panelGroups.forEach((panels) => {
-        panels.forEach((panel) => {
-          if (panel.getPanelConfiguration().panelLayoutConfigurationId === panelLayoutConfiguration.id) {
-            panel.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-          }
-        })
-      })
+      this.panelGroups.forEach(panelGroup => panelGroup.updatePanelLayoutConfigurationForPanels(panelLayoutConfiguration))
     })
     this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.panelLayoutConfigurations.delete(panelLayoutConfigurationId))
   }
 
   private connectToPanel(panelConfiguration: PanelConfiguration): void {
-    const existingPanelForHostname: Panel | undefined = [...this.panelGroups.values()].flatMap(panelGroup => [...panelGroup.values()]).find(panel => panel.getPanelConfiguration().hostname === panelConfiguration.hostname)
+    const existingPanelForHostname: boolean = [...this.panelGroups.values()].some(panelGroup => panelGroup.hasExistingPanelWithHostname(panelConfiguration.hostname))
     if (existingPanelForHostname) {
       this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
       return
@@ -80,17 +72,18 @@ export class PanelManagerImplementation implements PanelManager {
     }
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
-    panel.initialize()
-    panel.registerOnCommand(command => this.handleCommand(command))
+    panel.connect()
 
-    this.setPanel(panelConfiguration, panel)
+    this.addPanelToGroup(panelConfiguration, panel)
   }
 
-  private setPanel(panelConfiguration: PanelConfiguration, panel: Panel): void {
+  private addPanelToGroup(panelConfiguration: PanelConfiguration, panel: Panel): void {
     if (!this.panelGroups.has(panelConfiguration.panelGroupId)) {
-      this.panelGroups.set(panelConfiguration.panelGroupId, new Map())
+      const panelGroup: PanelGroup = new PanelGroup(panelConfiguration.panelGroupId)
+      panelGroup.registerOnCommand(command => this.handleCommand(command))
+      this.panelGroups.set(panelConfiguration.panelGroupId, panelGroup)
     }
-    this.panelGroups.get(panelConfiguration.panelGroupId)?.set(panelConfiguration.id, panel)
+    this.panelGroups.get(panelConfiguration.panelGroupId)?.addPanel(panel)
   }
 
   private handleCommand(command: PanelCommand): void {
@@ -103,67 +96,20 @@ export class PanelManagerImplementation implements PanelManager {
         this.panelCommandExecutor.executeTBarCommand(command)
         return
       }
-      case PanelCommandType.MODIFIER: {
-        this.updateActiveModifiersFromPanelCommand(command)
-        this.updatePanelsWithActiveModifiers()
-        return
-      }
     }
-  }
-
-  private updateActiveModifiersFromPanelCommand(command: ModifierPanelCommand): void {
-    if (!command.panelGroupId) {
-      throw new UnsupportedOperationException('A modifier command is missing its \'PanelGroupId')
-    }
-    if (!this.activePanelGroupModifiers.has(command.panelGroupId)) {
-      this.activePanelGroupModifiers.set(command.panelGroupId, new Set())
-    }
-    const activeModifiersForGroup: Set<PanelInputModifier> = this.activePanelGroupModifiers.get(command.panelGroupId)!
-
-    const isModifierAlreadyActiveInGroup: boolean = activeModifiersForGroup.has(command.modifier)
-    if (isModifierAlreadyActiveInGroup) {
-      activeModifiersForGroup.delete(command.modifier)
-    } else {
-      activeModifiersForGroup.add(command.modifier)
-    }
-  }
-
-  private updatePanelsWithActiveModifiers(): void {
-    this.panelGroups.forEach((panels: Map<string, Panel>, panelGroupId: string) => {
-      panels.forEach((panel: Panel) => {
-        const activeModifiersForGroup: Set<PanelInputModifier> | undefined = this.activePanelGroupModifiers.get(panelGroupId)
-        if (!activeModifiersForGroup) {
-          return
-        }
-        panel.updateActiveModifiers(activeModifiersForGroup)
-      })
-    })
   }
 
   private disconnectFromPanel(panelConfigurationId: string): void {
-    this.panelGroups.forEach((panels) => {
-      const panel: Panel | undefined = panels.get(panelConfigurationId)
-      if (!panel) {
-        return
-      }
-      panel.disconnect()
-      panels.delete(panel.getPanelConfiguration().id)
-    })
+    this.panelGroups.forEach(panelGroup => panelGroup.disconnectPanel(panelConfigurationId))
   }
 
   private reconnectToPanel(panelConfiguration: PanelConfiguration): void {
-    this.panelGroups.forEach((panels) => {
-      const panel: Panel | undefined = panels.get(panelConfiguration.id)
-      if (panel) {
-        panel.disconnect()
-        panels.delete(panelConfiguration.id)
-      }
-      this.connectToPanel(panelConfiguration)
-    })
+    this.disconnectFromPanel(panelConfiguration.id)
+    this.connectToPanel(panelConfiguration)
   }
 
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(this.connectToPanel.bind(this))
+    panelConfigurations.forEach(this.connectToPanel.bind(this))
   }
 }
