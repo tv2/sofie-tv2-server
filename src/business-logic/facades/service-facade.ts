@@ -62,6 +62,7 @@ export class ServiceFacade {
   public static createVideoMixer(): VideoMixer {
     return new AtemVideoMixer(
       ServiceFacade.createStatusMessageService(),
+      ServiceFacade.createHttpService(),
       DomainEventFacade.createDeviceObserver(),
       LoggerFacade.createLogger()
     )

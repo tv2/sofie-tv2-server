@@ -7,10 +7,13 @@ import { StatusCode } from '../../model/enums/status-code'
 import { DeviceObserver } from '../interfaces/device-observer'
 import { VideoMixerConfiguration } from '../../model/interfaces/video-mixer-configuration'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { HttpService } from '../interfaces/http-service'
 
 const RECONNECTION_TIMEOUT_MS: number = 5000
 
 const ATEM_TRANSITION_MULTIPLICATION_FACTOR: number = 10
+
+const VIDEO_MIXER_CONFIGURATION_ENDPOINT: string = '/devices/videoMixers/configurations'
 
 export class AtemVideoMixer implements VideoMixer {
   private readonly logger: Logger
@@ -22,6 +25,7 @@ export class AtemVideoMixer implements VideoMixer {
 
   public constructor(
     private readonly statusMessageService: StatusMessageService,
+    private readonly httpService: HttpService,
     deviceObserver: DeviceObserver,
     logger: Logger
   ) {
@@ -31,6 +35,7 @@ export class AtemVideoMixer implements VideoMixer {
       this.connect()
     })
     this.setup()
+    this.fetchVideoMixerConfiguration().catch(error => this.logger.data(error).error('Error fetching VideoMixerConfiguration'))
   }
 
   private setup(): void {
@@ -90,6 +95,11 @@ export class AtemVideoMixer implements VideoMixer {
       statusCode: StatusCode.UNKNOWN,
       lastUpdatedTimestamp: Date.now()
     }
+  }
+
+  private async fetchVideoMixerConfiguration(): Promise<void> {
+    this.videoMixerConfiguration = await this.httpService.get(VIDEO_MIXER_CONFIGURATION_ENDPOINT) as VideoMixerConfiguration
+    this.connect()
   }
 
   public sendTBarCommand(tBarPosition: number): void {
