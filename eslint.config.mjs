@@ -5,7 +5,7 @@ import stylisticEslintPlugin from '@stylistic/eslint-plugin'
 export default [
 
   {
-    files: ['**/*.ts', 'eslint.config.mjs', 'vitest.config.mts'],
+    files: ['**/*.ts'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
@@ -22,7 +22,7 @@ export default [
       ...stylisticEslintPlugin.configs['recommended-flat'].rules,
       'linebreak-style': ['error', 'unix'],
       'indent': 'off',
-      '@typescript-eslint/indent': ['error', 2],
+      '@stylistic/indent': ['error', 2],
       'no-void': ['error'],
       'no-console': 'error',
       'no-unused-vars': 'off',
