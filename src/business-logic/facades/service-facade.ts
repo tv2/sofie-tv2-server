@@ -1,23 +1,24 @@
-import { PanelService } from '../services/interfaces/panel-service'
+import { PanelService } from '../interfaces/panel-service'
 import { PanelConfigurationService } from '../services/panel-configuration-service'
 import { RepositoryFacade } from '../../data-access/repository-facade'
-import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
-import { PanelManager } from '../services/interfaces/panel-manager'
+import { PanelManager } from '../interfaces/panel-manager'
 import { PanelManagerImplementation } from '../services/panel-manager-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { PanelFactory } from '../panel-integrations/panel-factory'
 import { StatusMessageService } from '../services/status-message-service'
-import { HttpService } from '../services/interfaces/http-service'
+import { HttpService } from '../interfaces/http-service'
 import { FetchHttpService } from '../services/fetch-http-service'
 import { JsendHttpService } from '../services/jsend-http-service'
 import { AlbaServerHttpService } from '../services/alba-server-http-service'
+import { DomainEventFacade } from './domain-event-facade'
+import { PanelCommandExecutor } from '../services/panel-command-executor'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
     return new PanelConfigurationService(
       RepositoryFacade.createPanelLayoutConfigurationRepository(),
       RepositoryFacade.createPanelConfigurationRepository(),
-      EventEmitterFacade.createPanelEventEmitter()
+      DomainEventFacade.createPanelEmitter()
     )
   }
 
@@ -25,7 +26,9 @@ export class ServiceFacade {
     return new PanelManagerImplementation(
       ServiceFacade.createPanelFactory(),
       RepositoryFacade.createPanelConfigurationRepository(),
-      EventEmitterFacade.createPanelEventObserver(),
+      RepositoryFacade.createPanelLayoutConfigurationRepository(),
+      DomainEventFacade.createPanelObserver(),
+      ServiceFacade.createPanelCommandExecutor(),
       LoggerFacade.createLogger()
     )
   }
@@ -37,12 +40,16 @@ export class ServiceFacade {
   public static createStatusMessageService(): StatusMessageService {
     return new StatusMessageService(
       RepositoryFacade.createStatusMessageRepository(),
-      EventEmitterFacade.createStatusMessageEventEmitter(),
+      DomainEventFacade.createStatusMessageEmitter(),
       ServiceFacade.createHttpService()
     )
   }
 
   public static createHttpService(): HttpService {
     return new AlbaServerHttpService(new JsendHttpService(new FetchHttpService()))
+  }
+
+  public static createPanelCommandExecutor(): PanelCommandExecutor {
+    return new PanelCommandExecutor(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
   }
 }

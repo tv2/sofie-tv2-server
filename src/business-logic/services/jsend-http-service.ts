@@ -1,4 +1,4 @@
-import { HttpService } from './interfaces/http-service'
+import { HttpService } from '../interfaces/http-service'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { RequestStatus } from '../enums/request-status'
 import { HttpException } from '../../model/exceptions/http-exception'
@@ -45,5 +45,9 @@ export class JsendHttpService implements HttpService {
     if (!('status' in data)) {
       throw new UnsupportedOperationException('Expected JSend response to have the attribute \'status\'')
     }
+  }
+
+  public put(url: string, body?: unknown): Promise<void> {
+    return this.httpService.put(url, body)
   }
 }

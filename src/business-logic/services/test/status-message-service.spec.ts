@@ -1,7 +1,7 @@
 import { StatusMessageService } from '../status-message-service'
 import { StatusMessageRepository } from '../../../data-access/interfaces/status-message-repository'
-import { StatusMessageEventEmitter } from '../interfaces/status-message-event-emitter'
-import { HttpService } from '../interfaces/http-service'
+import { StatusMessageEmitter } from '../../interfaces/status-message-emitter'
+import { HttpService } from '../../interfaces/http-service'
 import { anyString, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from '../../../model/test/entity-test-factory'
 import { StatusMessage } from '../../../model/entities/status-message'
@@ -37,7 +37,7 @@ describe(StatusMessageService.name, () => {
   describe(StatusMessageService.prototype.sendStatusMessage.name, () => {
     it('emits a StatusMessage event', () => {
       const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage()
-      const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
+      const statusMessageEventEmitter: StatusMessageEmitter = mock<StatusMessageEmitter>()
 
       const testee: StatusMessageService = createTestee({ statusMessageEventEmitter })
       testee.sendStatusMessage(statusMessage)
@@ -59,12 +59,12 @@ describe(StatusMessageService.name, () => {
 
 function createTestee(params?: {
   statusMessageRepository?: StatusMessageRepository
-  statusMessageEventEmitter?: StatusMessageEventEmitter
+  statusMessageEventEmitter?: StatusMessageEmitter
   httpService?: HttpService
 }): StatusMessageService {
   return new StatusMessageService(
     instance(params?.statusMessageRepository ?? mock<StatusMessageRepository>()),
-    instance(params?.statusMessageEventEmitter ?? mock<StatusMessageEventEmitter>()),
+    instance(params?.statusMessageEventEmitter ?? mock<StatusMessageEmitter>()),
     instance(params?.httpService ?? mock<HttpService>())
   )
 }

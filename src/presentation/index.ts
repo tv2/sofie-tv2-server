@@ -5,8 +5,9 @@ import { BaseController } from './controllers/base-controller'
 import { ControllerFacade } from './facades/controller-facade'
 import { LoggerFacade } from '../logger/logger-facade'
 import { RepositoryFacade } from '../data-access/repository-facade'
-import { EventEmitterFacade } from './facades/event-emitter-facade'
 import { ServiceFacade } from '../business-logic/facades/service-facade'
+import { DomainEventFacade } from '../business-logic/facades/domain-event-facade'
+import { EventBuilderFacade } from './facades/event-builder-facade'
 
 const SOFIE_REST_URL: string = 'http://localhost:3005'
 const SOFIE_WEBSOCKET_URL: string = 'ws://localhost:3006'
@@ -24,8 +25,9 @@ async function startProxyServer(logger: Logger): Promise<void> {
   const proxyServer: ProxyServer = new FastifyServer(
     logger,
     controllers,
-    EventEmitterFacade.createPanelEventObserver(),
-    EventEmitterFacade.createStatusMessageEventObserver()
+    DomainEventFacade.createPanelObserver(),
+    EventBuilderFacade.createPanelEventBuilder(),
+    DomainEventFacade.createStatusMessageObserver()
   )
   await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: SOFIE_REST_URL, websocketUrl: SOFIE_WEBSOCKET_URL })
 }

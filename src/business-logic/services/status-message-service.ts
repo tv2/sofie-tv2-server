@@ -1,14 +1,14 @@
 import { StatusMessageRepository } from '../../data-access/interfaces/status-message-repository'
 import { StatusMessage } from '../../model/entities/status-message'
-import { StatusMessageEventEmitter } from './interfaces/status-message-event-emitter'
-import { HttpService } from './interfaces/http-service'
+import { StatusMessageEmitter } from '../interfaces/status-message-emitter'
+import { HttpService } from '../interfaces/http-service'
 
 const STATUS_MESSAGE_URL: string = '/systemInformation/statusMessages'
 
 export class StatusMessageService {
   public constructor(
     private readonly statusMessageRepository: StatusMessageRepository,
-    private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
+    private readonly statusMessageEventEmitter: StatusMessageEmitter,
     private readonly httpService: HttpService
   ) { }
 

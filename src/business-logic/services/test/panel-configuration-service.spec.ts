@@ -3,9 +3,9 @@ import {
   PanelLayoutConfigurationRepository
 } from '../../../data-access/interfaces/panel-layout-configuration-repository'
 import { PanelConfigurationRepository } from '../../../data-access/interfaces/panel-configuration-repository'
-import { PanelEventEmitter } from '../interfaces/panel-event-emitter'
+import { PanelEmitter } from '../../interfaces/panel-emitter'
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { PanelService } from '../interfaces/panel-service'
+import { PanelService } from '../../interfaces/panel-service'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { EntityTestFactory } from '../../../model/test/entity-test-factory'
 import { PanelConfiguration } from '../../../model/interfaces/panel-configuration'
@@ -21,7 +21,7 @@ describe(PanelConfigurationService.name, () => {
 
   let panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository
   let panelConfigurationRepository: PanelConfigurationRepository
-  let panelEventEmitter: PanelEventEmitter
+  let panelEmitter: PanelEmitter
 
   beforeEach(() => {
     panelLayoutConfiguration = EntityTestFactory.createPanelLayoutConfiguration()
@@ -29,9 +29,9 @@ describe(PanelConfigurationService.name, () => {
 
     panelLayoutConfigurationRepository = mock<PanelLayoutConfigurationRepository>()
     panelConfigurationRepository = mock<PanelConfigurationRepository>()
-    panelEventEmitter = mock<PanelEventEmitter>()
+    panelEmitter = mock<PanelEmitter>()
 
-    testee = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEventEmitter })
+    testee = createTestee({ panelLayoutConfigurationRepository, panelConfigurationRepository, panelEmitter })
   })
 
   describe(PanelConfigurationService.prototype.createPanelLayoutConfiguration.name, () => {
@@ -46,7 +46,7 @@ describe(PanelConfigurationService.name, () => {
 
     it('emits a PanelLayoutConfigurationCreatedEvent', async() => {
       await testee.createPanelLayoutConfiguration(panelLayoutConfiguration)
-      verify(panelEventEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfiguration)).once()
+      verify(panelEmitter.emitPanelLayoutConfigurationCreated(panelLayoutConfiguration)).once()
     })
   })
 
@@ -62,7 +62,7 @@ describe(PanelConfigurationService.name, () => {
 
     it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
       await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-      verify(panelEventEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
+      verify(panelEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
     })
   })
 
@@ -79,7 +79,7 @@ describe(PanelConfigurationService.name, () => {
 
       it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
         await testee.deletePanelLayoutConfiguration(panelLayoutConfiguration.id)
-        verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfiguration.id)).once()
+        verify(panelEmitter.emitPanelLayoutConfigurationDeleted(panelLayoutConfiguration.id)).once()
       })
     })
 
@@ -106,7 +106,7 @@ describe(PanelConfigurationService.name, () => {
         } catch {
           // The error is expected
         }
-        verify(panelEventEmitter.emitPanelLayoutConfigurationDeleted(anyString())).never()
+        verify(panelEmitter.emitPanelLayoutConfigurationDeleted(anyString())).never()
       })
 
       it('throws an unsupported operation exception', async() => {
@@ -145,7 +145,7 @@ describe(PanelConfigurationService.name, () => {
 
         it('emits a PanelConfigurationCreatedEvent', async() => {
           await testee.createPanelConfiguration(panelConfiguration)
-          verify(panelEventEmitter.emitPanelConfigurationCreated(panelConfiguration)).once()
+          verify(panelEmitter.emitPanelConfigurationCreated(panelConfiguration)).once()
         })
       })
 
@@ -173,7 +173,7 @@ describe(PanelConfigurationService.name, () => {
           } catch {
             // Expected error
           }
-          verify(panelEventEmitter.emitPanelConfigurationCreated(anything())).never()
+          verify(panelEmitter.emitPanelConfigurationCreated(anything())).never()
         })
 
         it('throws an unsupported operation exception', async() => {
@@ -204,7 +204,7 @@ describe(PanelConfigurationService.name, () => {
           } catch {
             // Expected error
           }
-          verify(panelEventEmitter.emitPanelConfigurationCreated(anything())).never()
+          verify(panelEmitter.emitPanelConfigurationCreated(anything())).never()
         })
 
         it('throws an unsupported operation exception', async() => {
@@ -242,7 +242,7 @@ describe(PanelConfigurationService.name, () => {
 
         it('emits an Updated event', async() => {
           await testee.updatePanelConfiguration(panelConfiguration)
-          verify(panelEventEmitter.emitPanelConfigurationUpdated(panelConfiguration)).once()
+          verify(panelEmitter.emitPanelConfigurationUpdated(panelConfiguration)).once()
         })
       })
 
@@ -269,7 +269,7 @@ describe(PanelConfigurationService.name, () => {
           } catch {
             // Expected error
           }
-          verify(panelEventEmitter.emitPanelConfigurationUpdated(anything())).never()
+          verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
         })
 
         it('throws an unsupported operation exception', () => {
@@ -300,7 +300,7 @@ describe(PanelConfigurationService.name, () => {
           } catch {
             // Expected error
           }
-          verify(panelEventEmitter.emitPanelConfigurationUpdated(anything())).never()
+          verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
         })
 
         it('throws an unsupported operation exception', () => {
@@ -318,7 +318,7 @@ describe(PanelConfigurationService.name, () => {
 
     it('emits a deleted event', async() => {
       await testee.deletePanelConfiguration(panelConfiguration.id)
-      verify(panelEventEmitter.emitPanelConfigurationDeleted(panelConfiguration.id)).once()
+      verify(panelEmitter.emitPanelConfigurationDeleted(panelConfiguration.id)).once()
     })
   })
 })
@@ -326,11 +326,11 @@ describe(PanelConfigurationService.name, () => {
 function createTestee(params?: {
   panelLayoutConfigurationRepository?: PanelLayoutConfigurationRepository
   panelConfigurationRepository?: PanelConfigurationRepository
-  panelEventEmitter?: PanelEventEmitter
+  panelEmitter?: PanelEmitter
 }): PanelConfigurationService {
   return new PanelConfigurationService(
     instance(params?.panelLayoutConfigurationRepository ?? mock<PanelLayoutConfigurationRepository>()),
     instance(params?.panelConfigurationRepository ?? mock<PanelConfigurationRepository>()),
-    instance(params?.panelEventEmitter ?? mock<PanelEventEmitter>())
+    instance(params?.panelEmitter ?? mock<PanelEmitter>())
   )
 }
