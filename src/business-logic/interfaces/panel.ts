@@ -8,7 +8,7 @@ import { StatusMessage } from '../../model/entities/status-message'
 const MODIFIER_DELIMITER: string = ';'
 
 export abstract class Panel {
-  public abstract initialize(): void
+  public abstract connect(): void
   public abstract disconnect(): void
   protected abstract assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void
 

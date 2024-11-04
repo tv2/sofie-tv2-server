@@ -80,7 +80,7 @@ export class PanelManagerImplementation implements PanelManager {
     }
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
-    panel.initialize()
+    panel.connect()
     panel.registerOnCommand(command => this.handleCommand(command))
 
     this.setPanel(panelConfiguration, panel)
@@ -164,6 +164,6 @@ export class PanelManagerImplementation implements PanelManager {
 
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
-    panelConfigurations.map(this.connectToPanel.bind(this))
+    panelConfigurations.forEach(this.connectToPanel.bind(this))
   }
 }

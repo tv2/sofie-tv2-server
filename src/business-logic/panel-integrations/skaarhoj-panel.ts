@@ -1,6 +1,6 @@
 import { Panel } from '../interfaces/panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { InputType, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import { InputType, KeyEvent, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
 import { Logger } from '../../logger/logger'
@@ -38,12 +38,18 @@ enum SkaarhojInputType {
   FADER = 'ABS'
 }
 
+interface SkaarhojInput {
+  id: string
+  inputType: string
+  data: string
+}
+
 export class SkaarhojPanel extends Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
   private keepAlive: boolean = true
-  private reconnectionTimeout: NodeJS.Timeout | undefined
+  private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -64,7 +70,7 @@ export class SkaarhojPanel extends Panel {
     }
   }
 
-  public initialize(): void {
+  public connect(): void {
     this.connectToSocket()
   }
 
@@ -82,8 +88,12 @@ export class SkaarhojPanel extends Panel {
     })
 
     this.socket.setEncoding('utf8')
-    this.socket.on('data', (data) => {
-      const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(data.toString())
+    this.socket.on('data', (data: Buffer) => {
+      const skaarhojInput: SkaarhojInput | undefined = this.parseSkaarhojInput(data.toString())
+      if (!skaarhojInput) {
+        return
+      }
+      const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(skaarhojInput)
       if (inputData && this.onCommandCallback) {
         this.onCommandCallback(inputData)
       }
@@ -107,7 +117,7 @@ export class SkaarhojPanel extends Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Connected to Skaarhoj Panel',
-      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Successfully connected to Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -121,7 +131,7 @@ export class SkaarhojPanel extends Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Skaarhoj panel is unreachable',
-      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}`,
+      message: `Unable to connect to the Skaarhoj panel at ${this.panelConfiguration.hostname}.`,
       statusCode: StatusCode.WARNING,
       lastUpdatedTimestamp: Date.now()
     }
@@ -131,7 +141,7 @@ export class SkaarhojPanel extends Panel {
     return {
       id: this.getStatusMessageId(),
       title: 'Disconnected from Skaarhoj panel',
-      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected`,
+      message: `The Skaarhoj panel at ${this.panelConfiguration.hostname} was disconnected.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -144,14 +154,14 @@ export class SkaarhojPanel extends Panel {
   }
 
   private reconnect(): void {
-    if (this.reconnectionTimeout) {
+    if (this.reconnectTimeoutIdentifier) {
       return
     }
     this.sendStatusMessage(this.createReconnectingStatusMessage())
 
-    this.reconnectionTimeout = setTimeout(() => {
-      clearTimeout(this.reconnectionTimeout)
-      this.reconnectionTimeout = undefined
+    this.reconnectTimeoutIdentifier = setTimeout(() => {
+      clearTimeout(this.reconnectTimeoutIdentifier)
+      this.reconnectTimeoutIdentifier = undefined
 
       if (this.socket.readyState !== 'closed') {
         return
@@ -171,31 +181,38 @@ export class SkaarhojPanel extends Panel {
     }
   }
 
-  private mapPanelInputToCommand(input: string): PanelCommand | undefined {
+  private parseSkaarhojInput(textInput: string): SkaarhojInput | undefined {
     // It's possible for Skaarhoj to send an array of commands separated by '\n'. We want the last entry of that array
-    const commandArray: string[] = input.split('\n').filter(s => s !== '')
-    const match = commandArray[commandArray.length - 1]?.match(SKAARHOJ_INPUT_REGEX)
-    if (!match || !match.groups) {
+    const skaarhojInput: SkaarhojInput | undefined = textInput.split('\n').findLast(s => s !== '')?.match(SKAARHOJ_INPUT_REGEX)?.groups as SkaarhojInput | undefined
+    if (!skaarhojInput) {
       return
     }
 
-    if (match.groups.inputType !== SKAARHOJ_INPUT_PREFIX) {
+    if (skaarhojInput.inputType !== SKAARHOJ_INPUT_PREFIX) {
       return
     }
 
-    // It's possible to get an id like "3.4", so the Math.floor is to turn that into "3" for now since we don't support multiple functions for a single button.
-    const id: number = Math.floor(Number.parseFloat(match.groups.id!))
-    const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(id + '')
+    // It's possible to get an id like "3.4", which indicates a specific area of button 3 is pressed.
+    // Since we currently treat the areas as one button, we strip the ".x" part of the id.
+    const id: string = skaarhojInput.id!.replace(/\..*$/, '')
+
+    return {
+      ...skaarhojInput,
+      id
+    }
+  }
+
+  private mapPanelInputToCommand(skaarhojInput: SkaarhojInput): PanelCommand | undefined {
+    const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(skaarhojInput.id)
     if (!inputConfiguration) {
       return
     }
 
     switch (inputConfiguration.type) {
       case InputType.BUTTON: {
-        const isButtonPressed: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED) && !!inputConfiguration.onPress
-        const isButtonReleased: boolean = !!input.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED) && !!inputConfiguration.onRelease
+        const skaarhojKeyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
 
-        if (!isButtonPressed && !isButtonReleased) {
+        if (skaarhojKeyEvent !== inputConfiguration.triggersOn) {
           return
         }
 
@@ -209,14 +226,14 @@ export class SkaarhojPanel extends Panel {
         return inputConfiguration.command
       }
       case InputType.FADER: {
-        if (!input.toUpperCase().match(SkaarhojInputType.FADER)) {
+        if (!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.FADER)) {
           return
         }
-        const regexValue = match.groups.data?.match(/Abs:(?<value>\d+)/)
-        if (!regexValue) {
+        const regexMatchForFaderValue: RegExpMatchArray | null | undefined = skaarhojInput.data?.match(/Abs:(?<value>\d+)/)
+        if (!regexMatchForFaderValue) {
           return
         }
-        const value: number = Number.parseFloat(regexValue[0].replace('Abs:', ''))
+        const value: number = Number.parseFloat(regexMatchForFaderValue[0].replace('Abs:', ''))
         if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
           return
         }
@@ -224,5 +241,17 @@ export class SkaarhojPanel extends Panel {
         return inputConfiguration.command
       }
     }
+  }
+
+  private mapSkaarhojInputToKeyEvent(skaarhojInput: SkaarhojInput): KeyEvent | undefined {
+    if (skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED)) {
+      return KeyEvent.PRESSED
+    }
+
+    if (skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED)) {
+      return KeyEvent.RELEASED
+    }
+
+    return undefined
   }
 }

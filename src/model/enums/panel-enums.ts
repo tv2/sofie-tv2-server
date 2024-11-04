@@ -29,3 +29,8 @@ export enum PanelInputModifier {
   MODIFIER_THREE = 'MODIFIER_THREE',
   MODIFIER_FOUR = 'MODIFIER_FOUR'
 }
+
+export enum KeyEvent {
+  PRESSED = 'PRESSED',
+  RELEASED = 'RELEASED',
+}
