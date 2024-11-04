@@ -1,4 +1,4 @@
-import { PanelCommandType, InputType } from '../enums/panel-enums'
+import { PanelCommandType, InputType, KeyEvent } from '../enums/panel-enums'
 import z, { ZodSchema } from 'zod'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration
@@ -10,8 +10,7 @@ export interface BaseInputConfiguration {
 
 export interface ButtonConfiguration extends BaseInputConfiguration {
   type: InputType.BUTTON
-  onPress?: boolean
-  onRelease?: boolean
+  triggersOn: KeyEvent
 }
 
 export interface FaderConfiguration extends BaseInputConfiguration {
@@ -69,8 +68,7 @@ const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z
 const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.object({
   type: z.literal(InputType.BUTTON),
   command: ZOD_PANEL_COMMAND_SCHEMA,
-  onPress: z.boolean(),
-  onRelease: z.boolean(),
+  triggersOn: z.nativeEnum(KeyEvent)
 })
 
 const ZOD_FADER_CONFIGURATION_SCHEMA: ZodSchema<FaderConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({

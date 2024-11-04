@@ -1,6 +1,6 @@
 import { Panel } from '../interfaces/panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
-import { PanelCommandType, InputType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
+import { InputType, KeyEvent, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import net, { Socket } from 'node:net'
 import { Logger } from '../../logger/logger'
@@ -206,7 +206,7 @@ export class SkaarhojPanel implements Panel {
       return
     }
 
-    // It's possible to get an id like "3.4", which indicates a specific area of buttton 3 is pressed.
+    // It's possible to get an id like "3.4", which indicates a specific area of button 3 is pressed.
     // Since we currently treat the areas as one button, we strip the ".x" part of the id.
     const id: string = skaarhojInput.id!.replace(/\..*$/, '')
 
@@ -224,13 +224,8 @@ export class SkaarhojPanel implements Panel {
 
     switch (inputConfiguration.type) {
       case InputType.BUTTON: {
-        const isButtonPressed: boolean = !!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED) && !!inputConfiguration.onPress
-        const isButtonReleased: boolean = !!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED) && !!inputConfiguration.onRelease
-
-        if (!isButtonPressed && !isButtonReleased) {
-          return
-        }
-        return inputConfiguration.command
+        const skaarhojKeyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
+        return skaarhojKeyEvent === inputConfiguration.triggersOn ? inputConfiguration.command : undefined
       }
       case InputType.FADER: {
         if (!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.FADER)) {
@@ -248,5 +243,17 @@ export class SkaarhojPanel implements Panel {
         return inputConfiguration.command
       }
     }
+  }
+
+  private mapSkaarhojInputToKeyEvent(skaarhojInput: SkaarhojInput): KeyEvent | undefined {
+    if (skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_PRESSED)) {
+      return KeyEvent.PRESSED
+    }
+
+    if (skaarhojInput.data.toUpperCase().match(SkaarhojInputType.BUTTON_RELEASED)) {
+      return KeyEvent.RELEASED
+    }
+
+    return undefined
   }
 }

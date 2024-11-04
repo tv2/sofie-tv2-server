@@ -22,3 +22,8 @@ export enum PanelCommandType {
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
 }
+
+export enum KeyEvent {
+  PRESSED = 'PRESSED',
+  RELEASED = 'RELEASED',
+}
