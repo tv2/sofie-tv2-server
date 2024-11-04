@@ -3,6 +3,8 @@ import { PanelObserver } from '../interfaces/panel-observer'
 import { PanelEmitter } from '../interfaces/panel-emitter'
 import { StatusMessageObserver } from '../interfaces/status-message-observer'
 import { StatusMessageEmitter } from '../interfaces/status-message-emitter'
+import { DeviceObserver } from '../interfaces/device-observer'
+import { DeviceEmitter } from '../interfaces/device-emitter'
 
 export class DomainEventFacade {
   private static eventBus: EventBus
@@ -20,6 +22,14 @@ export class DomainEventFacade {
   }
 
   public static createStatusMessageEmitter(): StatusMessageEmitter {
+    return this.eventBus
+  }
+
+  public static createDeviceObserver(): DeviceObserver {
+    return this.eventBus
+  }
+
+  public static createDeviceEmitter(): DeviceEmitter {
     return this.eventBus
   }
 

@@ -60,6 +60,10 @@ export class ServiceFacade {
   }
 
   public static createVideoMixer(): VideoMixer {
-    return new AtemVideoMixer(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
+    return new AtemVideoMixer(
+      ServiceFacade.createStatusMessageService(),
+      DomainEventFacade.createDeviceObserver(),
+      LoggerFacade.createLogger()
+    )
   }
 }

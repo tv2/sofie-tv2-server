@@ -14,8 +14,10 @@ import { StatusMessageObserver } from '../business-logic/interfaces/status-messa
 import { StatusMessageEvent } from './value-objects/status-message-event'
 import { PanelEventBuilder } from './interfaces/panel-event-builder'
 import { TypedEvent } from './value-objects/typed-event'
-import { StatusMessageEventType } from './enums/event-type'
+import { DeviceEventType, StatusMessageEventType } from './enums/event-type'
 import { StatusMessage } from '../model/entities/status-message'
+import { DeviceEmitter } from '../business-logic/interfaces/device-emitter'
+import { VideoMixerConfigurationUpdatedEvent } from './value-objects/device-event'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
@@ -29,7 +31,8 @@ export class FastifyServer implements ProxyServer {
     private readonly controllers: BaseController[],
     private readonly panelObserver: PanelObserver,
     private readonly panelEventBuilder: PanelEventBuilder,
-    private readonly statusMessageObserver: StatusMessageObserver
+    private readonly statusMessageObserver: StatusMessageObserver,
+    private readonly deviceEmitter: DeviceEmitter
   ) {
     this.logger = logger.tag(this.constructor.name)
   }
@@ -106,12 +109,35 @@ export class FastifyServer implements ProxyServer {
     })
 
     this.albaWebsocket.addEventListener('message', (message: MessageEvent) => {
+      this.emitInternalEvent(message.data)
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
 
     this.fastifyServer.setValidatorCompiler(validatorCompiler)
     this.fastifyServer.setSerializerCompiler(serializerCompiler)
     this.fastifyServer.withTypeProvider<ZodTypeProvider>()
+  }
+
+  private emitInternalEvent(data: unknown): void {
+    const parsedData: unknown = JSON.parse(`${data}`)
+    if (!this.isTypedEvent(parsedData)) {
+      return
+    }
+
+    if (this.isEventVideoMixerConfigurationUpdatedEvent(parsedData)) {
+      this.deviceEmitter.emitVideoMixerConfigurationUpdated(parsedData.videoMixer)
+    }
+  }
+
+  private isTypedEvent(data: unknown): data is TypedEvent {
+    if (typeof data !== 'object' || data === null) {
+      return false
+    }
+    return 'type' in data
+  }
+
+  private isEventVideoMixerConfigurationUpdatedEvent(event: TypedEvent): event is VideoMixerConfigurationUpdatedEvent {
+    return event.type === DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED
   }
 
   private setupControllers(): void {
