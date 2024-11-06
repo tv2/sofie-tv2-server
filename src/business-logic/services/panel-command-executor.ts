@@ -70,7 +70,7 @@ export class PanelCommandExecutor {
     if (!command.value) {
       return
     }
-    this.videoMixer.sendTBarCommand(command.value)
+    this.videoMixer.setTransitionPosition(command.value)
     if (command.shouldExecuteTake) {
       this.executeTake()
     }

@@ -1,3 +1,3 @@
 export interface VideoMixer {
-  sendTBarCommand(tBarPosition: number): void // The tBarPosition should range from 0 to 1.000
+  setTransitionPosition(position: number): void // The position should range from 0 to 1.000
 }
