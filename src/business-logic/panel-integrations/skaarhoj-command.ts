@@ -105,3 +105,13 @@ export class SkaarhojTextCommand extends SkaarhojCommand {
     return `${this.idPrefix}${this.id}=|||${this.title}|${this.format}|${this.textLineOne}|${this.textLineTwo}`
   }
 }
+
+export class SkaarhojClearAllCommand extends SkaarhojCommand {
+  public constructor() {
+    super('')
+  }
+
+  public override toString(): string {
+    return 'Clear'
+  }
+}

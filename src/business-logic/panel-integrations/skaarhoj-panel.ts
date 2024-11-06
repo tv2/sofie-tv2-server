@@ -11,6 +11,7 @@ import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-co
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
 import {
   SkaarhojButtonState,
+  SkaarhojClearAllCommand,
   SkaarhojColorCommand,
   SkaarhojCommand,
   SkaarhojStateCommand,
@@ -310,12 +311,7 @@ export class SkaarhojPanel extends Panel {
   }
 
   protected clearPanelState(): void {
-    const clearCommands: SkaarhojCommand[] = []
-    for (let i = 0; i < 200; i++) {
-      clearCommands.push(new SkaarhojStateCommand(`${i}`, SkaarhojButtonState.OFF))
-      clearCommands.push(new SkaarhojTextCommand(`${i}`, ''))
-    }
-    this.writeCommands(clearCommands)
+    this.writeCommand(new SkaarhojClearAllCommand())
   }
 
   protected sendPanelState(): void {
