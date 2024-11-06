@@ -30,7 +30,7 @@ export class AtemVideoMixer implements VideoMixer {
     logger: Logger
   ) {
     this.logger = logger.tag(AtemVideoMixer.name)
-    deviceObserver.subscribeToVideoMixerConfigurationUpdated((videoMixerConfiguration: VideoMixerConfiguration) => {
+    deviceObserver.subscribeToVideoMixerConfiguration((videoMixerConfiguration: VideoMixerConfiguration) => {
       this.videoMixerConfiguration = videoMixerConfiguration
       this.connect()
     })
@@ -51,8 +51,8 @@ export class AtemVideoMixer implements VideoMixer {
   private createConnectedStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Connected to Atem',
-      message: `Connected directly to Atem on ${this.videoMixerConfiguration?.hostname}. Ready to send T-Bar commands.`,
+      title: 'Atem is ready for T-bar transitions',
+      message: `Connection established to Atem on ${this.videoMixerConfiguration?.hostname}. Ready to send T-Bar commands.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -90,7 +90,7 @@ export class AtemVideoMixer implements VideoMixer {
   private createReconnectStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Reconnecting to Atem',
+      title: 'Unable to sent T-bar transitions to Atem',
       message: `Reconnecting to Atem on ${this.videoMixerConfiguration?.hostname}. Unable to send T-Bar command.`,
       statusCode: StatusCode.UNKNOWN,
       lastUpdatedTimestamp: Date.now()
@@ -102,7 +102,7 @@ export class AtemVideoMixer implements VideoMixer {
     this.connect()
   }
 
-  public sendTBarCommand(tBarPosition: number): void {
+  public setTransitionPosition(tBarPosition: number): void {
     this.atem.setTransitionPosition(tBarPosition * ATEM_TRANSITION_MULTIPLICATION_FACTOR).catch(error => this.logger.data(error).error('Failed to update Transition Position for Atem'))
   }
 }

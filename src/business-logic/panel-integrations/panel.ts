@@ -61,19 +61,29 @@ export abstract class Panel {
     }
 
     const inputConfigurationKeys: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations)
-    const inputKey: string | undefined = inputConfigurationKeys.find((key) => {
-      const separatedKey: string[] = key.split(MODIFIER_DELIMITER)
-      const doesKeyIncludeAllModifiers: boolean = Array.from(this.activeModifiers).every(activeModifier => separatedKey.includes(activeModifier))
-      const doesKeyIncludeInput: boolean = separatedKey.some(key => key === inputConfigurationKey)
-      const doesKeyHaveOtherModifiersThanActiveModifiers: boolean = separatedKey.length !== this.activeModifiers.size + 1
-
-      return doesKeyIncludeAllModifiers && doesKeyIncludeInput && !doesKeyHaveOtherModifiersThanActiveModifiers
-    })
+    const inputKey: string | undefined = inputConfigurationKeys.find(key => this.doesKeyMatchInputConfigurationKey(key, inputConfigurationKey))
 
     if (!inputKey) {
       return
     }
     return this.panelLayoutConfiguration.inputConfigurations[inputKey]
+  }
+
+  private doesKeyMatchInputConfigurationKey(key: string, inputConfigurationKey: string): boolean {
+    const separatedKey: string[] = key.split(MODIFIER_DELIMITER)
+
+    const doesKeyHaveOtherModifiersThanActiveModifiers: boolean = separatedKey.length !== this.activeModifiers.size + 1
+    if (doesKeyHaveOtherModifiersThanActiveModifiers) {
+      return false
+    }
+
+    const doesKeyIncludeInput: boolean = separatedKey.some(key => key === inputConfigurationKey)
+    if (!doesKeyIncludeInput) {
+      return false
+    }
+
+    const doesKeyIncludeAllModifiers: boolean = Array.from(this.activeModifiers).every(activeModifier => separatedKey.includes(activeModifier))
+    return doesKeyIncludeAllModifiers
   }
 
   protected sendStatusMessage(statusMessage: StatusMessage): void {
