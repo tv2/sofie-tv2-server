@@ -39,8 +39,8 @@ export class AtemVideoMixer implements VideoMixer {
   private createConnectedStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Connected to Atem',
-      message: `Connected directly to Atem on ${ATEM_IP}. Ready to send T-Bar commands.`,
+      title: 'Atem is ready for T-bar transitions',
+      message: `Connection established to Atem on ${ATEM_IP}. Ready to send T-Bar commands.`,
       statusCode: StatusCode.GOOD,
       lastUpdatedTimestamp: Date.now()
     }
@@ -75,14 +75,14 @@ export class AtemVideoMixer implements VideoMixer {
   private createReconnectStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Reconnecting to Atem',
+      title: 'Unable to sent T-bar transitions to Atem',
       message: `Reconnecting to Atem on ${ATEM_IP}. Unable to send T-Bar command.`,
       statusCode: StatusCode.UNKNOWN,
       lastUpdatedTimestamp: Date.now()
     }
   }
 
-  public sendTBarCommand(tBarPosition: number): void {
+  public setTransitionPosition(tBarPosition: number): void {
     this.atem.setTransitionPosition(tBarPosition * ATEM_TRANSITION_MULTIPLICATION_FACTOR).catch(error => this.logger.data(error).error('Failed to update Transition Position for Atem'))
   }
 }
