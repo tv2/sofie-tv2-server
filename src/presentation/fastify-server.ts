@@ -125,7 +125,7 @@ export class FastifyServer implements ProxyServer {
     }
 
     if (this.isEventVideoMixerConfigurationUpdatedEvent(parsedData)) {
-      this.deviceEmitter.emitVideoMixerConfigurationUpdated(parsedData.videoMixer)
+      this.deviceEmitter.emitVideoMixerConfiguration(parsedData.videoMixer)
     }
   }
 

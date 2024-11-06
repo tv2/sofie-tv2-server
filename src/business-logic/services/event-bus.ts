@@ -78,11 +78,11 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     this.eventEmitter.emit('statusMessage', statusMessage)
   }
 
-  public emitVideoMixerConfigurationUpdated(videoMixerConfiguration: VideoMixerConfiguration): void {
+  public emitVideoMixerConfiguration(videoMixerConfiguration: VideoMixerConfiguration): void {
     this.eventEmitter.emit('videoMixerConfigurationUpdated', videoMixerConfiguration)
   }
 
-  public subscribeToVideoMixerConfigurationUpdated(onVideoMixerConfigurationsCallback: (videoMixerConfiguration: VideoMixerConfiguration) => void): void {
+  public subscribeToVideoMixerConfiguration(onVideoMixerConfigurationsCallback: (videoMixerConfiguration: VideoMixerConfiguration) => void): void {
     this.eventEmitter.on('videoMixerConfigurationUpdated', onVideoMixerConfigurationsCallback)
   }
 }

@@ -30,7 +30,7 @@ export class AtemVideoMixer implements VideoMixer {
     logger: Logger
   ) {
     this.logger = logger.tag(AtemVideoMixer.name)
-    deviceObserver.subscribeToVideoMixerConfigurationUpdated((videoMixerConfiguration: VideoMixerConfiguration) => {
+    deviceObserver.subscribeToVideoMixerConfiguration((videoMixerConfiguration: VideoMixerConfiguration) => {
       this.videoMixerConfiguration = videoMixerConfiguration
       this.connect()
     })
