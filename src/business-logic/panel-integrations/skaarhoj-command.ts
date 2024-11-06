@@ -60,6 +60,7 @@ export class SkaarhojColorCommand extends SkaarhojCommand {
       case Color.BLUE: return SkaarhojColor.BLUE
       case Color.DARK_BLUE: return SkaarhojColor.DARK_BLUE
       case Color.PURPLE: return SkaarhojColor.PURPLE
+      case Color.AMBER: return SkaarhojColor.AMBER
       default: return SkaarhojColor.DEFAULT
     }
   }

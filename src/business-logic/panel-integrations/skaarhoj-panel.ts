@@ -315,29 +315,24 @@ export class SkaarhojPanel extends Panel {
   }
 
   protected sendPanelState(): void {
-    const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((key) => {
-      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[key]
-      if (!inputConfiguration) {
-        return []
-      }
-
-      if (inputConfiguration.type === InputType.BUTTON) {
-        return [
-          new SkaarhojStateCommand(key, SkaarhojButtonState.ON),
-          new SkaarhojColorCommand(key, inputConfiguration.color ?? Color.DEFAULT),
-          new SkaarhojTextCommand(key, inputConfiguration.text ?? '')
-        ] as SkaarhojCommand[]
-      }
-
-      if (inputConfiguration.type === InputType.DISPLAY) {
-        return [
-          new SkaarhojTextCommand(key, inputConfiguration.text)
-        ] as SkaarhojCommand[]
-      }
-
-      return []
+    const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((inputId) => {
+      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[inputId]
+      return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []
     })
 
     this.writeCommands(commands)
+  }
+
+  private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
+    const commands: SkaarhojCommand[] = [
+      new SkaarhojStateCommand(inputId, SkaarhojButtonState.ON),
+      new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
+    ]
+
+    if (inputConfiguration.label) {
+      commands.push(new SkaarhojTextCommand(inputConfiguration.label.id, inputConfiguration.label.text))
+    }
+
+    return commands
   }
 }

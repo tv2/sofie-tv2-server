@@ -5,5 +5,6 @@ export enum Color {
   BLUE = 'BLUE',
   DARK_BLUE = 'DARK_BLUE',
   PURPLE = 'PURPLE',
+  AMBER = 'AMBER',
   DEFAULT = 'DEFAULT'
 }
