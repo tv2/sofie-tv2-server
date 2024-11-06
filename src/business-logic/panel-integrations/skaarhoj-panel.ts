@@ -226,13 +226,6 @@ export class SkaarhojPanel extends Panel {
           return
         }
 
-        if (inputConfiguration.command.type === PanelCommandType.MODIFIER) {
-          return {
-            ...inputConfiguration.command,
-            panelGroupId: this.panelConfiguration.panelGroupId
-          }
-        }
-
         return inputConfiguration.command
       }
       case InputType.FADER: {

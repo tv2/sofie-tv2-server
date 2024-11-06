@@ -32,7 +32,6 @@ export interface ActionPanelCommand extends BasePanelCommand {
 export interface ModifierPanelCommand extends BasePanelCommand {
   type: PanelCommandType.MODIFIER
   modifier: string
-  panelGroupId?: string
 }
 
 export interface TBarPanelCommand extends BasePanelCommand {
