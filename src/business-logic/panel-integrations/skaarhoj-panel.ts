@@ -97,7 +97,7 @@ export class SkaarhojPanel extends Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
-      this.clearAllInputsInSkaarhoj()
+      this.clearPanelState()
       this.sendPanelState()
       this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
@@ -309,13 +309,12 @@ export class SkaarhojPanel extends Panel {
     return false
   }
 
-  private clearAllInputsInSkaarhoj(): void {
-    const clearCommands: SkaarhojCommand[] = Array(200).flatMap((_value, index) => {
-      return [
-        new SkaarhojStateCommand(`${index}`, SkaarhojButtonState.OFF),
-        new SkaarhojTextCommand(`${index}`, '')
-      ]
-    })
+  protected clearPanelState(): void {
+    const clearCommands: SkaarhojCommand[] = []
+    for (let i = 0; i < 200; i++) {
+      clearCommands.push(new SkaarhojStateCommand(`${i}`, SkaarhojButtonState.OFF))
+      clearCommands.push(new SkaarhojTextCommand(`${i}`, ''))
+    }
     this.writeCommands(clearCommands)
   }
 

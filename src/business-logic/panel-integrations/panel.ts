@@ -11,6 +11,7 @@ export abstract class Panel {
   public abstract connect(): void
   public abstract disconnect(): void
   protected abstract assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void
+  protected abstract clearPanelState(): void
   protected abstract sendPanelState(): void
 
   protected activeModifiers: ReadonlySet<string> = new Set()
@@ -42,6 +43,7 @@ export abstract class Panel {
   public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
     this.panelLayoutConfiguration = panelLayoutConfiguration
     this.updateModifierInputKeys()
+    this.clearPanelState()
     this.sendPanelState()
   }
 
