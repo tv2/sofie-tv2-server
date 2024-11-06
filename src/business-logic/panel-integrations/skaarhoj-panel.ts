@@ -8,7 +8,7 @@ import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
-import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
+import { InputConfiguration, PanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -247,10 +247,8 @@ export class SkaarhojPanel extends Panel {
         if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
           return
         }
-        inputConfiguration.command.value = this.getTBarValue(value)
-        const upperLowerBoundReached: boolean = this.updateTBarDirection(value)
-        inputConfiguration.command.shouldExecuteTake = upperLowerBoundReached
-        return inputConfiguration.command
+
+        return this.updateTBarCommandWithValues(inputConfiguration.command, value)
       }
     }
   }
@@ -267,29 +265,24 @@ export class SkaarhojPanel extends Panel {
     return undefined
   }
 
-  private getTBarValue(value: number): number {
-    if (this.tBarDirection === TBarDirection.DOWN) {
-      value = T_BAR_UPPER_BOUND - value
-    }
-
-    if (value > T_BAR_UPPER_BOUND) {
-      return T_BAR_UPPER_BOUND
-    }
-
-    if (value < T_BAR_LOWER_BOUND) {
-      return T_BAR_LOWER_BOUND
-    }
-    return value
+  private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+    const tBarValue: number = this.getTBarPosition(value)
+    const tBarDirection: TBarDirection = this.getTBarDirection(tBarValue)
+    command.shouldExecuteTake = tBarDirection !== this.tBarDirection
+    command.value = tBarValue
+    this.tBarDirection = tBarDirection
+    return command
   }
 
-  private updateTBarDirection(value: number): boolean {
-    const upperBoundReached: boolean = value === T_BAR_UPPER_BOUND && this.tBarDirection === TBarDirection.UP
-    const lowerBoundReached: boolean = value === T_BAR_LOWER_BOUND && this.tBarDirection === TBarDirection.DOWN
+  private getTBarPosition(value: number): number {
+    const tBarPosition: number = this.tBarDirection === TBarDirection.DOWN ? T_BAR_UPPER_BOUND - value : value
+    return Math.min(T_BAR_UPPER_BOUND, Math.max(T_BAR_LOWER_BOUND, tBarPosition))
+  }
 
-    if (upperBoundReached || lowerBoundReached) {
-      this.tBarDirection = upperBoundReached ? TBarDirection.DOWN : TBarDirection.UP
-      return true
+  private getTBarDirection(directedTBarValue: number): TBarDirection {
+    if (directedTBarValue < T_BAR_UPPER_BOUND) {
+      return this.tBarDirection
     }
-    return false
+    return this.tBarDirection === TBarDirection.DOWN ? TBarDirection.UP : TBarDirection.DOWN
   }
 }
