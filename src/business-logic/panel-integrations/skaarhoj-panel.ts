@@ -174,7 +174,8 @@ export class SkaarhojPanel extends Panel {
   public disconnect(): void {
     this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
     this.keepAlive = false
-    this.socket.end()
+    this.socket.resetAndDestroy()
+    delete this.onCommandCallback
   }
 
   private reconnect(): void {
