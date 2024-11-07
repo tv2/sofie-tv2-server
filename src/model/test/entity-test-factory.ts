@@ -23,6 +23,7 @@ export class EntityTestFactory {
       type: PanelType.SKAARHOJ,
       hostname: 'randomHostName',
       panelLayoutConfigurationId: 'randomPanelLayoutConfigurationId',
+      panelGroupId: 'randomPanelGroupId',
       ...panelConfiguration
     }
   }

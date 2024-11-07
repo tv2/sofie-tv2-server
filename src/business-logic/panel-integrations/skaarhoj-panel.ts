@@ -44,26 +44,24 @@ interface SkaarhojInput {
   data: string
 }
 
-export class SkaarhojPanel implements Panel {
+export class SkaarhojPanel extends Panel {
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
   private keepAlive: boolean = true
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
-  private onCommandCallback?: (command: PanelCommand) => void
-
   public constructor(
-    private readonly panelConfiguration: PanelConfiguration,
-    private panelLayoutConfiguration: PanelLayoutConfiguration,
-    private readonly statusMessageService: StatusMessageService,
+    panelConfiguration: PanelConfiguration,
+    panelLayoutConfiguration: PanelLayoutConfiguration,
+    statusMessageService: StatusMessageService,
     logger: Logger
   ) {
+    super(panelConfiguration, panelLayoutConfiguration, statusMessageService)
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
-    this.assertValidPanelConfiguration(panelConfiguration)
   }
 
-  private assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
+  protected assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
     if (panelConfiguration.type !== PanelType.SKAARHOJ) {
       throw new UnsupportedOperationException(`Can't create a Skaarhoj Panel for a ${panelConfiguration.type}`)
     }
@@ -81,12 +79,12 @@ export class SkaarhojPanel implements Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
-      this.statusMessageService.sendStatusMessage(this.createConnectionSuccessStatusMessage())
+      this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
     this.socket.on('error', (error) => {
       this.logger.data(error).error(`Error from ${SkaarhojPanel.name}:${this.panelConfiguration.hostname}`)
-      this.statusMessageService.sendStatusMessage(this.createUnableToConnectStatusMessage())
+      this.sendStatusMessage(this.createUnableToConnectStatusMessage())
     })
 
     this.socket.setEncoding('utf8')
@@ -103,7 +101,7 @@ export class SkaarhojPanel implements Panel {
 
     this.socket.on('close', () => {
       this.logger.debug(`Disconnected from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
-      this.statusMessageService.sendStatusMessage(this.createDisconnectedStatusMessage())
+      this.sendStatusMessage(this.createDisconnectedStatusMessage())
       if (this.keepAlive) {
         this.reconnect()
       }
@@ -159,7 +157,7 @@ export class SkaarhojPanel implements Panel {
     if (this.reconnectTimeoutIdentifier) {
       return
     }
-    this.statusMessageService.sendStatusMessage(this.createReconnectingStatusMessage())
+    this.sendStatusMessage(this.createReconnectingStatusMessage())
 
     this.reconnectTimeoutIdentifier = setTimeout(() => {
       clearTimeout(this.reconnectTimeoutIdentifier)
@@ -181,18 +179,6 @@ export class SkaarhojPanel implements Panel {
       statusCode: StatusCode.WARNING,
       lastUpdatedTimestamp: Date.now()
     }
-  }
-
-  public getPanelConfiguration(): PanelConfiguration {
-    return this.panelConfiguration
-  }
-
-  public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
-    this.panelLayoutConfiguration = panelLayoutConfiguration
-  }
-
-  public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
-    this.onCommandCallback = onCommandCallback
   }
 
   private parseSkaarhojInput(textInput: string): SkaarhojInput | undefined {
@@ -217,7 +203,7 @@ export class SkaarhojPanel implements Panel {
   }
 
   private mapPanelInputToCommand(skaarhojInput: SkaarhojInput): PanelCommand | undefined {
-    const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[skaarhojInput.id]
+    const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(skaarhojInput.id)
     if (!inputConfiguration) {
       return
     }
@@ -225,7 +211,19 @@ export class SkaarhojPanel implements Panel {
     switch (inputConfiguration.type) {
       case InputType.BUTTON: {
         const skaarhojKeyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
-        return skaarhojKeyEvent === inputConfiguration.triggersOn ? inputConfiguration.command : undefined
+
+        if (skaarhojKeyEvent !== inputConfiguration.triggersOn) {
+          return
+        }
+
+        if (inputConfiguration.command.type === PanelCommandType.MODIFIER) {
+          return {
+            ...inputConfiguration.command,
+            panelGroupId: this.panelConfiguration.panelGroupId
+          }
+        }
+
+        return inputConfiguration.command
       }
       case InputType.FADER: {
         if (!skaarhojInput.data.toUpperCase().match(SkaarhojInputType.FADER)) {
