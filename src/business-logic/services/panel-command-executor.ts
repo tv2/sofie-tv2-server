@@ -1,7 +1,7 @@
 import { ActionPanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
 import { HttpService } from '../interfaces/http-service'
 import { Logger } from '../../logger/logger'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 
 // TODO: Refactor to follow active Rundown in SOF-2268
 const RUNDOWN_ID: string = 'jSXbtcsHTPjebGXurMzP401Z3u0_'
@@ -18,16 +18,14 @@ enum PseudoActionId {
 export class PanelCommandExecutor {
   private readonly logger: Logger
 
-  public constructor(private readonly httpService: HttpService, logger: Logger) {
+  public constructor(private readonly httpService: HttpService, private readonly videoMixer: VideoMixer, logger: Logger) {
     this.logger = logger.tag(PanelCommandExecutor.name)
   }
 
   public executeActionCommand(command: ActionPanelCommand): void {
     switch (command.actionId) {
       case PseudoActionId.TAKE: {
-        this.httpService.put(`/rundowns/${RUNDOWN_ID}/takeNext`).catch((error) => {
-          this.logger.data(error).error('Error executing TAKE')
-        })
+        this.executeTake()
         return
       }
       case PseudoActionId.SET_NEXT_PART: {
@@ -62,8 +60,19 @@ export class PanelCommandExecutor {
     }
   }
 
-  public executeTBarCommand(_command: TBarPanelCommand): void {
-    // TODO: To be implemented in SOF-2264
-    throw new UnsupportedOperationException('Not implemented yet')
+  private executeTake(): void {
+    this.httpService.put(`/rundowns/${RUNDOWN_ID}/takeNext`).catch((error) => {
+      this.logger.data(error).error('Error executing TAKE')
+    })
+  }
+
+  public executeTBarCommand(command: TBarPanelCommand): void {
+    if (!command.value) {
+      return
+    }
+    this.videoMixer.setTransitionPosition(command.value)
+    if (command.shouldExecuteTake) {
+      this.executeTake()
+    }
   }
 }

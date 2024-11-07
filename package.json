@@ -15,7 +15,7 @@
     "lint-fix": "eslint --fix .",
     "validate": "yarn validate-dependencies && yarn validate-licenses",
     "validate-dependencies": "yarn npm audit --environment production --severity moderate --recursive",
-    "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;Unlicense\"",
+    "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;BlueOak-1.0.0;Unlicense\"",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage \"*.log\""
   },
@@ -45,6 +45,7 @@
     "@fastify/http-proxy": "^10.0.0",
     "@fastify/websocket": "^11.0.1",
     "@tv2media/logger": "^2.0.2",
+    "atem-connection": "^3.5.0",
     "fastify": "^5.0.0",
     "fastify-type-provider-zod": "^4.0.1",
     "mongodb": "^6.9.0",

@@ -1,7 +1,7 @@
-import { Panel } from '../interfaces/panel'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelCommand } from '../../model/interfaces/input-configuration'
 import { PanelCommandType } from '../../model/enums/panel-enums'
+import { Panel } from './panel'
 
 export class PanelGroup {
   private readonly activeModifiers: Set<string> = new Set()

@@ -32,12 +32,12 @@ export interface ActionPanelCommand extends BasePanelCommand {
 export interface ModifierPanelCommand extends BasePanelCommand {
   type: PanelCommandType.MODIFIER
   modifier: string
-  panelGroupId?: string
 }
 
 export interface TBarPanelCommand extends BasePanelCommand {
   type: PanelCommandType.T_BAR
-  value?: number
+  value?: number // The number range should go from 0 to 1000
+  shouldExecuteTake?: boolean // Whether a Take needs to be executed in Alba alongside the transition
 }
 
 const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({

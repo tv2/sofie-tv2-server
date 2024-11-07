@@ -1,4 +1,4 @@
-import { Panel } from '../interfaces/panel'
+import { Panel } from './panel'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { InputType, KeyEvent, PanelCommandType, PanelType, SkaarhojModel } from '../../model/enums/panel-enums'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
@@ -8,7 +8,7 @@ import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
-import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
+import { InputConfiguration, PanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -38,6 +38,14 @@ enum SkaarhojInputType {
   FADER = 'ABS'
 }
 
+enum TBarDirection {
+  UP = 'UP',
+  DOWN = 'DOWN'
+}
+
+const T_BAR_UPPER_BOUND: number = 1000
+const T_BAR_LOWER_BOUND: number = 0
+
 interface SkaarhojInput {
   id: string
   inputType: string
@@ -50,6 +58,8 @@ export class SkaarhojPanel extends Panel {
 
   private keepAlive: boolean = true
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
+
+  private tBarDirection: TBarDirection = TBarDirection.DOWN
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -216,13 +226,6 @@ export class SkaarhojPanel extends Panel {
           return
         }
 
-        if (inputConfiguration.command.type === PanelCommandType.MODIFIER) {
-          return {
-            ...inputConfiguration.command,
-            panelGroupId: this.panelConfiguration.panelGroupId
-          }
-        }
-
         return inputConfiguration.command
       }
       case InputType.FADER: {
@@ -237,8 +240,8 @@ export class SkaarhojPanel extends Panel {
         if (inputConfiguration.command.type !== PanelCommandType.T_BAR) {
           return
         }
-        inputConfiguration.command.value = value
-        return inputConfiguration.command
+
+        return this.updateTBarCommandWithValues(inputConfiguration.command, value)
       }
     }
   }
@@ -253,5 +256,26 @@ export class SkaarhojPanel extends Panel {
     }
 
     return undefined
+  }
+
+  private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+    const tBarTransitionProgress: number = this.getTBarTransitionProgress(value)
+    const tBarDirection: TBarDirection = this.getTBarDirection(tBarTransitionProgress)
+    command.shouldExecuteTake = tBarDirection !== this.tBarDirection
+    command.value = tBarTransitionProgress
+    this.tBarDirection = tBarDirection
+    return command
+  }
+
+  private getTBarTransitionProgress(value: number): number {
+    const tBarPosition: number = this.tBarDirection === TBarDirection.DOWN ? T_BAR_UPPER_BOUND - value : value
+    return Math.min(T_BAR_UPPER_BOUND, Math.max(T_BAR_LOWER_BOUND, tBarPosition))
+  }
+
+  private getTBarDirection(directedTBarValue: number): TBarDirection {
+    if (directedTBarValue < T_BAR_UPPER_BOUND) {
+      return this.tBarDirection
+    }
+    return this.tBarDirection === TBarDirection.DOWN ? TBarDirection.UP : TBarDirection.DOWN
   }
 }
