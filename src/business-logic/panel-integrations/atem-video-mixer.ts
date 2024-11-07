@@ -90,7 +90,7 @@ export class AtemVideoMixer implements VideoMixer {
   private createReconnectStatusMessage(): StatusMessage {
     return {
       id: this.getStatusMessageId(),
-      title: 'Unable to sent T-bar transitions to Atem',
+      title: 'Unable to send T-bar transitions to Atem',
       message: `Reconnecting to Atem on ${this.videoMixerConfiguration?.hostname}. Unable to send T-Bar command.`,
       statusCode: StatusCode.UNKNOWN,
       lastUpdatedTimestamp: Date.now()

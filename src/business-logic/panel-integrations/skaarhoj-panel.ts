@@ -259,15 +259,15 @@ export class SkaarhojPanel extends Panel {
   }
 
   private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
-    const tBarValue: number = this.getTBarPosition(value)
-    const tBarDirection: TBarDirection = this.getTBarDirection(tBarValue)
+    const tBarTransitionProgress: number = this.getTBarTransitionProgress(value)
+    const tBarDirection: TBarDirection = this.getTBarDirection(tBarTransitionProgress)
     command.shouldExecuteTake = tBarDirection !== this.tBarDirection
-    command.value = tBarValue
+    command.value = tBarTransitionProgress
     this.tBarDirection = tBarDirection
     return command
   }
 
-  private getTBarPosition(value: number): number {
+  private getTBarTransitionProgress(value: number): number {
     const tBarPosition: number = this.tBarDirection === TBarDirection.DOWN ? T_BAR_UPPER_BOUND - value : value
     return Math.min(T_BAR_UPPER_BOUND, Math.max(T_BAR_LOWER_BOUND, tBarPosition))
   }
