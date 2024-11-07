@@ -48,7 +48,7 @@
     "atem-connection": "^3.5.0",
     "fastify": "^5.0.0",
     "fastify-type-provider-zod": "^4.0.1",
-    "mongodb": "^6.9.0",
+    "mongodb": "^6.10.0",
     "reflect-metadata": "^0.2.2",
     "ws": "^8.18.0",
     "zod": "^3.23.8"
