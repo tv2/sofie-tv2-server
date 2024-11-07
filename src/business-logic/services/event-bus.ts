@@ -6,8 +6,11 @@ import { EventEmitter } from 'node:events'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageEmitter } from '../interfaces/status-message-emitter'
 import { StatusMessageObserver } from '../interfaces/status-message-observer'
+import { VideoMixerConfiguration } from '../../model/interfaces/video-mixer-configuration'
+import { DeviceObserver } from '../interfaces/device-observer'
+import { DeviceEmitter } from '../interfaces/device-emitter'
 
-export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver {
+export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver, DeviceEmitter, DeviceObserver {
   private readonly eventEmitter: EventEmitter<{
     panelConfigurationCreated: [PanelConfiguration]
     panelConfigurationUpdated: [PanelConfiguration]
@@ -16,6 +19,7 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     panelLayoutConfigurationUpdated: [PanelLayoutConfiguration]
     panelLayoutConfigurationDeleted: [string]
     statusMessage: [StatusMessage]
+    videoMixerConfigurationUpdated: [VideoMixerConfiguration]
   }> = new EventEmitter()
 
   public emitPanelLayoutConfigurationCreated(panelLayoutConfiguration: PanelLayoutConfiguration): void {
@@ -72,5 +76,13 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
 
   public emitStatusMessage(statusMessage: StatusMessage): void {
     this.eventEmitter.emit('statusMessage', statusMessage)
+  }
+
+  public emitVideoMixerConfiguration(videoMixerConfiguration: VideoMixerConfiguration): void {
+    this.eventEmitter.emit('videoMixerConfigurationUpdated', videoMixerConfiguration)
+  }
+
+  public subscribeToVideoMixerConfiguration(onVideoMixerConfigurationsCallback: (videoMixerConfiguration: VideoMixerConfiguration) => void): void {
+    this.eventEmitter.on('videoMixerConfigurationUpdated', onVideoMixerConfigurationsCallback)
   }
 }

@@ -1,4 +1,4 @@
-export type EventType = PanelEventType | StatusMessageEventType
+export type EventType = PanelEventType | StatusMessageEventType | DeviceEventType
 
 export enum PanelEventType {
   PANEL_LAYOUT_CONFIGURATION_CREATED = 'PANEL_LAYOUT_CONFIGURATION_CREATED',
@@ -12,4 +12,8 @@ export enum PanelEventType {
 
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
+}
+
+export enum DeviceEventType {
+  VIDEO_MIXER_CONFIGURATION_UPDATED = 'VIDEO_MIXER_CONFIGURATION_UPDATED'
 }

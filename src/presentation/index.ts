@@ -27,7 +27,8 @@ async function startProxyServer(logger: Logger): Promise<void> {
     controllers,
     DomainEventFacade.createPanelObserver(),
     EventBuilderFacade.createPanelEventBuilder(),
-    DomainEventFacade.createStatusMessageObserver()
+    DomainEventFacade.createStatusMessageObserver(),
+    DomainEventFacade.createDeviceEmitter()
   )
   await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: SOFIE_REST_URL, websocketUrl: SOFIE_WEBSOCKET_URL })
 }
