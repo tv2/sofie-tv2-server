@@ -302,7 +302,7 @@ export class SkaarhojPanel extends Panel {
 
   protected sendPanelState(): void {
     const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((inputId) => {
-      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[inputId]
+      const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(inputId)
       return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []
     })
 
@@ -311,7 +311,7 @@ export class SkaarhojPanel extends Panel {
 
   private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
     const commands: SkaarhojCommand[] = [
-      new SkaarhojStateCommand(inputId, SkaarhojButtonState.ON),
+      new SkaarhojStateCommand(inputId, SkaarhojButtonState.DIMMED),
       new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
     ]
 

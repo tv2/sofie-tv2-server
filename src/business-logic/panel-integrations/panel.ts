@@ -38,6 +38,8 @@ export abstract class Panel {
 
   public updateActiveModifiers(activeModifiers: ReadonlySet<string>): void {
     this.activeModifiers = activeModifiers
+    this.clearPanelState()
+    this.sendPanelState()
   }
 
   public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
