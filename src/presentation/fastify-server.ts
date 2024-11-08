@@ -131,13 +131,15 @@ export class FastifyServer implements ProxyServer {
       this.deviceEmitter.emitVideoMixerConfiguration(parsedData.videoMixer)
     }
 
-    if (this.isRundownEvent(parsedData)) {
-      if (parsedData.type === RundownEventType.ACTIVATED || parsedData.type === RundownEventType.REHEARSE) {
-        this.rundownEmitter.emitActiveRundownId(parsedData.rundownId)
-      }
-      if (parsedData.type === RundownEventType.DEACTIVATED) {
-        this.rundownEmitter.emitActiveRundownId(undefined)
-      }
+    if (!this.isRundownEvent(parsedData)) {
+      return
+    }
+
+    if (parsedData.type === RundownEventType.ACTIVATED || parsedData.type === RundownEventType.REHEARSE) {
+      this.rundownEmitter.emitActiveRundownId(parsedData.rundownId)
+    }
+    if (parsedData.type === RundownEventType.DEACTIVATED) {
+      this.rundownEmitter.emitActiveRundownId(undefined)
     }
   }
 

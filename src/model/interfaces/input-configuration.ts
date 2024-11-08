@@ -48,7 +48,7 @@ export interface ModifierPanelCommand extends BasePanelCommand {
 
 export interface TBarPanelCommand extends BasePanelCommand {
   type: PanelCommandType.T_BAR
-  value?: number // The number range should go from 0 to 1.000
+  value?: number // The number range should go from 0 to 1000
   shouldExecuteTake?: boolean // Whether a Take needs to be executed in Alba alongside the transition
 }
 

@@ -93,7 +93,7 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     this.eventEmitter.emit('activeRundownId', rundownId)
   }
 
-  public subscribeToRundownActiveRundownId(onActiveRundownIdChangedCallback: (rundownId: (string | undefined)) => void): void {
+  public subscribeToActiveRundownId(onActiveRundownIdChangedCallback: (rundownId: (string | undefined)) => void): void {
     this.eventEmitter.on('activeRundownId', onActiveRundownIdChangedCallback)
   }
 }
