@@ -29,7 +29,7 @@ export class PanelCommandExecutor {
     logger: Logger
   ) {
     this.logger = logger.tag(PanelCommandExecutor.name)
-    this.rundownObserver.subscribeToRundownActiveRundownId(rundownId => this.activeRundownId = rundownId)
+    this.rundownObserver.subscribeToActiveRundownId(rundownId => this.activeRundownId = rundownId)
     this.fetchActiveRundown().catch(error => this.logger.data(error).error('Failed to fetch active Rundown'))
   }
 
