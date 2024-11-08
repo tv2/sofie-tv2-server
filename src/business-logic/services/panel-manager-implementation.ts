@@ -87,15 +87,19 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private handleCommand(command: PanelCommand): void {
-    switch (command.type) {
-      case PanelCommandType.ACTION: {
-        this.panelCommandExecutor.executeActionCommand(command)
-        return
+    try {
+      switch (command.type) {
+        case PanelCommandType.ACTION: {
+          this.panelCommandExecutor.executeActionCommand(command)
+          return
+        }
+        case PanelCommandType.T_BAR: {
+          this.panelCommandExecutor.executeTBarCommand(command)
+          return
+        }
       }
-      case PanelCommandType.T_BAR: {
-        this.panelCommandExecutor.executeTBarCommand(command)
-        return
-      }
+    } catch (error) {
+      this.logger.data(error).error(`Failed executing command: ${JSON.stringify(command)}`)
     }
   }
 

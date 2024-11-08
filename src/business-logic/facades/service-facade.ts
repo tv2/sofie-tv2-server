@@ -53,6 +53,7 @@ export class ServiceFacade {
 
   public static createPanelCommandExecutor(): PanelCommandExecutor {
     return new PanelCommandExecutor(
+      DomainEventFacade.createRundownObserver(),
       ServiceFacade.createHttpService(),
       ServiceFacade.createVideoMixer(),
       LoggerFacade.createLogger()

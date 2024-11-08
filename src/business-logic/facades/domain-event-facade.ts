@@ -5,6 +5,8 @@ import { StatusMessageObserver } from '../interfaces/status-message-observer'
 import { StatusMessageEmitter } from '../interfaces/status-message-emitter'
 import { DeviceObserver } from '../interfaces/device-observer'
 import { DeviceEmitter } from '../interfaces/device-emitter'
+import { RundownEmitter } from '../interfaces/rundown-emitter'
+import { RundownObserver } from '../interfaces/rundown-observer'
 
 export class DomainEventFacade {
   private static eventBus: EventBus
@@ -30,6 +32,14 @@ export class DomainEventFacade {
   }
 
   public static createDeviceEmitter(): DeviceEmitter {
+    return this.eventBus
+  }
+
+  public static createRundownObserver(): RundownObserver {
+    return this.eventBus
+  }
+
+  public static createRundownEmitter(): RundownEmitter {
     return this.eventBus
   }
 

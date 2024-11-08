@@ -9,8 +9,10 @@ import { StatusMessageObserver } from '../interfaces/status-message-observer'
 import { VideoMixerConfiguration } from '../../model/interfaces/video-mixer-configuration'
 import { DeviceObserver } from '../interfaces/device-observer'
 import { DeviceEmitter } from '../interfaces/device-emitter'
+import { RundownEmitter } from '../interfaces/rundown-emitter'
+import { RundownObserver } from '../interfaces/rundown-observer'
 
-export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver, DeviceEmitter, DeviceObserver {
+export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver, DeviceEmitter, DeviceObserver, RundownEmitter, RundownObserver {
   private readonly eventEmitter: EventEmitter<{
     panelConfigurationCreated: [PanelConfiguration]
     panelConfigurationUpdated: [PanelConfiguration]
@@ -20,6 +22,7 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     panelLayoutConfigurationDeleted: [string]
     statusMessage: [StatusMessage]
     videoMixerConfigurationUpdated: [VideoMixerConfiguration]
+    activeRundownId: [string | undefined]
   }> = new EventEmitter()
 
   public emitPanelLayoutConfigurationCreated(panelLayoutConfiguration: PanelLayoutConfiguration): void {
@@ -84,5 +87,13 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
 
   public subscribeToVideoMixerConfiguration(onVideoMixerConfigurationsCallback: (videoMixerConfiguration: VideoMixerConfiguration) => void): void {
     this.eventEmitter.on('videoMixerConfigurationUpdated', onVideoMixerConfigurationsCallback)
+  }
+
+  public emitActiveRundownId(rundownId: string | undefined): void {
+    this.eventEmitter.emit('activeRundownId', rundownId)
+  }
+
+  public subscribeToActiveRundownId(onActiveRundownIdChangedCallback: (rundownId: (string | undefined)) => void): void {
+    this.eventEmitter.on('activeRundownId', onActiveRundownIdChangedCallback)
   }
 }
