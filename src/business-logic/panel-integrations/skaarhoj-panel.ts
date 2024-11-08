@@ -9,6 +9,15 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
+import {
+  SkaarhojButtonState,
+  SkaarhojClearAllCommand,
+  SkaarhojColorCommand,
+  SkaarhojCommand,
+  SkaarhojStateCommand,
+  SkaarhojTextCommand
+} from './skaarhoj-command'
+import { Color } from '../../model/enums/color'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
@@ -89,6 +98,8 @@ export class SkaarhojPanel extends Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
+      this.clearPanelState()
+      this.sendPanelState()
       this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
@@ -118,9 +129,13 @@ export class SkaarhojPanel extends Panel {
     })
   }
 
-  private writeCommand(command: string): void {
+  private writeCommand(command: SkaarhojCommand | string): void {
     // The \n is quite important. Without Skaarhoj won't interpret any of the commands.
-    this.socket.write(`${command}\n`)
+    this.socket.write(`${command.toString()}\n`)
+  }
+
+  private writeCommands(commands: SkaarhojCommand[]): void {
+    commands.forEach(this.writeCommand.bind(this))
   }
 
   private createConnectionSuccessStatusMessage(): StatusMessage {
@@ -160,7 +175,8 @@ export class SkaarhojPanel extends Panel {
   public disconnect(): void {
     this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
     this.keepAlive = false
-    this.socket.end()
+    this.socket.resetAndDestroy()
+    delete this.onCommandCallback
   }
 
   private reconnect(): void {
@@ -244,6 +260,7 @@ export class SkaarhojPanel extends Panel {
         return this.updateTBarCommandWithValues(inputConfiguration.command, value)
       }
     }
+    return
   }
 
   private mapSkaarhojInputToKeyEvent(skaarhojInput: SkaarhojInput): KeyEvent | undefined {
@@ -277,5 +294,31 @@ export class SkaarhojPanel extends Panel {
       return this.tBarDirection
     }
     return this.tBarDirection === TBarDirection.DOWN ? TBarDirection.UP : TBarDirection.DOWN
+  }
+
+  protected clearPanelState(): void {
+    this.writeCommand(new SkaarhojClearAllCommand())
+  }
+
+  protected sendPanelState(): void {
+    const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((inputId) => {
+      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[inputId]
+      return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []
+    })
+
+    this.writeCommands(commands)
+  }
+
+  private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
+    const commands: SkaarhojCommand[] = [
+      new SkaarhojStateCommand(inputId, SkaarhojButtonState.ON),
+      new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
+    ]
+
+    if (inputConfiguration.label) {
+      commands.push(new SkaarhojTextCommand(inputConfiguration.label.id, inputConfiguration.label.text))
+    }
+
+    return commands
   }
 }
