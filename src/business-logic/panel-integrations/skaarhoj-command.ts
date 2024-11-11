@@ -5,7 +5,8 @@ export enum SkaarhojButtonState {
   ON_AMBER = 1,
   ON_RED = 2,
   ON_GREEN = 3,
-  ON = 4
+  ON = 4,
+  DIMMED = 5
 }
 
 enum SkaarhojColor {
