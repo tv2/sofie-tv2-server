@@ -19,6 +19,9 @@ import {
 } from './skaarhoj-command'
 import { Color } from '../../model/enums/color'
 
+const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
+const MK48_RUNDOWN_DISPLAY_ID: string = '62'
+
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
 /**
@@ -98,8 +101,7 @@ export class SkaarhojPanel extends Panel {
       this.logger.info(`Connected to Skaarhoj Panel on ${this.panelConfiguration.hostname}:${SKAARHOJ_PORT}`)
       this.writeCommand('list')
       this.writeCommand(DISABLE_SLEEP_MODE_COMMAND)
-      this.clearPanelState()
-      this.sendPanelState()
+      this.updatePanelState()
       this.sendStatusMessage(this.createConnectionSuccessStatusMessage())
     })
 
@@ -300,11 +302,15 @@ export class SkaarhojPanel extends Panel {
     this.writeCommand(new SkaarhojClearAllCommand())
   }
 
-  protected sendPanelState(): void {
+  protected sendActivePanelState(): void {
     const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((inputId) => {
       const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(inputId)
       return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []
     })
+
+    if (this.activeRundown) {
+      commands.push(new SkaarhojTextCommand(this.getRundownDisplayId(), this.activeRundown.name))
+    }
 
     this.writeCommands(commands)
   }
@@ -320,5 +326,20 @@ export class SkaarhojPanel extends Panel {
     }
 
     return commands
+  }
+
+  protected override sendInactivePanelState(): void {
+    this.writeCommand(new SkaarhojTextCommand(this.getRundownDisplayId(), 'No active Rundown'))
+  }
+
+  private getRundownDisplayId(): string {
+    switch (this.panelConfiguration.model) {
+      case SkaarhojModel.MK48: {
+        return MK48_RUNDOWN_DISPLAY_ID
+      }
+      case SkaarhojModel.MKT1A: {
+        return MKT1A_RUNDOWN_DISPLAY_ID
+      }
+    }
   }
 }

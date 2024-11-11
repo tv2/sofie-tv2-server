@@ -11,6 +11,9 @@ import { PanelCommandExecutor } from './panel-command-executor'
 import { PanelCommand } from '../../model/interfaces/input-configuration'
 import { PanelCommandType } from '../../model/enums/panel-enums'
 import { PanelGroup } from '../panel-integrations/panel-group'
+import { RundownObserver } from '../interfaces/rundown-observer'
+import { RundownService } from '../interfaces/rundown-service'
+import { Rundown } from '../../model/entities/rundown'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -18,12 +21,16 @@ export class PanelManagerImplementation implements PanelManager {
   private readonly panelGroups: Map<string, PanelGroup> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
 
+  private activeRundown: Rundown | undefined
+
   public constructor(
     private readonly panelFactory: PanelFactory,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelObserver: PanelObserver,
     private readonly panelCommandExecutor: PanelCommandExecutor,
+    private readonly rundownObserver: RundownObserver,
+    private readonly rundownService: RundownService,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
@@ -32,6 +39,8 @@ export class PanelManagerImplementation implements PanelManager {
   public async initialize(): Promise<void> {
     await this.updatePanelLayoutConfigurations()
     this.subscribeToPanelEvents()
+    this.subscribeToRundownEvents()
+    await this.updateActiveRundown()
     try {
       await this.connectToPanels()
     } catch (error) {
@@ -73,6 +82,7 @@ export class PanelManagerImplementation implements PanelManager {
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
     panel.connect()
+    panel.updateActiveRundown(this.activeRundown)
 
     this.addPanelToGroup(panelConfiguration, panel)
   }
@@ -115,5 +125,21 @@ export class PanelManagerImplementation implements PanelManager {
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
     panelConfigurations.forEach(this.connectToPanel.bind(this))
+  }
+
+  private subscribeToRundownEvents(): void {
+    this.rundownObserver.subscribeToActiveRundownId((activeRundownId) => {
+      this.updateActiveRundownFromId(activeRundownId).catch(error => this.logger.data(error).error('Error while fetching active Rundown'))
+    })
+  }
+
+  private async updateActiveRundownFromId(activeRundownId: string | undefined): Promise<void> {
+    this.activeRundown = activeRundownId ? await this.rundownService.getRundown(activeRundownId) : undefined
+    this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
+  }
+
+  private async updateActiveRundown(): Promise<void> {
+    this.activeRundown = await this.rundownService.getActiveRundown()
+    this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
   }
 }

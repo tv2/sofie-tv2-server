@@ -4,6 +4,7 @@ import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-c
 import { PanelCommandType } from '../../model/enums/panel-enums'
 import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
+import { Rundown } from '../../model/entities/rundown'
 
 const MODIFIER_DELIMITER: string = ';'
 
@@ -12,10 +13,13 @@ export abstract class Panel {
   public abstract disconnect(): void
   protected abstract assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void
   protected abstract clearPanelState(): void
-  protected abstract sendPanelState(): void
+  protected abstract sendActivePanelState(): void
+  protected abstract sendInactivePanelState(): void
 
   protected activeModifiers: ReadonlySet<string> = new Set()
   private modifierInputKeys: ReadonlySet<string> = new Set()
+
+  protected activeRundown: Rundown | undefined
 
   protected onCommandCallback?: (command: PanelCommand) => void
 
@@ -28,6 +32,15 @@ export abstract class Panel {
     this.updateModifierInputKeys()
   }
 
+  protected updatePanelState(): void {
+    this.clearPanelState()
+    if (!this.activeRundown) {
+      this.sendInactivePanelState()
+    } else {
+      this.sendActivePanelState()
+    }
+  }
+
   public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
     this.onCommandCallback = onCommandCallback
   }
@@ -38,15 +51,13 @@ export abstract class Panel {
 
   public updateActiveModifiers(activeModifiers: ReadonlySet<string>): void {
     this.activeModifiers = activeModifiers
-    this.clearPanelState()
-    this.sendPanelState()
+    this.updatePanelState()
   }
 
   public updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): void {
     this.panelLayoutConfiguration = panelLayoutConfiguration
     this.updateModifierInputKeys()
-    this.clearPanelState()
-    this.sendPanelState()
+    this.updatePanelState()
   }
 
   private updateModifierInputKeys(): void {
@@ -90,5 +101,10 @@ export abstract class Panel {
 
   protected sendStatusMessage(statusMessage: StatusMessage): void {
     this.statusMessageService.sendStatusMessage(statusMessage)
+  }
+
+  public updateActiveRundown(rundown: Rundown | undefined): void {
+    this.activeRundown = rundown
+    this.updatePanelState()
   }
 }

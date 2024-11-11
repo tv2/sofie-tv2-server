@@ -14,6 +14,8 @@ import { DomainEventFacade } from './domain-event-facade'
 import { PanelCommandExecutor } from '../services/panel-command-executor'
 import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 import { AtemVideoMixer } from '../panel-integrations/atem-video-mixer'
+import { RundownService } from '../interfaces/rundown-service'
+import { RundownHttpService } from '../services/rundown-http-service'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -31,6 +33,8 @@ export class ServiceFacade {
       RepositoryFacade.createPanelLayoutConfigurationRepository(),
       DomainEventFacade.createPanelObserver(),
       ServiceFacade.createPanelCommandExecutor(),
+      DomainEventFacade.createRundownObserver(),
+      ServiceFacade.createRundownService(),
       LoggerFacade.createLogger()
     )
   }
@@ -51,10 +55,15 @@ export class ServiceFacade {
     return new AlbaServerHttpService(new JsendHttpService(new FetchHttpService()))
   }
 
+  public static createRundownService(): RundownService {
+    return new RundownHttpService(ServiceFacade.createHttpService())
+  }
+
   public static createPanelCommandExecutor(): PanelCommandExecutor {
     return new PanelCommandExecutor(
       DomainEventFacade.createRundownObserver(),
       ServiceFacade.createHttpService(),
+      ServiceFacade.createRundownService(),
       ServiceFacade.createVideoMixer(),
       LoggerFacade.createLogger()
     )
