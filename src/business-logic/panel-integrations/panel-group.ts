@@ -1,11 +1,13 @@
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType } from '../../model/enums/panel-enums'
+import { KeyEvent, PanelCommandType } from '../../model/enums/panel-enums'
 import { Panel } from './panel'
 import { Rundown } from '../../model/entities/rundown'
 
+const MODIFIER_LATCH_THRESHOLD_MS: number = 300
+
 export class PanelGroup {
-  private readonly activeModifiers: Set<string> = new Set()
+  private readonly activeModifiers: Map<string, number> = new Map()
   private readonly panels: Map<string, Panel> = new Map()
 
   private onCommandCallback?: (panelCommand: PanelCommand) => void
@@ -15,29 +17,50 @@ export class PanelGroup {
 
   public addPanel(panel: Panel): void {
     this.panels.set(panel.getPanelConfiguration().id, panel)
-    panel.registerOnCommand(panelCommand => this.handlePanelCommand(panelCommand))
+    panel.registerOnCommand((panelCommand: PanelCommand, keyEvent: KeyEvent | undefined) => this.handlePanelCommand(panelCommand, keyEvent))
   }
 
-  private handlePanelCommand(panelCommand: PanelCommand): void {
+  private handlePanelCommand(panelCommand: PanelCommand, keyEvent: KeyEvent | undefined): void {
     if (panelCommand.type !== PanelCommandType.MODIFIER) {
       this.onCommandCallback?.(panelCommand)
       return
     }
 
-    this.updateActiveModifiers(panelCommand.modifier)
+    this.updateActiveModifiers(panelCommand.modifier, keyEvent)
     this.updatePanelsWithActiveModifiers()
   }
 
-  private updateActiveModifiers(modifier: string): void {
-    if (!this.activeModifiers.has(modifier)) {
-      this.activeModifiers.add(modifier)
-    } else {
-      this.activeModifiers.delete(modifier)
+  private updateActiveModifiers(modifier: string, keyEvent: KeyEvent | undefined): void {
+    if (keyEvent === KeyEvent.PRESSED) {
+      this.updateModifierForKeyPressed(modifier)
+    }
+
+    if (keyEvent === KeyEvent.RELEASED) {
+      this.updateModifierForKeyReleased(modifier)
     }
   }
 
+  private updateModifierForKeyPressed(modifier: string): void {
+    if (!this.activeModifiers.has(modifier)) {
+      this.activeModifiers.set(modifier, Date.now())
+      return
+    }
+    this.activeModifiers.delete(modifier)
+  }
+
+  private updateModifierForKeyReleased(modifier: string): void {
+    const modifierPressedTimestamp: number | undefined = this.activeModifiers.get(modifier)
+    if (!modifierPressedTimestamp) {
+      return
+    }
+    if (Date.now() - modifierPressedTimestamp < MODIFIER_LATCH_THRESHOLD_MS) {
+      return
+    }
+    this.activeModifiers.delete(modifier)
+  }
+
   private updatePanelsWithActiveModifiers(): void {
-    this.panels.forEach(panel => panel.updateActiveModifiers(this.activeModifiers))
+    this.panels.forEach(panel => panel.updateActiveModifiers(new Set(this.activeModifiers.keys())))
   }
 
   public disconnectPanel(panelConfigurationId: string): void {

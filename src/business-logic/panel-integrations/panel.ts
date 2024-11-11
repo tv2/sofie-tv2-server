@@ -1,7 +1,7 @@
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { InputConfiguration, PanelCommand } from '../../model/interfaces/input-configuration'
-import { PanelCommandType } from '../../model/enums/panel-enums'
+import { KeyEvent, PanelCommandType } from '../../model/enums/panel-enums'
 import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { Rundown } from '../../model/entities/rundown'
@@ -21,7 +21,7 @@ export abstract class Panel {
 
   protected activeRundown: Rundown | undefined
 
-  protected onCommandCallback?: (command: PanelCommand) => void
+  protected onCommandCallback?: (command: PanelCommand, keyEvent: KeyEvent | undefined) => void
 
   protected constructor(
     protected readonly panelConfiguration: PanelConfiguration,
@@ -41,7 +41,7 @@ export abstract class Panel {
     }
   }
 
-  public registerOnCommand(onCommandCallback: (command: PanelCommand) => void): void {
+  public registerOnCommand(onCommandCallback: (command: PanelCommand, keyEvent: KeyEvent | undefined) => void): void {
     this.onCommandCallback = onCommandCallback
   }
 
