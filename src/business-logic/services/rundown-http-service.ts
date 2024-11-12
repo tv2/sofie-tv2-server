@@ -9,7 +9,7 @@ export class RundownHttpService implements RundownService {
   public constructor(private readonly httpService: HttpService) {}
 
   public async getRundown(rundownId: string): Promise<Rundown> {
-    return await this.httpService.get(`${RUNDOWN_ENDPOINT}/${rundownId}`) as Rundown
+    return this.httpService.get(`${RUNDOWN_ENDPOINT}/${rundownId}`) as Promise<Rundown>
   }
 
   public async getActiveRundown(): Promise<Rundown | undefined> {
