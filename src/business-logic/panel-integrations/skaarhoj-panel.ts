@@ -336,7 +336,7 @@ export class SkaarhojPanel extends Panel {
     return this.activeModifiers.has(inputConfiguration.command.modifier)
   }
 
-  protected override sendInactivePanelState(): void {
+  protected sendInactivePanelState(): void {
     this.writeCommand(new SkaarhojTextCommand(this.getRundownDisplayId(), 'No active Rundown'))
   }
 
