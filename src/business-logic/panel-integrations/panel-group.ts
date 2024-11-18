@@ -41,11 +41,11 @@ export class PanelGroup {
   }
 
   private updateModifierForKeyPressed(modifier: string): void {
-    if (!this.activeModifiers.has(modifier)) {
-      this.activeModifiers.set(modifier, Date.now())
+    if (this.activeModifiers.has(modifier)) {
       return
     }
-    this.activeModifiers.delete(modifier)
+
+    this.activeModifiers.set(modifier, Date.now())
   }
 
   private updateModifierForKeyReleased(modifier: string): void {
