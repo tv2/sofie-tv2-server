@@ -11,6 +11,10 @@ import { PanelCommandExecutor } from './panel-command-executor'
 import { PanelCommand } from '../../model/interfaces/input-configuration'
 import { PanelCommandType } from '../../model/enums/panel-enums'
 import { PanelGroup } from '../panel-integrations/panel-group'
+import { RundownObserver } from '../interfaces/rundown-observer'
+import { RundownService } from '../interfaces/rundown-service'
+import { Rundown } from '../../model/entities/rundown'
+import { NoActiveRundownException } from '../../model/exceptions/no-active-rundown-exception'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -18,12 +22,16 @@ export class PanelManagerImplementation implements PanelManager {
   private readonly panelGroups: Map<string, PanelGroup> = new Map()
   private readonly panelLayoutConfigurations: Map<string, PanelLayoutConfiguration> = new Map()
 
+  private activeRundown: Rundown | undefined
+
   public constructor(
     private readonly panelFactory: PanelFactory,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelObserver: PanelObserver,
     private readonly panelCommandExecutor: PanelCommandExecutor,
+    private readonly rundownObserver: RundownObserver,
+    private readonly rundownService: RundownService,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
@@ -32,6 +40,8 @@ export class PanelManagerImplementation implements PanelManager {
   public async initialize(): Promise<void> {
     await this.updatePanelLayoutConfigurations()
     this.subscribeToPanelEvents()
+    this.subscribeToRundownEvents()
+    await this.updateActiveRundown()
     try {
       await this.connectToPanels()
     } catch (error) {
@@ -73,6 +83,7 @@ export class PanelManagerImplementation implements PanelManager {
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
     panel.connect()
+    panel.updateActiveRundown(this.activeRundown)
 
     this.addPanelToGroup(panelConfiguration, panel)
   }
@@ -87,19 +98,27 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private handleCommand(command: PanelCommand): void {
+    // Note: Since we assert the activeRundown here, it is safe for us to use the "this.activeRundown!" later in this method.
+    this.assertActiveRundown()
     try {
       switch (command.type) {
         case PanelCommandType.ACTION: {
-          this.panelCommandExecutor.executeActionCommand(command)
+          this.panelCommandExecutor.executeActionCommand(command, this.activeRundown!)
           return
         }
         case PanelCommandType.T_BAR: {
-          this.panelCommandExecutor.executeTBarCommand(command)
+          this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown!)
           return
         }
       }
     } catch (error) {
       this.logger.data(error).error(`Failed executing command: ${JSON.stringify(command)}`)
+    }
+  }
+
+  private assertActiveRundown(): void {
+    if (!this.activeRundown) {
+      throw new NoActiveRundownException('Unable to execute command since there is no active Rundown')
     }
   }
 
@@ -115,5 +134,21 @@ export class PanelManagerImplementation implements PanelManager {
   private async connectToPanels(): Promise<void> {
     const panelConfigurations: PanelConfiguration[] = await this.panelConfigurationRepository.getPanelConfigurations()
     panelConfigurations.forEach(this.connectToPanel.bind(this))
+  }
+
+  private subscribeToRundownEvents(): void {
+    this.rundownObserver.subscribeToActiveRundownId((activeRundownId) => {
+      this.updateActiveRundownFromId(activeRundownId).catch(error => this.logger.data(error).error('Error while fetching active Rundown'))
+    })
+  }
+
+  private async updateActiveRundownFromId(activeRundownId: string | undefined): Promise<void> {
+    this.activeRundown = activeRundownId ? await this.rundownService.getRundown(activeRundownId) : undefined
+    this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
+  }
+
+  private async updateActiveRundown(): Promise<void> {
+    this.activeRundown = await this.rundownService.getActiveRundown()
+    this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
   }
 }

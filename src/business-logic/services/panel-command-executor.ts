@@ -2,11 +2,7 @@ import { ActionPanelCommand, TBarPanelCommand } from '../../model/interfaces/inp
 import { HttpService } from '../interfaces/http-service'
 import { Logger } from '../../logger/logger'
 import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
-import { RundownObserver } from '../interfaces/rundown-observer'
-import { NoActiveRundownException } from '../../model/exceptions/no-active-rundown-exception'
-import { Rundown, RundownMode } from '../../model/entities/rundown'
-
-const BASIC_RUNDOWN_ENDPOINT: string = '/rundowns/basic'
+import { Rundown } from '../../model/entities/rundown'
 
 enum PseudoActionId {
   TAKE = 'TAKE',
@@ -20,86 +16,65 @@ enum PseudoActionId {
 export class PanelCommandExecutor {
   private readonly logger: Logger
 
-  private activeRundownId: string | undefined
-
   public constructor(
-    private readonly rundownObserver: RundownObserver,
     private readonly httpService: HttpService,
     private readonly videoMixer: VideoMixer,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelCommandExecutor.name)
-    this.rundownObserver.subscribeToActiveRundownId(rundownId => this.activeRundownId = rundownId)
-    this.fetchActiveRundown().catch(error => this.logger.data(error).error('Failed to fetch active Rundown'))
   }
 
-  private async fetchActiveRundown(): Promise<void> {
-    const rundowns: Rundown[] = await this.httpService.get(BASIC_RUNDOWN_ENDPOINT) as Rundown[]
-    const activeRundown: Rundown | undefined = rundowns.find(rundown => rundown.mode === RundownMode.ACTIVE || rundown.mode === RundownMode.REHEARSAL)
-    this.activeRundownId = activeRundown?.id
-  }
-
-  public executeActionCommand(command: ActionPanelCommand): void {
-    this.assertActiveRundown()
-
+  public executeActionCommand(command: ActionPanelCommand, rundown: Rundown): void {
     switch (command.actionId) {
       case PseudoActionId.TAKE: {
-        this.executeTake()
+        this.executeTake(rundown)
         return
       }
       case PseudoActionId.SET_NEXT_PART: {
-        this.httpService.put(`/rundowns/${this.activeRundownId}/setNext/PART_AFTER_NEXT_PART`).catch((error) => {
+        this.httpService.put(`/rundowns/${rundown.id}/setNext/PART_AFTER_NEXT_PART`).catch((error) => {
           this.logger.data(error).error('Error executing Part after next Part')
         })
         return
       }
       case PseudoActionId.SET_PREVIOUS_PART: {
-        this.httpService.put(`/rundowns/${this.activeRundownId}/setNext/PART_BEFORE_NEXT_PART`).catch((error) => {
+        this.httpService.put(`/rundowns/${rundown.id}/setNext/PART_BEFORE_NEXT_PART`).catch((error) => {
           this.logger.data(error).error('Error executing Part before next Part')
         })
         return
       }
       case PseudoActionId.SET_NEXT_SEGMENT: {
-        this.httpService.put(`/rundowns/${this.activeRundownId}/setNext/SEGMENT_AFTER_NEXT_SEGMENT`).catch((error) => {
+        this.httpService.put(`/rundowns/${rundown.id}/setNext/SEGMENT_AFTER_NEXT_SEGMENT`).catch((error) => {
           this.logger.data(error).error('Error executing Segment after next Segment')
         })
         return
       }
       case PseudoActionId.SET_PREVIOUS_SEGMENT: {
-        this.httpService.put(`/rundowns/${this.activeRundownId}/setNext/SEGMENT_BEFORE_NEXT_SEGMENT`).catch((error) => {
+        this.httpService.put(`/rundowns/${rundown.id}/setNext/SEGMENT_BEFORE_NEXT_SEGMENT`).catch((error) => {
           this.logger.data(error).error('Error executing Segment before next Segment')
         })
         return
       }
       default: {
-        this.httpService.put(`/actions/${command.actionId}/rundowns/${this.activeRundownId}`, { actionArguments: command.actionArguments }).catch((error) => {
+        this.httpService.put(`/actions/${command.actionId}/rundowns/${rundown.id}`, { actionArguments: command.actionArguments }).catch((error) => {
           this.logger.data(error).error(`Error executing Action ${command.actionId}`)
         })
       }
     }
   }
 
-  private assertActiveRundown(): void {
-    if (!this.activeRundownId) {
-      throw new NoActiveRundownException('Unable to execute command since there is no active Rundown')
-    }
-  }
-
-  private executeTake(): void {
-    this.httpService.put(`/rundowns/${this.activeRundownId}/takeNext`).catch((error) => {
+  private executeTake(rundown: Rundown): void {
+    this.httpService.put(`/rundowns/${rundown.id}/takeNext`).catch((error) => {
       this.logger.data(error).error('Error executing TAKE')
     })
   }
 
-  public executeTBarCommand(command: TBarPanelCommand): void {
-    this.assertActiveRundown()
-
+  public executeTBarCommand(command: TBarPanelCommand, rundown: Rundown): void {
     if (!command.value) {
       return
     }
     this.videoMixer.setTransitionPosition(command.value)
     if (command.shouldExecuteTake) {
-      this.executeTake()
+      this.executeTake(rundown)
     }
   }
 }

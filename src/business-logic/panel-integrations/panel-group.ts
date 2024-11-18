@@ -2,6 +2,7 @@ import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-co
 import { PanelCommand } from '../../model/interfaces/input-configuration'
 import { PanelCommandType } from '../../model/enums/panel-enums'
 import { Panel } from './panel'
+import { Rundown } from '../../model/entities/rundown'
 
 export class PanelGroup {
   private readonly activeModifiers: Set<string> = new Set()
@@ -62,5 +63,9 @@ export class PanelGroup {
 
   public registerOnCommand(onCommandCallback: (panelCommand: PanelCommand) => void): void {
     this.onCommandCallback = onCommandCallback
+  }
+
+  public updateActiveRundown(rundown: Rundown | undefined): void {
+    this.panels.forEach(panel => panel.updateActiveRundown(rundown))
   }
 }
