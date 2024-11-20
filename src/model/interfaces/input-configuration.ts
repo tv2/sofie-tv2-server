@@ -18,7 +18,7 @@ export interface InputLabel {
 
 export interface ButtonConfiguration extends BaseInputConfiguration {
   type: InputType.BUTTON
-  triggersOn: KeyEvent
+  triggersOn: KeyEvent[]
 }
 
 export interface FaderConfiguration extends BaseInputConfiguration {
@@ -94,7 +94,7 @@ const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z
 
 const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.BUTTON),
-  triggersOn: z.nativeEnum(KeyEvent),
+  triggersOn: z.nativeEnum(KeyEvent).array(),
 }))
 const ZOD_FADER_CONFIGURATION_SCHEMA: ZodSchema<FaderConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.FADER),

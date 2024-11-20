@@ -118,7 +118,8 @@ export class SkaarhojPanel extends Panel {
       }
       const inputData: PanelCommand | undefined = this.mapPanelInputToCommand(skaarhojInput)
       if (inputData && this.onCommandCallback) {
-        this.onCommandCallback(inputData)
+        const keyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
+        this.onCommandCallback(inputData, keyEvent)
       }
     })
 
@@ -239,8 +240,7 @@ export class SkaarhojPanel extends Panel {
     switch (inputConfiguration.type) {
       case InputType.BUTTON: {
         const skaarhojKeyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
-
-        if (skaarhojKeyEvent !== inputConfiguration.triggersOn) {
+        if (!skaarhojKeyEvent || !inputConfiguration.triggersOn.includes(skaarhojKeyEvent)) {
           return
         }
 
@@ -317,7 +317,7 @@ export class SkaarhojPanel extends Panel {
 
   private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
     const commands: SkaarhojCommand[] = [
-      new SkaarhojStateCommand(inputId, SkaarhojButtonState.DIMMED),
+      new SkaarhojStateCommand(inputId, this.isInputActiveModifier(inputConfiguration) ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED),
       new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
     ]
 
@@ -326,6 +326,14 @@ export class SkaarhojPanel extends Panel {
     }
 
     return commands
+  }
+
+  private isInputActiveModifier(inputConfiguration: InputConfiguration): boolean {
+    if (inputConfiguration.command.type !== PanelCommandType.MODIFIER) {
+      return false
+    }
+
+    return this.activeModifiers.has(inputConfiguration.command.modifier)
   }
 
   protected sendInactivePanelState(): void {
