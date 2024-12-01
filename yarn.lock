@@ -543,7 +543,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mongodb-js/saslprep@npm:^1.1.5":
+"@mongodb-js/saslprep@npm:^1.1.9":
   version: 1.1.9
   resolution: "@mongodb-js/saslprep@npm:1.1.9"
   dependencies:
@@ -1378,10 +1378,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.7.0":
-  version: 6.8.0
-  resolution: "bson@npm:6.8.0"
-  checksum: 10c0/0503bb2a4ce2e183bd06151bdb983a623cfde05c76fbb5a34e941c594f3a681b52333d61b37c7933b8733b0ba14607b3599d94b46635d90bb96b1e7cec51aa8f
+"bson@npm:^6.10.0":
+  version: 6.10.0
+  resolution: "bson@npm:6.10.0"
+  checksum: 10c0/1447b08cc4910cc1d1b55642184fa13d06bc2b454280d09431082a8293b83854971821129d4925b22f5e2b49e08cdc1ac958a0193cfbad9efb2381ad3d86f242
   languageName: node
   linkType: hard
 
@@ -3193,12 +3193,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.9.0":
-  version: 6.9.0
-  resolution: "mongodb@npm:6.9.0"
+"mongodb@npm:^6.11.0":
+  version: 6.11.0
+  resolution: "mongodb@npm:6.11.0"
   dependencies:
-    "@mongodb-js/saslprep": "npm:^1.1.5"
-    bson: "npm:^6.7.0"
+    "@mongodb-js/saslprep": "npm:^1.1.9"
+    bson: "npm:^6.10.0"
     mongodb-connection-string-url: "npm:^3.0.0"
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
@@ -3223,7 +3223,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/2b6c241a3361d014464a2c446fc9a71bae7270a9d8f777ffb8d69f0decfc6047f7dd6315c76caaa301fd61476948c3570b4b54a0866af5968e89b3cf5afa218e
+  checksum: 10c0/a3d38aef41d1656058ff6a6aecc741d0308864752ac58ffc990dcd021db514e2855390bb9f107f5b99777bc4a720c84a40818afb4ac12b4e19760ce36a664206
   languageName: node
   linkType: hard
 
@@ -4234,7 +4234,7 @@ __metadata:
     fastify: "npm:^5.0.0"
     fastify-type-provider-zod: "npm:^4.0.1"
     license-checker: "npm:^25.0.1"
-    mongodb: "npm:^6.9.0"
+    mongodb: "npm:^6.11.0"
     nodemon: "npm:^3.1.0"
     reflect-metadata: "npm:^0.2.2"
     rimraf: "npm:^6.0.1"
