@@ -7,7 +7,7 @@ export interface PanelConfiguration {
   model: PanelModel
   hostname: string
   panelGroupId: string
-  panelLayoutConfigurationId: string
+  panelLayoutConfigurationId?: string
 }
 
 export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConfiguration, 'id'>> = z.object({
@@ -15,7 +15,7 @@ export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConf
   model: z.nativeEnum(SkaarhojModel),
   hostname: z.string(),
   panelGroupId: z.string(),
-  panelLayoutConfigurationId: z.string()
+  panelLayoutConfigurationId: z.string().optional(),
 })
 
 export const ZOD_PANEL_CONFIGURATION_SCHEMA: ZodSchema<PanelConfiguration> = ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({

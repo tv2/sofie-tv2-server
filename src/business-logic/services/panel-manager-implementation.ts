@@ -75,10 +75,12 @@ export class PanelManagerImplementation implements PanelManager {
       return
     }
 
-    const panelLayoutConfiguration: PanelLayoutConfiguration | undefined = this.panelLayoutConfigurations.get(panelConfiguration.panelLayoutConfigurationId)
+    const panelLayoutConfiguration: PanelLayoutConfiguration | undefined = panelConfiguration.panelLayoutConfigurationId
+      ? this.panelLayoutConfigurations.get(panelConfiguration.panelLayoutConfigurationId)
+      : undefined
+
     if (!panelLayoutConfiguration) {
-      this.logger.data(panelConfiguration).warn(`No PanelLayoutConfiguration found for PanelConfiguration ${panelConfiguration.hostname}. Skipping connecting to Panel`)
-      return
+      this.logger.data(panelConfiguration).warn(`No PanelLayoutConfiguration found for PanelConfiguration ${panelConfiguration.hostname}.`)
     }
 
     const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)

@@ -75,11 +75,11 @@ export class SkaarhojPanel extends Panel {
 
   public constructor(
     panelConfiguration: PanelConfiguration,
-    panelLayoutConfiguration: PanelLayoutConfiguration,
     statusMessageService: StatusMessageService,
-    logger: Logger
+    logger: Logger,
+    panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
-    super(panelConfiguration, panelLayoutConfiguration, statusMessageService)
+    super(panelConfiguration, statusMessageService, panelLayoutConfiguration)
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
   }
 
@@ -303,6 +303,9 @@ export class SkaarhojPanel extends Panel {
   }
 
   protected sendActivePanelState(): void {
+    if (!this.panelLayoutConfiguration) {
+      return
+    }
     const commands: SkaarhojCommand[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).flatMap((inputId) => {
       const inputConfiguration: InputConfiguration | undefined = this.getInputConfiguration(inputId)
       return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []

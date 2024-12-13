@@ -25,8 +25,8 @@ export abstract class Panel {
 
   protected constructor(
     protected readonly panelConfiguration: PanelConfiguration,
-    protected panelLayoutConfiguration: PanelLayoutConfiguration,
-    private readonly statusMessageService: StatusMessageService
+    private readonly statusMessageService: StatusMessageService,
+    protected panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
     this.assertValidPanelConfiguration(panelConfiguration)
     this.updateModifierInputKeys()
@@ -61,14 +61,20 @@ export abstract class Panel {
   }
 
   private updateModifierInputKeys(): void {
+    if (!this.panelLayoutConfiguration) {
+      return
+    }
     const keysForModifierInputs: string[] = Object.keys(this.panelLayoutConfiguration.inputConfigurations).filter((key) => {
-      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration.inputConfigurations[key]
+      const inputConfiguration: InputConfiguration | undefined = this.panelLayoutConfiguration?.inputConfigurations[key]
       return inputConfiguration?.command.type === PanelCommandType.MODIFIER
     })
     this.modifierInputKeys = new Set(keysForModifierInputs)
   }
 
   protected getInputConfiguration(inputConfigurationKey: string): InputConfiguration | undefined {
+    if (!this.panelLayoutConfiguration) {
+      return
+    }
     if (this.modifierInputKeys.has(inputConfigurationKey)) {
       return this.panelLayoutConfiguration.inputConfigurations[inputConfigurationKey]
     }

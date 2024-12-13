@@ -7,7 +7,7 @@ export class PanelConfigurationDto {
   public readonly model: PanelModel
   public readonly hostname: string
   public readonly panelGroupId: string
-  public readonly panelLayoutConfigurationId: string
+  public readonly panelLayoutConfigurationId?: string
 
   public constructor(panelConfiguration: PanelConfiguration) {
     this.id = panelConfiguration.id
