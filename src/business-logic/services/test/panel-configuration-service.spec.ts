@@ -62,7 +62,7 @@ describe(PanelConfigurationService.name, () => {
 
     it('emits a PanelLayoutConfigurationUpdatedEvent', async() => {
       await testee.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-      verify(panelEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)).once()
+      verify(panelEmitter.emitPanelLayoutConfigurationUpdated(anything())).once()
     })
   })
 

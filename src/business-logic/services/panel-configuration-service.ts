@@ -30,7 +30,8 @@ export class PanelConfigurationService implements PanelService {
 
   public async updatePanelLayoutConfiguration(panelLayoutConfiguration: PanelLayoutConfiguration): Promise<void> {
     await this.panelLayoutConfigurationRepository.updatePanelLayoutConfiguration(panelLayoutConfiguration)
-    this.panelEmitter.emitPanelLayoutConfigurationUpdated(panelLayoutConfiguration)
+    const updatedPanelLayoutConfiguration: PanelLayoutConfiguration = await this.panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelLayoutConfiguration.id)
+    this.panelEmitter.emitPanelLayoutConfigurationUpdated(updatedPanelLayoutConfiguration)
   }
 
   public async deletePanelLayoutConfiguration(panelLayoutConfigurationId: string): Promise<void> {
