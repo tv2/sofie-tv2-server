@@ -11,6 +11,7 @@ import { DeviceObserver } from '../interfaces/device-observer'
 import { DeviceEmitter } from '../interfaces/device-emitter'
 import { RundownEmitter } from '../interfaces/rundown-emitter'
 import { RundownObserver } from '../interfaces/rundown-observer'
+import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
 
 export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver, DeviceEmitter, DeviceObserver, RundownEmitter, RundownObserver {
   private readonly eventEmitter: EventEmitter<{
@@ -20,6 +21,7 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     panelLayoutConfigurationCreated: [PanelLayoutConfiguration]
     panelLayoutConfigurationUpdated: [PanelLayoutConfiguration]
     panelLayoutConfigurationDeleted: [string]
+    panelInputModifierCreated: [PanelInputModifier]
     statusMessage: [StatusMessage]
     videoMixerConfigurationUpdated: [VideoMixerConfiguration]
     activeRundownId: [string | undefined]
@@ -49,6 +51,10 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     this.eventEmitter.emit('panelConfigurationDeleted', panelConfigurationId)
   }
 
+  public emitPanelInputModifierCreated(panelInputModifier: PanelInputModifier): void {
+    this.eventEmitter.emit('panelInputModifierCreated', panelInputModifier)
+  }
+
   public subscribeToPanelConfigurationCreated(onPanelConfigurationCreatedCallback: (panelConfiguration: PanelConfiguration) => void): void {
     this.eventEmitter.on('panelConfigurationCreated', onPanelConfigurationCreatedCallback)
   }
@@ -71,6 +77,10 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
 
   public subscribeToPanelLayoutConfigurationDeleted(onPanelLayoutConfigurationDeletedCallback: (panelLayoutConfigurationId: string) => void): void {
     this.eventEmitter.on('panelLayoutConfigurationDeleted', onPanelLayoutConfigurationDeletedCallback)
+  }
+
+  public subscribeToPanelInputModifierCreated(onPanelInputModifierCreated: (panelInputModifier: PanelInputModifier) => void): void {
+    this.eventEmitter.on('panelInputModifierCreated', onPanelInputModifierCreated)
   }
 
   public subscribeToStatusMessages(onStatusMessageEventCallback: (statusMessage: StatusMessage) => void): void {

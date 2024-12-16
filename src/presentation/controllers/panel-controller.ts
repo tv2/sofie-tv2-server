@@ -18,6 +18,11 @@ import {
 } from '../../model/interfaces/panel-configuration'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
+import {
+  PanelInputModifier,
+  ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID
+} from '../../model/interfaces/panel-input-modifier'
+import { PanelInputModifierDto } from '../dtos/panel-input-modifier-dto'
 
 @RestController('/panels')
 export class PanelController extends BaseController {
@@ -143,6 +148,27 @@ export class PanelController extends BaseController {
     try {
       await this.panelService.deletePanelConfiguration(request.params.id)
       await this.sendOkReply(reply, `Successfully deleted PanelConfiguration for ${request.params.id}`)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @GetRequest('/panelInputModifiers')
+  public async getPanelInputModifiers(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    try {
+      const panelInputModifiers: PanelInputModifier[] = await this.panelService.getPanelInputModifiers()
+      await this.sendOkReply(reply, panelInputModifiers.map(panelInputModifier => new PanelInputModifierDto(panelInputModifier)))
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
+
+  @PostRequest('/panelInputModifiers', ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID)
+  public async createPanelInputModifier(request: FastifyRequest<{ Body: PanelInputModifier }>, reply: FastifyReply): Promise<void> {
+    try {
+      const panelInputModifier: PanelInputModifier = request.body
+      await this.panelService.createPanelInputModifier(panelInputModifier)
+      await this.sendOkReply(reply, 'Successfully create PanelInputModifier')
     } catch (error) {
       await this.httpErrorHandler.handleError(reply, error)
     }

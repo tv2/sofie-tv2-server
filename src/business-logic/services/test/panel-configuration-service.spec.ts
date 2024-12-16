@@ -12,6 +12,7 @@ import { PanelConfiguration } from '../../../model/interfaces/panel-configuratio
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
 import { PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
+import { PanelInputModifierRepository } from '../../../data-access/interfaces/panel-input-modifier-repository'
 
 describe(PanelConfigurationService.name, () => {
   let testee: PanelService
@@ -326,11 +327,13 @@ describe(PanelConfigurationService.name, () => {
 function createTestee(params?: {
   panelLayoutConfigurationRepository?: PanelLayoutConfigurationRepository
   panelConfigurationRepository?: PanelConfigurationRepository
+  panelInputModifierRepository?: PanelInputModifierRepository
   panelEmitter?: PanelEmitter
 }): PanelConfigurationService {
   return new PanelConfigurationService(
     instance(params?.panelLayoutConfigurationRepository ?? mock<PanelLayoutConfigurationRepository>()),
     instance(params?.panelConfigurationRepository ?? mock<PanelConfigurationRepository>()),
+    instance(params?.panelInputModifierRepository ?? mock<PanelInputModifierRepository>()),
     instance(params?.panelEmitter ?? mock<PanelEmitter>())
   )
 }

@@ -7,14 +7,12 @@ import { LoggerFacade } from '../../logger/logger-facade'
 import { JsendHttpResponseFormatter } from '../services/jsend-http-response-formatter'
 import { SystemInformationController } from '../controllers/system-information-controller'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { PanelInputModifierController } from '../controllers/panel-input-modifier-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
     return [
       this.createPanelController(),
       this.createSystemInformationController(),
-      this.createPanelInputModifierController()
     ]
   }
 
@@ -31,14 +29,6 @@ export class ControllerFacade {
     return new SystemInformationController(
       ServiceFacade.createStatusMessageService(),
       this.createHttpResponseFormatter()
-    )
-  }
-
-  private static createPanelInputModifierController(): PanelInputModifierController {
-    return new PanelInputModifierController(
-      RepositoryFacade.createPanelInputModifierRepository(),
-      this.createHttpResponseFormatter(),
-      this.createHttpErrorHandler()
     )
   }
 
