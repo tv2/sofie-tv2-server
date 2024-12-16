@@ -18,7 +18,7 @@ describe(SkaarhojPanel.name, () => {
   describe('on creation', () => {
     describe('it receives a PanelConfiguration that does not have a Skaarhoj type', () => {
       it('throws an unsupported operation exception', () => {
-        // panelConfiguration = EntityTestFactory.createPanelConfiguration({ type: 'NON_SKAARHOJ_TYPE' as PanelType, model: SkaarhojModel.MKT1A })
+        panelConfiguration = EntityTestFactory.createPanelConfiguration({ type: 'NON_SKAARHOJ_TYPE' as PanelType, model: SkaarhojModel.MKT1A })
         expect(() => new SkaarhojPanel(panelConfiguration, instance(mock(StatusMessageService)), logger, EntityTestFactory.createPanelLayoutConfiguration())).throws(UnsupportedOperationException)
       })
     })
