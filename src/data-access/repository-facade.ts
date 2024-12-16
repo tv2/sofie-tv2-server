@@ -10,6 +10,8 @@ import { PanelConfigurationRepository } from './interfaces/panel-configuration-r
 import { MongoPanelConfigurationRepository } from './mongo/mongo-panel-configuration-repository'
 import { StatusMessageRepository } from './interfaces/status-message-repository'
 import { InMemoryStatusMessageRepository } from './in-memory/in-memory-status-message-repository'
+import { PanelInputModifierRepository } from './interfaces/panel-input-modifier-repository'
+import { MongoPanelInputModifierRepository } from './mongo/mongo-panel-input-modifier-repository'
 
 export class RepositoryFacade {
   public static createPhysicalPanelLayoutRepository(): PhysicalPanelLayoutRepository {
@@ -38,5 +40,12 @@ export class RepositoryFacade {
 
   public static createStatusMessageRepository(): StatusMessageRepository {
     return InMemoryStatusMessageRepository.getInstance()
+  }
+
+  public static createPanelInputModifierRepository(): PanelInputModifierRepository {
+    return new MongoPanelInputModifierRepository(
+      this.createMongoDatabase(),
+      this.createUuidGenerator()
+    )
   }
 }
