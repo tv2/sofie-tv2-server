@@ -6,11 +6,14 @@ import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelConfigurationRepository } from '../../data-access/interfaces/panel-configuration-repository'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
+import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
+import { PanelInputModifierRepository } from '../../data-access/interfaces/panel-input-modifier-repository'
 
 export class PanelConfigurationService implements PanelService {
   public constructor(
     private readonly panelLayoutConfigurationRepository: PanelLayoutConfigurationRepository,
     private readonly panelConfigurationRepository: PanelConfigurationRepository,
+    private readonly panelInputModifierRepository: PanelInputModifierRepository,
     private readonly panelEmitter: PanelEmitter
   ) {
   }
@@ -92,5 +95,19 @@ export class PanelConfigurationService implements PanelService {
   public async deletePanelConfiguration(panelConfigurationId: string): Promise<void> {
     await this.panelConfigurationRepository.deletePanelConfiguration(panelConfigurationId)
     this.panelEmitter.emitPanelConfigurationDeleted(panelConfigurationId)
+  }
+
+  public getPanelInputModifiers(): Promise<PanelInputModifier[]> {
+    return this.panelInputModifierRepository.getPanelInputModifiers()
+  }
+
+  public async createPanelInputModifier(panelInputModifier: PanelInputModifier): Promise<void> {
+    const createdPanelInputModifier: PanelInputModifier = await this.panelInputModifierRepository.createPanelInputModifier(panelInputModifier)
+    this.panelEmitter.emitPanelInputModifierCreated(createdPanelInputModifier)
+  }
+
+  public async deletedPanelInputModifier(panelInputModifierId: string): Promise<void> {
+    await this.panelInputModifierRepository.deletedPanelInputModifier(panelInputModifierId)
+    this.panelEmitter.emitPanelInputModifierDeleted(panelInputModifierId)
   }
 }

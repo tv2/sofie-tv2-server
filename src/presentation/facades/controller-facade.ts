@@ -12,7 +12,7 @@ export class ControllerFacade {
   public static getControllers(): BaseController[] {
     return [
       this.createPanelController(),
-      this.createSystemInformationController()
+      this.createSystemInformationController(),
     ]
   }
 

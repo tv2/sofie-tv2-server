@@ -12,6 +12,8 @@ import { PanelConfiguration } from '../../../model/interfaces/panel-configuratio
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { PanelLayoutConfiguration } from '../../../model/interfaces/panel-layout-configuration'
 import { PanelType, SkaarhojModel } from '../../../model/enums/panel-enums'
+import { PanelInputModifierRepository } from '../../../data-access/interfaces/panel-input-modifier-repository'
+import { PanelInputModifier } from '../../../model/interfaces/panel-input-modifier'
 
 describe(PanelConfigurationService.name, () => {
   let testee: PanelService
@@ -321,16 +323,72 @@ describe(PanelConfigurationService.name, () => {
       verify(panelEmitter.emitPanelConfigurationDeleted(panelConfiguration.id)).once()
     })
   })
+
+  describe(PanelConfigurationService.prototype.createPanelInputModifier.name, () => {
+    let panelInputModifier: PanelInputModifier
+    let panelInputModifierRepository: PanelInputModifierRepository
+    let panelEmitter: PanelEmitter
+
+    let testee: PanelService
+
+    beforeEach(() => {
+      panelInputModifier = EntityTestFactory.createPanelInputModifier()
+      panelInputModifierRepository = mock<PanelInputModifierRepository>()
+      panelEmitter = mock<PanelEmitter>()
+
+      testee = createTestee({ panelInputModifierRepository, panelEmitter })
+
+      when(panelInputModifierRepository.createPanelInputModifier(panelInputModifier)).thenResolve(panelInputModifier)
+    })
+
+    it('creates the PanelInputModifier', async() => {
+      await testee.createPanelInputModifier(panelInputModifier)
+      verify(panelInputModifierRepository.createPanelInputModifier(panelInputModifier)).once()
+    })
+
+    it('emits a PanelInputModifier created event', async() => {
+      await testee.createPanelInputModifier(panelInputModifier)
+      verify(panelEmitter.emitPanelInputModifierCreated(panelInputModifier)).once()
+    })
+  })
+
+  describe(PanelConfigurationService.prototype.deletedPanelInputModifier.name, () => {
+    let panelInputModifier: PanelInputModifier
+    let panelInputModifierRepository: PanelInputModifierRepository
+    let panelEmitter: PanelEmitter
+
+    let testee: PanelService
+
+    beforeEach(() => {
+      panelInputModifier = EntityTestFactory.createPanelInputModifier()
+      panelInputModifierRepository = mock<PanelInputModifierRepository>()
+      panelEmitter = mock<PanelEmitter>()
+
+      testee = createTestee({ panelInputModifierRepository, panelEmitter })
+    })
+
+    it('deletes the PanelInputModifier', async() => {
+      await testee.deletedPanelInputModifier(panelInputModifier.id)
+      verify(panelInputModifierRepository.deletedPanelInputModifier(panelInputModifier.id)).once()
+    })
+
+    it('emits a PanelInputModifier deleted event', async() => {
+      await testee.deletedPanelInputModifier(panelInputModifier.id)
+      verify(panelEmitter.emitPanelInputModifierDeleted(panelInputModifier.id)).once()
+    })
+  })
 })
 
 function createTestee(params?: {
   panelLayoutConfigurationRepository?: PanelLayoutConfigurationRepository
   panelConfigurationRepository?: PanelConfigurationRepository
+  panelInputModifierRepository?: PanelInputModifierRepository
   panelEmitter?: PanelEmitter
 }): PanelConfigurationService {
   return new PanelConfigurationService(
     instance(params?.panelLayoutConfigurationRepository ?? mock<PanelLayoutConfigurationRepository>()),
     instance(params?.panelConfigurationRepository ?? mock<PanelConfigurationRepository>()),
+    instance(params?.panelInputModifierRepository ?? mock<PanelInputModifierRepository>()),
     instance(params?.panelEmitter ?? mock<PanelEmitter>())
   )
 }

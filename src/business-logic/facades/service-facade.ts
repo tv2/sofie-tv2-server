@@ -22,6 +22,7 @@ export class ServiceFacade {
     return new PanelConfigurationService(
       RepositoryFacade.createPanelLayoutConfigurationRepository(),
       RepositoryFacade.createPanelConfigurationRepository(),
+      RepositoryFacade.createPanelInputModifierRepository(),
       DomainEventFacade.createPanelEmitter()
     )
   }

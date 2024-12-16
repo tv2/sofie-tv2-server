@@ -3,6 +3,8 @@ import {
   PanelConfigurationCreatedEvent,
   PanelConfigurationDeletedEvent,
   PanelConfigurationUpdatedEvent,
+  PanelInputModifierCreatedEvent,
+  PanelInputModifierDeletedEvent,
   PanelLayoutConfigurationCreatedEvent,
   PanelLayoutConfigurationDeletedEvent,
   PanelLayoutConfigurationUpdatedEvent
@@ -12,6 +14,8 @@ import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
 import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
+import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
+import { PanelInputModifierDto } from '../dtos/panel-input-modifier-dto'
 
 export class EventBuilder implements PanelEventBuilder {
   public buildPanelLayoutConfigurationCreatedEvent(panelLayoutConfiguration: PanelLayoutConfiguration): PanelLayoutConfigurationCreatedEvent {
@@ -59,6 +63,22 @@ export class EventBuilder implements PanelEventBuilder {
       type: PanelEventType.PANEL_CONFIGURATION_DELETED,
       timestamp: Date.now(),
       panelConfigurationId
+    }
+  }
+
+  public buildPanelInputModifierCreatedEvent(panelInputModifier: PanelInputModifier): PanelInputModifierCreatedEvent {
+    return {
+      type: PanelEventType.PANEL_INPUT_MODIFIER_CREATED,
+      timestamp: Date.now(),
+      panelInputModifier: new PanelInputModifierDto(panelInputModifier)
+    }
+  }
+
+  public buildPanelInputModifierDeletedEvent(panelInputModifierId: string): PanelInputModifierDeletedEvent {
+    return {
+      type: PanelEventType.PANEL_INPUT_MODIFIER_DELETED,
+      timestamp: Date.now(),
+      panelInputModifierId
     }
   }
 }

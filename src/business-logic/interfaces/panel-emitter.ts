@@ -1,5 +1,6 @@
 import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-configuration'
 import { PanelConfiguration } from '../../model/interfaces/panel-configuration'
+import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
 
 export interface PanelEmitter {
   emitPanelLayoutConfigurationCreated(panelLayoutConfiguration: PanelLayoutConfiguration): void
@@ -9,4 +10,7 @@ export interface PanelEmitter {
   emitPanelConfigurationCreated(panelConfiguration: PanelConfiguration): void
   emitPanelConfigurationUpdated(panelConfiguration: PanelConfiguration): void
   emitPanelConfigurationDeleted(panelConfigurationId: string): void
+
+  emitPanelInputModifierCreated(panelInputModifier: PanelInputModifier): void
+  emitPanelInputModifierDeleted(panelInputModifierId: string): void
 }

@@ -3,6 +3,7 @@ import { PanelType, SkaarhojModel } from '../enums/panel-enums'
 import { PanelLayoutConfiguration } from '../interfaces/panel-layout-configuration'
 import { StatusMessage } from '../entities/status-message'
 import { StatusCode } from '../enums/status-code'
+import { PanelInputModifier } from '../interfaces/panel-input-modifier'
 
 export class EntityTestFactory {
   public static createPanelLayoutConfiguration(panelLayoutConfiguration?: Partial<PanelLayoutConfiguration>): PanelLayoutConfiguration {
@@ -25,6 +26,14 @@ export class EntityTestFactory {
       panelLayoutConfigurationId: 'randomPanelLayoutConfigurationId',
       panelGroupId: 'randomPanelGroupId',
       ...panelConfiguration
+    }
+  }
+
+  public static createPanelInputModifier(panelInputModifier?: Partial<PanelInputModifier>): PanelInputModifier {
+    return {
+      id: 'randomPanelModifierInputId',
+      name: 'randomPanelModifierInputName',
+      ...panelInputModifier
     }
   }
 

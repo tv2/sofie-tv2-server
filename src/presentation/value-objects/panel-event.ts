@@ -2,6 +2,7 @@ import { TypedEvent } from './typed-event'
 import { EventType, PanelEventType } from '../enums/event-type'
 import { PanelLayoutConfigurationDto } from '../dtos/panel-layout-configuration-dto'
 import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
+import { PanelInputModifierDto } from '../dtos/panel-input-modifier-dto'
 
 export interface PanelEvent extends TypedEvent {
   type: EventType
@@ -35,4 +36,14 @@ export interface PanelConfigurationUpdatedEvent extends PanelEvent {
 export interface PanelConfigurationDeletedEvent extends PanelEvent {
   type: PanelEventType.PANEL_CONFIGURATION_DELETED
   panelConfigurationId: string
+}
+
+export interface PanelInputModifierCreatedEvent extends PanelEvent {
+  type: PanelEventType.PANEL_INPUT_MODIFIER_CREATED
+  panelInputModifier: PanelInputModifierDto
+}
+
+export interface PanelInputModifierDeletedEvent extends PanelEvent {
+  type: PanelEventType.PANEL_INPUT_MODIFIER_DELETED
+  panelInputModifierId: string
 }
