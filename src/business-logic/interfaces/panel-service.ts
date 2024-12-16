@@ -17,4 +17,5 @@ export interface PanelService {
 
   getPanelInputModifiers(): Promise<PanelInputModifier[]>
   createPanelInputModifier(panelInputModifier: PanelInputModifier): Promise<void>
+  deletedPanelInputModifier(panelInputModifierId: string): Promise<void>
 }

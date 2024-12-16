@@ -4,6 +4,7 @@ import {
   PanelConfigurationDeletedEvent,
   PanelConfigurationUpdatedEvent,
   PanelInputModifierCreatedEvent,
+  PanelInputModifierDeletedEvent,
   PanelLayoutConfigurationCreatedEvent,
   PanelLayoutConfigurationDeletedEvent,
   PanelLayoutConfigurationUpdatedEvent
@@ -70,6 +71,14 @@ export class EventBuilder implements PanelEventBuilder {
       type: PanelEventType.PANEL_INPUT_MODIFIER_CREATED,
       timestamp: Date.now(),
       panelInputModifier: new PanelInputModifierDto(panelInputModifier)
+    }
+  }
+
+  public buildPanelInputModifierDeletedEvent(panelInputModifierId: string): PanelInputModifierDeletedEvent {
+    return {
+      type: PanelEventType.PANEL_INPUT_MODIFIER_DELETED,
+      timestamp: Date.now(),
+      panelInputModifierId
     }
   }
 }

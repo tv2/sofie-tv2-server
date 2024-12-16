@@ -173,4 +173,14 @@ export class PanelController extends BaseController {
       await this.httpErrorHandler.handleError(reply, error)
     }
   }
+
+  @DeleteRequest('/panelInputModifiers/:id')
+  public async deletePanelInputModifier(request: FastifyRequest<{ Params: Pick<PanelInputModifier, 'id'> }>, reply: FastifyReply): Promise<void> {
+    try {
+      await this.panelService.deletedPanelInputModifier(request.params.id)
+      await this.sendOkReply(reply, `Successfully deleted PanelInputModifier for ${request.params.id}`)
+    } catch (error) {
+      await this.httpErrorHandler.handleError(reply, error)
+    }
+  }
 }

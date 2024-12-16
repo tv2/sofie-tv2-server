@@ -12,4 +12,5 @@ export interface PanelEmitter {
   emitPanelConfigurationDeleted(panelConfigurationId: string): void
 
   emitPanelInputModifierCreated(panelInputModifier: PanelInputModifier): void
+  emitPanelInputModifierDeleted(panelInputModifierId: string): void
 }

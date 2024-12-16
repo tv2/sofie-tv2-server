@@ -89,6 +89,7 @@ export class FastifyServer implements ProxyServer {
     this.panelObserver.subscribeToPanelLayoutConfigurationDeleted(panelLayoutConfigurationId => this.sendEvent(this.panelEventBuilder.buildPanelLayoutConfigurationDeletedEvent(panelLayoutConfigurationId), socket))
 
     this.panelObserver.subscribeToPanelInputModifierCreated(panelInputModifier => this.sendEvent(this.panelEventBuilder.buildPanelInputModifierCreatedEvent(panelInputModifier), socket))
+    this.panelObserver.subscribeToPanelInputModifierDeleted(panelInputModifierId => this.sendEvent(this.panelEventBuilder.buildPanelInputModifierDeletedEvent(panelInputModifierId), socket))
   }
 
   private sendEvent(event: TypedEvent, socket: WebSocket): void {

@@ -12,4 +12,5 @@ export interface PanelObserver {
   subscribeToPanelLayoutConfigurationDeleted(onPanelLayoutConfigurationDeletedCallback: (panelLayoutConfigurationId: string) => void): void
 
   subscribeToPanelInputModifierCreated(onPanelInputModifierCreated: (panelInputModifier: PanelInputModifier) => void): void
+  subscribeToPanelInputModifierDeleted(onPanelInputModifierDeleted: (panelInputModifierId: string) => void): void
 }

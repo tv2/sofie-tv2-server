@@ -31,4 +31,9 @@ export class MongoPanelInputModifierRepository extends BaseMongoRepository<Mongo
     await this.getCollection().updateOne({ id: panelInputModifier.id }, { $set: panelInputModifier }, { upsert: true })
     return panelInputModifier
   }
+
+  public async deletedPanelInputModifier(panelInputModifierId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deletedPanelInputModifier.name)
+    await this.getCollection().deleteOne({ id: panelInputModifierId })
+  }
 }

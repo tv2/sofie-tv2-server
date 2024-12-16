@@ -22,6 +22,7 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     panelLayoutConfigurationUpdated: [PanelLayoutConfiguration]
     panelLayoutConfigurationDeleted: [string]
     panelInputModifierCreated: [PanelInputModifier]
+    panelInputModifierDeleted: [string]
     statusMessage: [StatusMessage]
     videoMixerConfigurationUpdated: [VideoMixerConfiguration]
     activeRundownId: [string | undefined]
@@ -55,6 +56,10 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     this.eventEmitter.emit('panelInputModifierCreated', panelInputModifier)
   }
 
+  public emitPanelInputModifierDeleted(panelInputModifierId: string): void {
+    this.eventEmitter.emit('panelInputModifierDeleted', panelInputModifierId)
+  }
+
   public subscribeToPanelConfigurationCreated(onPanelConfigurationCreatedCallback: (panelConfiguration: PanelConfiguration) => void): void {
     this.eventEmitter.on('panelConfigurationCreated', onPanelConfigurationCreatedCallback)
   }
@@ -81,6 +86,10 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
 
   public subscribeToPanelInputModifierCreated(onPanelInputModifierCreated: (panelInputModifier: PanelInputModifier) => void): void {
     this.eventEmitter.on('panelInputModifierCreated', onPanelInputModifierCreated)
+  }
+
+  public subscribeToPanelInputModifierDeleted(onPanelInputModifierDeleted: (panelInputModifierId: string) => void): void {
+    this.eventEmitter.on('panelInputModifierDeleted', onPanelInputModifierDeleted)
   }
 
   public subscribeToStatusMessages(onStatusMessageEventCallback: (statusMessage: StatusMessage) => void): void {

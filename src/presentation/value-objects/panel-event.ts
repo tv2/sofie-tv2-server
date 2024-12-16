@@ -42,3 +42,8 @@ export interface PanelInputModifierCreatedEvent extends PanelEvent {
   type: PanelEventType.PANEL_INPUT_MODIFIER_CREATED
   panelInputModifier: PanelInputModifierDto
 }
+
+export interface PanelInputModifierDeletedEvent extends PanelEvent {
+  type: PanelEventType.PANEL_INPUT_MODIFIER_DELETED
+  panelInputModifierId: string
+}

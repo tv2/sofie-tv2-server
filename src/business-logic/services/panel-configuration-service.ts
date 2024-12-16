@@ -105,4 +105,9 @@ export class PanelConfigurationService implements PanelService {
     const createdPanelInputModifier: PanelInputModifier = await this.panelInputModifierRepository.createPanelInputModifier(panelInputModifier)
     this.panelEmitter.emitPanelInputModifierCreated(createdPanelInputModifier)
   }
+
+  public async deletedPanelInputModifier(panelInputModifierId: string): Promise<void> {
+    await this.panelInputModifierRepository.deletedPanelInputModifier(panelInputModifierId)
+    this.panelEmitter.emitPanelInputModifierDeleted(panelInputModifierId)
+  }
 }
