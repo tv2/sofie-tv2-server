@@ -7,13 +7,13 @@ export class PanelLayoutConfigurationDto {
   public readonly name: string
   public readonly type: PanelType
   public readonly model: PanelModel
-  public readonly inputConfiguration: Record<string, InputConfiguration>
+  public readonly inputConfigurations: Record<string, InputConfiguration>
 
   public constructor(panelLayoutConfiguration: PanelLayoutConfiguration) {
     this.id = panelLayoutConfiguration.id
     this.name = panelLayoutConfiguration.name
     this.type = panelLayoutConfiguration.type
     this.model = panelLayoutConfiguration.model
-    this.inputConfiguration = panelLayoutConfiguration.inputConfigurations
+    this.inputConfigurations = panelLayoutConfiguration.inputConfigurations
   }
 }
