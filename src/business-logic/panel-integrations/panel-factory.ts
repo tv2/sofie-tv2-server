@@ -10,10 +10,10 @@ import { PanelLayoutConfiguration } from '../../model/interfaces/panel-layout-co
 export class PanelFactory {
   public constructor(private readonly statusMessageService: StatusMessageService, private readonly logger: Logger) {}
 
-  public createPanel(panelConfiguration: PanelConfiguration, panelLayoutConfiguration: PanelLayoutConfiguration): Panel {
+  public createPanel(panelConfiguration: PanelConfiguration, panelLayoutConfiguration?: PanelLayoutConfiguration): Panel {
     switch (panelConfiguration.type) {
       case PanelType.SKAARHOJ: {
-        return new SkaarhojPanel(panelConfiguration, panelLayoutConfiguration, this.statusMessageService, this.logger)
+        return new SkaarhojPanel(panelConfiguration, this.statusMessageService, this.logger, panelLayoutConfiguration)
       }
       default: {
         throw new UnsupportedOperationException(`No Panel implementation found for ${panelConfiguration.type}`)

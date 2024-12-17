@@ -60,8 +60,10 @@ export class PanelConfigurationService implements PanelService {
   }
 
   public async createPanelConfiguration(panelConfigurationWithoutId: PanelConfiguration): Promise<void> {
-    const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfigurationWithoutId.panelLayoutConfigurationId, 'create')
-    this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfigurationWithoutId, 'create')
+    if (panelConfigurationWithoutId.panelLayoutConfigurationId) {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfigurationWithoutId.panelLayoutConfigurationId, 'create')
+      this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfigurationWithoutId, 'create')
+    }
 
     const panelConfiguration: PanelConfiguration = await this.panelConfigurationRepository.createPanelConfiguration(panelConfigurationWithoutId)
     this.panelEmitter.emitPanelConfigurationCreated(panelConfiguration)
@@ -85,8 +87,10 @@ export class PanelConfigurationService implements PanelService {
   }
 
   public async updatePanelConfiguration(panelConfiguration: PanelConfiguration): Promise<void> {
-    const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId, 'update')
-    this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfiguration, 'update')
+    if (panelConfiguration.panelLayoutConfigurationId) {
+      const panelLayoutConfiguration: PanelLayoutConfiguration = await this.fetchPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId, 'update')
+      this.assertPanelLayoutConfigurationAndPanelConfigurationCompatibility(panelLayoutConfiguration, panelConfiguration, 'update')
+    }
 
     await this.panelConfigurationRepository.updatePanelConfiguration(panelConfiguration)
     this.panelEmitter.emitPanelConfigurationUpdated(panelConfiguration)
