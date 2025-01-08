@@ -238,6 +238,7 @@ export class SkaarhojPanel extends Panel {
     }
 
     switch (inputConfiguration.type) {
+      case InputType.BUTTON_WITH_DISPLAY: // Intentional fallthrough
       case InputType.BUTTON: {
         const skaarhojKeyEvent: KeyEvent | undefined = this.mapSkaarhojInputToKeyEvent(skaarhojInput)
         if (!skaarhojKeyEvent || !inputConfiguration.triggersOn.includes(skaarhojKeyEvent)) {
@@ -324,8 +325,8 @@ export class SkaarhojPanel extends Panel {
       new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
     ]
 
-    if (inputConfiguration.label) {
-      commands.push(new SkaarhojTextCommand(inputConfiguration.label.id, inputConfiguration.label.text))
+    if (inputConfiguration.type === InputType.DISPLAY || inputConfiguration.type === InputType.BUTTON_WITH_DISPLAY) {
+      commands.push(new SkaarhojTextCommand(inputId, inputConfiguration.text))
     }
 
     return commands
