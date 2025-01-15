@@ -2,18 +2,12 @@ import { InputType, KeyEvent, PanelCommandType } from '../enums/panel-enums'
 import z, { ZodSchema } from 'zod'
 import { Color } from '../enums/color'
 
-export type InputConfiguration = ButtonConfiguration | FaderConfiguration | DisplayConfiguration
+export type InputConfiguration = ButtonConfiguration | FaderConfiguration | DisplayConfiguration | ButtonWithDisplayConfiguration
 
 export interface BaseInputConfiguration {
   type: InputType
   command: PanelCommand
   color?: Color | undefined
-  label?: InputLabel | undefined
-}
-
-export interface InputLabel {
-  id: string
-  text: string
 }
 
 export interface ButtonConfiguration extends BaseInputConfiguration {
@@ -27,6 +21,13 @@ export interface FaderConfiguration extends BaseInputConfiguration {
 
 export interface DisplayConfiguration extends BaseInputConfiguration {
   type: InputType.DISPLAY
+  text: string
+}
+
+export interface ButtonWithDisplayConfiguration extends BaseInputConfiguration {
+  type: InputType.BUTTON_WITH_DISPLAY
+  text: string
+  triggersOn: KeyEvent[]
 }
 
 export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand | EmptyPanelCommand
@@ -86,10 +87,6 @@ const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z
   type: z.nativeEnum(InputType),
   command: ZOD_PANEL_COMMAND_SCHEMA,
   color: z.nativeEnum(Color).optional(),
-  label: z.object({
-    id: z.string(),
-    text: z.string()
-  }).optional()
 })
 
 const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
@@ -102,10 +99,18 @@ const ZOD_FADER_CONFIGURATION_SCHEMA: ZodSchema<FaderConfiguration> = z.intersec
 
 const ZOD_DISPLAY_CONFIGURATION_SCHEMA: ZodSchema<DisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.DISPLAY),
+  text: z.string()
+}))
+
+const ZOD_BUTTON_WITH_DISPLAY_CONFIGURATION_SCHEMA: ZodSchema<ButtonWithDisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+  type: z.literal(InputType.BUTTON_WITH_DISPLAY),
+  text: z.string(),
+  triggersOn: z.nativeEnum(KeyEvent).array(),
 }))
 
 export const ZOD_INPUT_CONFIGURATION_SCHEMA: ZodSchema<InputConfiguration> = z.union([
   ZOD_BUTTON_CONFIGURATION_SCHEMA,
   ZOD_FADER_CONFIGURATION_SCHEMA,
-  ZOD_DISPLAY_CONFIGURATION_SCHEMA
+  ZOD_DISPLAY_CONFIGURATION_SCHEMA,
+  ZOD_BUTTON_WITH_DISPLAY_CONFIGURATION_SCHEMA
 ])
