@@ -21,7 +21,7 @@ export enum PanelCommandType {
   ACTION = 'ACTION',
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
-  EMPTY = 'EMPTY',
+  DISPLAY = 'DISPLAY',
 }
 
 export enum KeyEvent {

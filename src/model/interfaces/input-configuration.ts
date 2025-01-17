@@ -30,7 +30,7 @@ export interface ButtonWithDisplayConfiguration extends BaseInputConfiguration {
   triggersOn: KeyEvent[]
 }
 
-export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand | EmptyPanelCommand
+export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand | DisplayPanelCommand
 
 export interface BasePanelCommand {
   type: PanelCommandType
@@ -53,8 +53,8 @@ export interface TBarPanelCommand extends BasePanelCommand {
   shouldExecuteTake?: boolean // Whether a Take needs to be executed in Alba alongside the transition
 }
 
-export interface EmptyPanelCommand extends BasePanelCommand {
-  type: PanelCommandType.EMPTY
+export interface DisplayPanelCommand extends BasePanelCommand {
+  type: PanelCommandType.DISPLAY
 }
 
 const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({
@@ -72,15 +72,15 @@ export const ZOD_T_BAR_PANEL_COMMAND_SCHEMA: ZodSchema<TBarPanelCommand> = z.obj
   type: z.literal(PanelCommandType.T_BAR),
 })
 
-export const ZOD_EMPTY_PANEL_COMMAND_SCHEMA: ZodSchema<EmptyPanelCommand> = z.object({
-  type: z.literal(PanelCommandType.EMPTY),
+export const ZOD_DISPLAY_PANEL_COMMAND_SCHEMA: ZodSchema<DisplayPanelCommand> = z.object({
+  type: z.literal(PanelCommandType.DISPLAY),
 })
 
 export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
   ZOD_ACTION_PANEL_COMMAND_SCHEMA,
   ZOD_MODIFIER_PANEL_COMMAND_SCHEMA,
   ZOD_T_BAR_PANEL_COMMAND_SCHEMA,
-  ZOD_EMPTY_PANEL_COMMAND_SCHEMA
+  ZOD_DISPLAY_PANEL_COMMAND_SCHEMA
 ])
 
 const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z.object({
