@@ -1,13 +1,12 @@
 import { InputType, KeyEvent, PanelCommandType } from '../enums/panel-enums'
 import z, { ZodSchema } from 'zod'
-import { Color } from '../enums/color'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration | DisplayConfiguration | ButtonWithDisplayConfiguration
 
 export interface BaseInputConfiguration {
   type: InputType
   command: PanelCommand
-  color?: Color | undefined
+  color?: string | undefined
 }
 
 export interface ButtonConfiguration extends BaseInputConfiguration {
@@ -86,7 +85,7 @@ export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
 const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z.object({
   type: z.nativeEnum(InputType),
   command: ZOD_PANEL_COMMAND_SCHEMA,
-  color: z.nativeEnum(Color).optional(),
+  color: z.string().optional(),
 })
 
 const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({

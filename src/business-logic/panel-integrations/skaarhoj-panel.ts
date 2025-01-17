@@ -17,7 +17,7 @@ import {
   SkaarhojStateCommand,
   SkaarhojTextCommand
 } from './skaarhoj-command'
-import { Color } from '../../model/enums/color'
+import { ColorConverter } from '../interfaces/color-converter'
 
 const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
 const MK48_RUNDOWN_DISPLAY_ID: string = '62'
@@ -76,6 +76,7 @@ export class SkaarhojPanel extends Panel {
   public constructor(
     panelConfiguration: PanelConfiguration,
     statusMessageService: StatusMessageService,
+    private readonly colorConverter: ColorConverter,
     logger: Logger,
     panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
@@ -322,7 +323,7 @@ export class SkaarhojPanel extends Panel {
   private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
     const commands: SkaarhojCommand[] = [
       new SkaarhojStateCommand(inputId, this.isInputActiveModifier(inputConfiguration) ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED),
-      new SkaarhojColorCommand(inputId, inputConfiguration.color ?? Color.DEFAULT)
+      new SkaarhojColorCommand(inputId, inputConfiguration.color ? this.colorConverter.hexToRgb(inputConfiguration.color) : undefined)
     ]
 
     if (inputConfiguration.type === InputType.DISPLAY || inputConfiguration.type === InputType.BUTTON_WITH_DISPLAY) {

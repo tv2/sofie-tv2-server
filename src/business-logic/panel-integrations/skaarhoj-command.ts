@@ -1,4 +1,4 @@
-import { Color } from '../../model/enums/color'
+import { RgbColor } from '../interfaces/color-converter'
 
 export enum SkaarhojButtonState {
   OFF = 0,
@@ -7,23 +7,6 @@ export enum SkaarhojButtonState {
   ON_GREEN = 3,
   ON = 4,
   DIMMED = 5
-}
-
-enum SkaarhojColor {
-  DEFAULT = '128',
-  BLACK = '129',
-  WHITE = '130',
-  WARM = '131',
-  RED = '132',
-  ROSE = '133',
-  PINK = '134',
-  PURPLE = '135',
-  AMBER = '136',
-  YELLOW = '137',
-  DARK_BLUE = '138',
-  BLUE = '139',
-  CYAN = '141',
-  GREEN = '196'
 }
 
 export abstract class SkaarhojCommand {
@@ -44,30 +27,23 @@ export class SkaarhojStateCommand extends SkaarhojCommand {
   }
 }
 
+const DEFAULT_SKAARHOJ_COLOR: number = 128
+
 export class SkaarhojColorCommand extends SkaarhojCommand {
   private readonly idPrefix: string = 'HWCc#'
-  private readonly color: SkaarhojColor
+  private readonly color: RgbColor | undefined
 
-  public constructor(id: string, color: Color) {
+  public constructor(id: string, color: RgbColor | undefined) {
     super(id)
-    this.color = this.mapColorToSkaarhojColor(color)
-  }
-
-  private mapColorToSkaarhojColor(color: Color): SkaarhojColor {
-    switch (color) {
-      case Color.RED: return SkaarhojColor.RED
-      case Color.PINK: return SkaarhojColor.PINK
-      case Color.GREEN: return SkaarhojColor.GREEN
-      case Color.BLUE: return SkaarhojColor.BLUE
-      case Color.DARK_BLUE: return SkaarhojColor.DARK_BLUE
-      case Color.PURPLE: return SkaarhojColor.PURPLE
-      case Color.AMBER: return SkaarhojColor.AMBER
-      default: return SkaarhojColor.DEFAULT
-    }
+    this.color = color
   }
 
   public toString(): string {
-    return `${this.idPrefix}${this.id}=${this.color}`
+    if (!this.color) {
+      return `${this.idPrefix}${this.id}=${DEFAULT_SKAARHOJ_COLOR}`
+    }
+
+    return `{ "HWCIDs": [${this.id}], "HWCColor": { "ColorRGB": { "red": ${this.color.red}, "green": ${this.color.green}, "blue": ${this.color.blue} } }  }`
   }
 }
 
