@@ -15,6 +15,7 @@ import { RundownObserver } from '../interfaces/rundown-observer'
 import { RundownService } from '../interfaces/rundown-service'
 import { Rundown } from '../../model/entities/rundown'
 import { NoActiveRundownException } from '../../model/exceptions/no-active-rundown-exception'
+import { ColorConverter } from '../interfaces/color-converter'
 
 export class PanelManagerImplementation implements PanelManager {
   private readonly logger: Logger
@@ -32,6 +33,7 @@ export class PanelManagerImplementation implements PanelManager {
     private readonly panelCommandExecutor: PanelCommandExecutor,
     private readonly rundownObserver: RundownObserver,
     private readonly rundownService: RundownService,
+    private readonly colorConverter: ColorConverter,
     logger: Logger
   ) {
     this.logger = logger.tag(PanelManagerImplementation.name)
@@ -83,7 +85,7 @@ export class PanelManagerImplementation implements PanelManager {
       this.logger.data(panelConfiguration).warn(`No PanelLayoutConfiguration found for PanelConfiguration ${panelConfiguration.hostname}.`)
     }
 
-    const panel: Panel = this.panelFactory.createPanel(panelConfiguration, panelLayoutConfiguration)
+    const panel: Panel = this.panelFactory.createPanel(panelConfiguration, this.colorConverter, panelLayoutConfiguration)
     panel.connect()
     panel.updateActiveRundown(this.activeRundown)
 

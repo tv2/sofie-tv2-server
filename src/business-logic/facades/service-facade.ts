@@ -16,6 +16,8 @@ import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
 import { AtemVideoMixer } from '../panel-integrations/atem-video-mixer'
 import { RundownService } from '../interfaces/rundown-service'
 import { RundownHttpService } from '../services/rundown-http-service'
+import { ColorConverter } from '../interfaces/color-converter'
+import { HexRgbColorConverter } from '../services/hex-rgb-color-converter'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -36,6 +38,7 @@ export class ServiceFacade {
       ServiceFacade.createPanelCommandExecutor(),
       DomainEventFacade.createRundownObserver(),
       ServiceFacade.createRundownService(),
+      ServiceFacade.createColorConverter(),
       LoggerFacade.createLogger()
     )
   }
@@ -75,5 +78,9 @@ export class ServiceFacade {
       DomainEventFacade.createDeviceObserver(),
       LoggerFacade.createLogger()
     )
+  }
+
+  public static createColorConverter(): ColorConverter {
+    return new HexRgbColorConverter()
   }
 }
