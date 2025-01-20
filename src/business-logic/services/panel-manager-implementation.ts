@@ -109,11 +109,11 @@ export class PanelManagerImplementation implements PanelManager {
     try {
       switch (command.type) {
         case PanelCommandType.ACTION: {
-          this.panelCommandExecutor.executeActionCommand(command, this.activeRundown!)
+          this.panelCommandExecutor.executeActionCommand(command, this.activeRundown)
           return
         }
         case PanelCommandType.T_BAR: {
-          this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown!)
+          this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown)
           return
         }
       }
