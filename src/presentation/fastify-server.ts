@@ -76,6 +76,9 @@ export class FastifyServer implements ProxyServer {
       socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
     })
 
+    this.fastifyServer.setValidatorCompiler(validatorCompiler)
+    this.fastifyServer.setSerializerCompiler(serializerCompiler)
+    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
     this.connectToAlbaServer(proxyConfiguration)
   }
 
@@ -109,8 +112,8 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
     this.albaWebsocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
 
-    this.albaWebsocket.addEventListener('close', () => {
-      this.logger.debug('Disconnected from Alba Server')
+    this.albaWebsocket.addEventListener('error', () => {
+      this.logger.warn(`Failed to establish connection with Alba server trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
@@ -118,10 +121,6 @@ export class FastifyServer implements ProxyServer {
       this.emitInternalEvent(message.data)
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
-
-    this.fastifyServer.setValidatorCompiler(validatorCompiler)
-    this.fastifyServer.setSerializerCompiler(serializerCompiler)
-    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
   }
 
   private emitInternalEvent(data: unknown): void {
