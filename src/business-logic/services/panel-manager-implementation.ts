@@ -14,7 +14,6 @@ import { PanelGroup } from '../panel-integrations/panel-group'
 import { RundownObserver } from '../interfaces/rundown-observer'
 import { RundownService } from '../interfaces/rundown-service'
 import { Rundown } from '../../model/entities/rundown'
-import { NoActiveRundownException } from '../../model/exceptions/no-active-rundown-exception'
 import { ColorConverter } from '../interfaces/color-converter'
 
 export class PanelManagerImplementation implements PanelManager {
@@ -102,27 +101,24 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private handleCommand(command: PanelCommand): void {
-    // Note: Since we assert the activeRundown here, it is safe for us to use the "this.activeRundown!" later in this method.
-    this.assertActiveRundown()
+    if (!this.activeRundown) {
+      this.logger.warn(`Received command: ${JSON.stringify(command)} but no active Rundown is set.`)
+      return
+    }
+
     try {
       switch (command.type) {
         case PanelCommandType.ACTION: {
-          this.panelCommandExecutor.executeActionCommand(command, this.activeRundown!)
+          this.panelCommandExecutor.executeActionCommand(command, this.activeRundown)
           return
         }
         case PanelCommandType.T_BAR: {
-          this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown!)
+          this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown)
           return
         }
       }
     } catch (error) {
       this.logger.data(error).error(`Failed executing command: ${JSON.stringify(command)}`)
-    }
-  }
-
-  private assertActiveRundown(): void {
-    if (!this.activeRundown) {
-      throw new NoActiveRundownException('Unable to execute command since there is no active Rundown')
     }
   }
 
