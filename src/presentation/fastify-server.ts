@@ -111,18 +111,17 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket?.close()
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
     this.albaWebsocket.addEventListener('open', () => {
-      this.logger.info('Successfully connected to AlbaServer')
+      this.logger.info('Successfully connected to Alba Server')
     })
 
     this.albaWebsocket.addEventListener('close', () => {
-      this.logger.info(`Failed to establish connection with AlbaServer, trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
+      this.logger.info(`Failed to establish connection with Alba Server, trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
-    this.albaWebsocket.addEventListener('error', (err) => {
-      // Checking if err has any information.
-      if (Object.keys(err).length !== 0) {
-        this.logger.data(err).error('An error occured.')
+    this.albaWebsocket.addEventListener('error', (error) => {
+      if (Object.keys(error).length !== 0) {
+        this.logger.data(error).error('An error occured.')
       }
     })
 
