@@ -8,7 +8,7 @@ import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { fastifyWebsocket } from '@fastify/websocket'
-import WebSocket, { MessageEvent } from 'ws'
+import WebSocket, { ErrorEvent, MessageEvent } from 'ws'
 import { PanelObserver } from '../business-logic/interfaces/panel-observer'
 import { StatusMessageObserver } from '../business-logic/interfaces/status-message-observer'
 import { StatusMessageEvent } from './value-objects/status-message-event'
@@ -119,9 +119,9 @@ export class FastifyServer implements ProxyServer {
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
-    this.albaWebsocket.addEventListener('error', (error) => {
-      if (Object.keys(error).length !== 0) {
-        this.logger.data(error).error('An error occured.')
+    this.albaWebsocket.addEventListener('error', (error: ErrorEvent) => {
+      if (error.message.length > 0) {
+        this.logger.data(error).error(error.message)
       }
     })
 
