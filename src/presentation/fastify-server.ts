@@ -8,7 +8,7 @@ import { RouteOptions } from 'fastify/types/route'
 import { Logger } from '../logger/logger'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { fastifyWebsocket } from '@fastify/websocket'
-import WebSocket, { MessageEvent } from 'ws'
+import WebSocket, { ErrorEvent, MessageEvent } from 'ws'
 import { PanelObserver } from '../business-logic/interfaces/panel-observer'
 import { StatusMessageObserver } from '../business-logic/interfaces/status-message-observer'
 import { StatusMessageEvent } from './value-objects/status-message-event'
@@ -76,6 +76,9 @@ export class FastifyServer implements ProxyServer {
       socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
     })
 
+    this.fastifyServer.setValidatorCompiler(validatorCompiler)
+    this.fastifyServer.setSerializerCompiler(serializerCompiler)
+    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
     this.connectToAlbaServer(proxyConfiguration)
   }
 
@@ -107,21 +110,25 @@ export class FastifyServer implements ProxyServer {
   private connectToAlbaServer(proxyConfiguration: ProxyConfiguration): void {
     this.albaWebsocket?.close()
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
-    this.albaWebsocket.addEventListener('open', () => this.logger.debug('Connected to AlbaServer'))
+    this.albaWebsocket.addEventListener('open', () => {
+      this.logger.info('Successfully connected to Alba Server')
+    })
 
     this.albaWebsocket.addEventListener('close', () => {
-      this.logger.debug('Disconnected from Alba Server')
+      this.logger.info(`Failed to establish connection with Alba Server, trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
+    })
+
+    this.albaWebsocket.addEventListener('error', (error: ErrorEvent) => {
+      if (error.message.length > 0) {
+        this.logger.data(error).error(error.message)
+      }
     })
 
     this.albaWebsocket.addEventListener('message', (message: MessageEvent) => {
       this.emitInternalEvent(message.data)
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
     })
-
-    this.fastifyServer.setValidatorCompiler(validatorCompiler)
-    this.fastifyServer.setSerializerCompiler(serializerCompiler)
-    this.fastifyServer.withTypeProvider<ZodTypeProvider>()
   }
 
   private emitInternalEvent(data: unknown): void {
