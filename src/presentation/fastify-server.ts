@@ -20,6 +20,7 @@ import { DeviceEmitter } from '../business-logic/interfaces/device-emitter'
 import { VideoMixerConfigurationUpdatedEvent } from './value-objects/device-event'
 import { RundownEvent } from './value-objects/rundown-event'
 import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
+import { StatusCode } from '../model/enums/status-code'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 
@@ -112,10 +113,15 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
     this.albaWebsocket.addEventListener('open', () => {
       this.logger.info('Successfully connected to Alba Server')
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({ statusCode: StatusCode.GOOD, message: 'We successfully established connection!', id: 'connected_to_alba_server', title: 'Connected to Alba Server.', lastUpdatedTimestamp: Date.now() })
+      this.broadcastStatusMessageEvent(statusMessage)
     })
 
     this.albaWebsocket.addEventListener('close', () => {
-      this.logger.info(`Failed to establish connection with Alba Server, trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
+      let retryMessage = `Retrying in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`
+      this.logger.warn(`Failed to establish connection with Alba Server. ${retryMessage}`)
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({ statusCode: StatusCode.BAD, message: retryMessage, id: 'lost_connection_to_alba_server', title: 'Lost connection to Alba Server.', lastUpdatedTimestamp: Date.now() })
+      this.broadcastStatusMessageEvent(statusMessage)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
@@ -128,6 +134,12 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket.addEventListener('message', (message: MessageEvent) => {
       this.emitInternalEvent(message.data)
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
+    })
+  }
+
+  private broadcastStatusMessageEvent(statusMessage: StatusMessageEvent): void {
+    this.fastifyServer.websocketServer.clients.forEach((client: WebSocket) => {
+      client.send(JSON.stringify(statusMessage))
     })
   }
 
