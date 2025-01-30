@@ -23,6 +23,7 @@ import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
 import { StatusCode } from '../model/enums/status-code'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
+const ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID: string = 'alba_connection_status'
 
 export class FastifyServer implements ProxyServer {
   private albaWebsocket?: WebSocket
@@ -113,14 +114,24 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
     this.albaWebsocket.addEventListener('open', () => {
       this.logger.info('Successfully connected to Alba Server')
-      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({ statusCode: StatusCode.GOOD, message: 'We successfully established connection!', id: 'connected_to_alba_server', title: 'Connected to Alba Server.', lastUpdatedTimestamp: Date.now() })
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        statusCode: StatusCode.GOOD,
+        message: '', id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
+        title: 'Reconnected to backend.',
+        lastUpdatedTimestamp: Date.now()
+      })
       this.broadcastStatusMessageEvent(statusMessage)
     })
 
     this.albaWebsocket.addEventListener('close', () => {
-      let retryMessage = `Retrying in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`
-      this.logger.warn(`Failed to establish connection with Alba Server. ${retryMessage}`)
-      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({ statusCode: StatusCode.BAD, message: retryMessage, id: 'lost_connection_to_alba_server', title: 'Lost connection to Alba Server.', lastUpdatedTimestamp: Date.now() })
+      const retryMessage = `Retrying in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`
+      this.logger.error(`Failed to establish connection with Alba Server. ${retryMessage}`)
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        statusCode: StatusCode.BAD,
+        message: retryMessage,
+        id: 'alba_server_connection',
+        title: 'Attempting to reconnect...',
+        lastUpdatedTimestamp: Date.now() })
       this.broadcastStatusMessageEvent(statusMessage)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
