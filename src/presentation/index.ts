@@ -9,7 +9,7 @@ import { ServiceFacade } from '../business-logic/facades/service-facade'
 import { DomainEventFacade } from '../business-logic/facades/domain-event-facade'
 import { EventBuilderFacade } from './facades/event-builder-facade'
 
-const ALBA_REST_URL: string =  process.env.ALBA_REST_URL ?? 'http://localhost:3005'
+const ALBA_REST_URL: string = process.env.ALBA_REST_URL ?? 'http://localhost:3005'
 const ALBA_WEBSOCKET_URL: string = process.env.ALBA_WEBSOCKET_URL ?? 'ws://localhost:3006'
 const PROXY_SERVER_PORT: number = 3010
 
