@@ -2,12 +2,6 @@
   "name": "sofie-tv2-server",
   "version": "0.0.0",
   "repository": "git@github.com:tv2/sofie-tv2-server.git",
-  "contributors": [
-    {
-      "name": "Anders Frederik Lou Jørgensen",
-      "email": "<afjo@tv2.dk>"
-    }
-  ],
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
@@ -15,13 +9,13 @@
     "build": "yarn clean && tsc --build",
     "build-watch": "tsc --build --watch",
     "watch": "nodemon",
-    "test": "vitest run --coverage --passWithNoTests",
-    "test-watch": "vitest --coverage --passWithNoTests",
+    "test": "vitest run",
+    "test-watch": "vitest",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "validate": "yarn validate-dependencies && yarn validate-licenses",
     "validate-dependencies": "yarn npm audit --environment production --severity moderate --recursive",
-    "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;Unlicense\"",
+    "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;BlueOak-1.0.0;Unlicense\"",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage \"*.log\""
   },
@@ -29,25 +23,37 @@
     "node": ">=20.12.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.8.0",
+    "@stylistic/eslint-plugin": "^2.10.1",
     "@types/license-checker": "^25",
-    "@types/node": "^20.12.8",
-    "@typescript-eslint/eslint-plugin": "^7.8.0",
-    "@typescript-eslint/parser": "^7.8.0",
+    "@types/node": "^22.7.5",
+    "@types/ws": "^8.5.12",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2",
+    "@typestrong/ts-mockito": "^2.7.12",
     "@vitest/coverage-v8": "^1.5.3",
     "cross-env": "^7.0.3",
-    "eslint": "^9.1.1",
+    "eslint": "^9.13.0",
     "license-checker": "^25.0.1",
     "nodemon": "^3.1.0",
-    "rimraf": "^5.0.5",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5",
+    "typescript": "^5.6.3",
     "vitest": "^1.5.3"
   },
   "packageManager": "yarn@4.1.1",
   "dependencies": {
-    "@fastify/http-proxy": "^9.5.0",
+    "@fastify/http-proxy": "^11.0.1",
+    "@fastify/websocket": "^11.0.1",
     "@tv2media/logger": "^2.0.2",
-    "fastify": "^4.28.1"
+    "atem-connection": "^3.5.0",
+    "fastify": "^5.0.0",
+    "fastify-type-provider-zod": "^4.0.1",
+    "mongodb": "^6.9.0",
+    "reflect-metadata": "^0.2.2",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
+  },
+  "resolutions": {
+    "cross-spawn": ">=7.0.5"
   }
 }

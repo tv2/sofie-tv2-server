@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       versionTag:
-        description: 'Version tag (e.g. 46.3.1-staging)'
+        description: 'Version tag (e.g. 0.0.1-staging)'
         required: true
         type: 'string'
 
@@ -23,9 +23,9 @@ jobs:
           password: '${{ secrets.DOCKERHUB_PASSWORD }}'
 
       - name: 'Build and publish Docker image'
-        uses: 'docker/build-push-action@v5'
+        uses: 'docker/build-push-action@v6'
         with:
           context: '.'
           push: true
           tags: |
-            tv2media/sofie-tv2-server:${{ inputs.versionTag }}
+            tv2media/alba-tv2-server:${{ inputs.versionTag }}
