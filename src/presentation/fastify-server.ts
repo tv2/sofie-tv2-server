@@ -115,8 +115,9 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket.addEventListener('open', () => {
       this.logger.info('Successfully connected to Alba Server')
       const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
         statusCode: StatusCode.GOOD,
-        message: '', id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
+        message: '',
         title: 'Reconnected to backend.',
         lastUpdatedTimestamp: Date.now()
       })
@@ -127,10 +128,10 @@ export class FastifyServer implements ProxyServer {
       const retryMessage = `Retrying in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`
       this.logger.error(`Failed to establish connection with Alba Server. ${retryMessage}`)
       const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
         statusCode: StatusCode.BAD,
         message: retryMessage,
-        id: 'alba_server_connection',
-        title: 'Attempting to reconnect...',
+        title: 'Attempting to reconnect to backend...',
         lastUpdatedTimestamp: Date.now() })
       this.broadcastStatusMessageEvent(statusMessage)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
