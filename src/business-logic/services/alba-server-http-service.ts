@@ -1,6 +1,6 @@
 import { HttpService } from '../interfaces/http-service'
 
-const ALBA_API_BASE_URL: string = process.env.ALBA_API_BASE_URL ?? 'http://localhost:3005/api'
+const ALBA_API_BASE_URL: string = `${process.env.ALBA_REST_URL ?? 'http://localhost:3005'}/api`
 
 export class AlbaServerHttpService implements HttpService {
   public constructor(private readonly httpService: HttpService) {

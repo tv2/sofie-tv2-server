@@ -148,7 +148,7 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private async updateActiveRundown(): Promise<void> {
-    // this.activeRundown = await this.rundownService.getActiveRundown()
-    // this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
+    this.activeRundown = await this.rundownService.getActiveRundown()
+    this.panelGroups.forEach(panelGroup => panelGroup.updateActiveRundown(this.activeRundown))
   }
 }
