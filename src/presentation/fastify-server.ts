@@ -70,7 +70,7 @@ export class FastifyServer implements ProxyServer {
 
   private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
-    this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
+    this.fastifyServer.get('/tv2-server/ws', { websocket: true }, (socket: WebSocket) => {
       this.subscribeToPanelEvents(socket)
       this.statusMessageObserver.subscribeToStatusMessages(statusMessage => this.sendEvent(this.buildStatusMessageEvent(statusMessage), socket))
       socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
