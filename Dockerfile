@@ -13,5 +13,7 @@ COPY --from=BUILD_PHASE /opt/sofie-tv2-server/dist/ ./
 COPY --from=BUILD_PHASE /opt/sofie-tv2-server/node_modules/ ./node_modules/
 
 EXPOSE 3010
+EXPOSE 3005
+EXPOSE 3006
 
 CMD node .
