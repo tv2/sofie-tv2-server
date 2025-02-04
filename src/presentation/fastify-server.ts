@@ -68,7 +68,7 @@ export class FastifyServer implements ProxyServer {
     })
   }
 
-  private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
+  private async setupWebSocketServer(_proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
     this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
       this.subscribeToPanelEvents(socket)
@@ -79,7 +79,7 @@ export class FastifyServer implements ProxyServer {
     this.fastifyServer.setValidatorCompiler(validatorCompiler)
     this.fastifyServer.setSerializerCompiler(serializerCompiler)
     this.fastifyServer.withTypeProvider<ZodTypeProvider>()
-    this.connectToAlbaServer(proxyConfiguration)
+    // this.connectToAlbaServer(proxyConfiguration)
   }
 
   private subscribeToPanelEvents(socket: WebSocket): void {
