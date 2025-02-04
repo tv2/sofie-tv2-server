@@ -22,6 +22,7 @@ import { RundownEvent } from './value-objects/rundown-event'
 import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
+const TV2_SERVER_API_PREFIX: string = process.env.TV2_SERVER_API_PREFIX ?? '/tv2-server'
 
 export class FastifyServer implements ProxyServer {
   private albaWebsocket?: WebSocket
@@ -53,6 +54,8 @@ export class FastifyServer implements ProxyServer {
   private async configureProxy(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyHttpProxy, {
       upstream: proxyConfiguration.httpUrl,
+      prefix: TV2_SERVER_API_PREFIX,
+      rewritePrefix: ''
     })
   }
 
@@ -70,7 +73,7 @@ export class FastifyServer implements ProxyServer {
 
   private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
-    this.fastifyServer.get('/tv2-server/ws', { websocket: true }, (socket: WebSocket) => {
+    this.fastifyServer.get(`${TV2_SERVER_API_PREFIX}/ws`, { websocket: true }, (socket: WebSocket) => {
       this.subscribeToPanelEvents(socket)
       this.statusMessageObserver.subscribeToStatusMessages(statusMessage => this.sendEvent(this.buildStatusMessageEvent(statusMessage), socket))
       socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
@@ -183,7 +186,7 @@ export class FastifyServer implements ProxyServer {
 
       return {
         method: route.method,
-        url: `/tv2-server/api${route.path}`,
+        url: `${TV2_SERVER_API_PREFIX}/api${route.path}`,
         handler: route.action.bind(controller),
         schema,
       }
