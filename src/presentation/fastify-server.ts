@@ -45,7 +45,7 @@ export class FastifyServer implements ProxyServer {
     this.addCors()
     await this.setupWebSocketServer(proxyConfiguration)
     this.setupControllers()
-    await this.fastifyServer.listen({ port })
+    await this.fastifyServer.listen({ port, host: '0.0.0.0' })
 
     this.logger.info(`Running proxy server on port ${port}.\nHTTP requests are redirected to ${proxyConfiguration.httpUrl} and WebSocket connections to ${proxyConfiguration.websocketUrl}.`)
   }
