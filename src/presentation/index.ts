@@ -9,9 +9,9 @@ import { ServiceFacade } from '../business-logic/facades/service-facade'
 import { DomainEventFacade } from '../business-logic/facades/domain-event-facade'
 import { EventBuilderFacade } from './facades/event-builder-facade'
 
-const SOFIE_REST_URL: string = 'http://localhost:3005'
-const SOFIE_WEBSOCKET_URL: string = 'ws://localhost:3006'
-const PROXY_SERVER_PORT: number = 3010
+const ALBA_REST_URL: string = process.env.ALBA_REST_URL ?? 'http://localhost:3005'
+const ALBA_WEBSOCKET_URL: string = process.env.ALBA_WEBSOCKET_URL ?? 'ws://localhost:3006'
+const PROXY_SERVER_PORT: number = Number.parseInt(process.env.ALBA_TV2_SERVER_PORT ?? '3010')
 
 const controllers: BaseController[] = ControllerFacade.getControllers()
 
@@ -31,7 +31,7 @@ async function startProxyServer(logger: Logger): Promise<void> {
     DomainEventFacade.createDeviceEmitter(),
     DomainEventFacade.createRundownEmitter()
   )
-  await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: SOFIE_REST_URL, websocketUrl: SOFIE_WEBSOCKET_URL })
+  await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: ALBA_REST_URL, websocketUrl: ALBA_WEBSOCKET_URL })
 }
 
 async function connectToDatabase(logger: Logger): Promise<void> {

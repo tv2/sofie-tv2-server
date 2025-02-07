@@ -20,8 +20,10 @@ import { DeviceEmitter } from '../business-logic/interfaces/device-emitter'
 import { VideoMixerConfigurationUpdatedEvent } from './value-objects/device-event'
 import { RundownEvent } from './value-objects/rundown-event'
 import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
+import { StatusCode } from '../model/enums/status-code'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
+const ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID: string = 'alba_connection_status'
 
 export class FastifyServer implements ProxyServer {
   private albaWebsocket?: WebSocket
@@ -112,10 +114,26 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket = new WebSocket(proxyConfiguration.websocketUrl)
     this.albaWebsocket.addEventListener('open', () => {
       this.logger.info('Successfully connected to Alba Server')
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
+        statusCode: StatusCode.GOOD,
+        message: '',
+        title: 'Reconnected to backend.',
+        lastUpdatedTimestamp: Date.now()
+      })
+      this.broadcastStatusMessageEvent(statusMessage)
     })
 
     this.albaWebsocket.addEventListener('close', () => {
-      this.logger.info(`Failed to establish connection with Alba Server, trying to reconnect in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`)
+      const retryMessage = `Retrying in ${RECONNECT_DELAY_IN_MS / 1000} seconds ...`
+      this.logger.error(`Failed to establish connection with Alba Server. ${retryMessage}`)
+      const statusMessage: StatusMessageEvent = this.buildStatusMessageEvent({
+        id: ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID,
+        statusCode: StatusCode.BAD,
+        message: retryMessage,
+        title: 'Attempting to reconnect to backend...',
+        lastUpdatedTimestamp: Date.now() })
+      this.broadcastStatusMessageEvent(statusMessage)
       setTimeout(() => this.connectToAlbaServer(proxyConfiguration), RECONNECT_DELAY_IN_MS)
     })
 
@@ -128,6 +146,12 @@ export class FastifyServer implements ProxyServer {
     this.albaWebsocket.addEventListener('message', (message: MessageEvent) => {
       this.emitInternalEvent(message.data)
       this.fastifyServer.websocketServer.clients.forEach(client => client.send(message.data))
+    })
+  }
+
+  private broadcastStatusMessageEvent(statusMessage: StatusMessageEvent): void {
+    this.fastifyServer.websocketServer.clients.forEach((client: WebSocket) => {
+      client.send(JSON.stringify(statusMessage))
     })
   }
 
