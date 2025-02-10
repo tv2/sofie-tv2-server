@@ -19,6 +19,7 @@ async function startAlbaTv2Server(logger: Logger): Promise<void> {
   await connectToDatabase(logger)
   await startProxyServer(logger).catch(error => logger.data(error).error('Failed to start proxy server'))
   await startSystemServices()
+  logger.info('Alba TV2 Server successfully started')
 }
 
 async function startProxyServer(logger: Logger): Promise<void> {

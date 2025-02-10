@@ -23,6 +23,7 @@ import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
 import { StatusCode } from '../model/enums/status-code'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
+const TV2_SERVER_API_PREFIX: string = process.env.TV2_SERVER_API_PREFIX ?? '/tv2-server'
 const ALBA_CONNECTION_STATUS_MESSAGE_EVENT_ID: string = 'alba_connection_status'
 
 export class FastifyServer implements ProxyServer {
@@ -47,7 +48,7 @@ export class FastifyServer implements ProxyServer {
     this.addCors()
     await this.setupWebSocketServer(proxyConfiguration)
     this.setupControllers()
-    await this.fastifyServer.listen({ port })
+    await this.fastifyServer.listen({ port, host: '0.0.0.0' })
 
     this.logger.info(`Running proxy server on port ${port}.\nHTTP requests are redirected to ${proxyConfiguration.httpUrl} and WebSocket connections to ${proxyConfiguration.websocketUrl}.`)
   }
@@ -55,6 +56,8 @@ export class FastifyServer implements ProxyServer {
   private async configureProxy(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyHttpProxy, {
       upstream: proxyConfiguration.httpUrl,
+      prefix: TV2_SERVER_API_PREFIX,
+      rewritePrefix: ''
     })
   }
 
@@ -72,7 +75,7 @@ export class FastifyServer implements ProxyServer {
 
   private async setupWebSocketServer(proxyConfiguration: ProxyConfiguration): Promise<void> {
     await this.fastifyServer.register(fastifyWebsocket)
-    this.fastifyServer.get('/ws', { websocket: true }, (socket: WebSocket) => {
+    this.fastifyServer.get(`${TV2_SERVER_API_PREFIX}/ws`, { websocket: true }, (socket: WebSocket) => {
       this.subscribeToPanelEvents(socket)
       this.statusMessageObserver.subscribeToStatusMessages(statusMessage => this.sendEvent(this.buildStatusMessageEvent(statusMessage), socket))
       socket.onmessage = (message): void => this.albaWebsocket?.send(message.data)
@@ -207,7 +210,7 @@ export class FastifyServer implements ProxyServer {
 
       return {
         method: route.method,
-        url: `/api${route.path}`,
+        url: `${TV2_SERVER_API_PREFIX}/api${route.path}`,
         handler: route.action.bind(controller),
         schema,
       }
