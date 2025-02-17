@@ -25,6 +25,7 @@ export class EntityTestFactory {
       hostname: 'randomHostName',
       panelLayoutConfigurationId: 'randomPanelLayoutConfigurationId',
       panelGroupId: 'randomPanelGroupId',
+      isDisabled: false,
       ...panelConfiguration
     }
   }
