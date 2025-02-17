@@ -8,6 +8,7 @@ export class PanelConfigurationDto {
   public readonly hostname: string
   public readonly panelGroupId: string
   public readonly panelLayoutConfigurationId?: string
+  public readonly isDisabled: boolean
 
   public constructor(panelConfiguration: PanelConfiguration) {
     this.id = panelConfiguration.id
@@ -16,5 +17,6 @@ export class PanelConfigurationDto {
     this.hostname = panelConfiguration.hostname
     this.panelGroupId = panelConfiguration.panelGroupId
     this.panelLayoutConfigurationId = panelConfiguration.panelLayoutConfigurationId
+    this.isDisabled = panelConfiguration.isDisabled ?? false
   }
 }
