@@ -73,6 +73,6 @@ export default [
     },
   },
   {
-    ignores: ['.yarn/**', 'coverage/**'],
+    ignores: ['.yarn/**', 'coverage/**','src/data-access/migrations/mongo/mongo-migrations/*.ts'],
   },
 ]
