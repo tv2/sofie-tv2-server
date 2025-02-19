@@ -18,7 +18,12 @@
     "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;BlueOak-1.0.0;Unlicense\"",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage \"*.log\"",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "create-migration": "sh -c 'ts-node node_modules/migrate-mongo/bin/migrate-mongo create $0 -f src/data-access/migrations/mongo/migrate-mongo-config.ts'",
+    "migration-status": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
+    "undo-last-migration": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts && npm run migration-status",
+    "migrate": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
+    "migrate-down": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts"
   },
   "engines": {
     "node": ">=20.12.0"
@@ -49,6 +54,7 @@
     "atem-connection": "^3.5.0",
     "fastify": "^5.0.0",
     "fastify-type-provider-zod": "^4.0.1",
+    "migrate-mongo": "^11.0.0",
     "mongodb": "^6.9.0",
     "reflect-metadata": "^0.2.2",
     "ws": "^8.18.0",
