@@ -17,6 +17,6 @@ export class PanelConfigurationDto {
     this.hostname = panelConfiguration.hostname
     this.panelGroupId = panelConfiguration.panelGroupId
     this.panelLayoutConfigurationId = panelConfiguration.panelLayoutConfigurationId
-    this.isDisabled = panelConfiguration.isDisabled ?? false
+    this.isDisabled = panelConfiguration.isDisabled
   }
 }
