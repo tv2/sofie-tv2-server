@@ -559,12 +559,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mongodb-js/saslprep@npm:^1.1.5":
-  version: 1.1.9
-  resolution: "@mongodb-js/saslprep@npm:1.1.9"
+"@mongodb-js/saslprep@npm:^1.1.9":
+  version: 1.2.0
+  resolution: "@mongodb-js/saslprep@npm:1.2.0"
   dependencies:
     sparse-bitfield: "npm:^3.0.3"
-  checksum: 10c0/2f391db96db7a69e6849cc906e4a0bcd14127ad0493f97fc4134790fa2f0d4af5abcd110382c9d97a996ca31766e0c358c2e08d154f6ddfa06144e2c8a036895
+  checksum: 10c0/579b42a4f59f3e3def0fca6716dcdfc68bb27a6d527202c538bbc44a79f048538d17d0a522af2eba11e6aa8d5d0da1ff7fb5f4335f8d8726730e51cdcff95684
   languageName: node
   linkType: hard
 
@@ -1452,10 +1452,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.7.0":
-  version: 6.8.0
-  resolution: "bson@npm:6.8.0"
-  checksum: 10c0/0503bb2a4ce2e183bd06151bdb983a623cfde05c76fbb5a34e941c594f3a681b52333d61b37c7933b8733b0ba14607b3599d94b46635d90bb96b1e7cec51aa8f
+"bson@npm:^6.10.3":
+  version: 6.10.3
+  resolution: "bson@npm:6.10.3"
+  checksum: 10c0/15ad7a9b3bf8090add5fea1761b1ba7d75e5256efcfbb8c9ca448ca98e59c3b079c37c36c7aca0cc916236bd2d4684a5525c68f3d76da8a13d55dc230abbdd21
   languageName: node
   linkType: hard
 
@@ -3339,16 +3339,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.9.0":
-  version: 6.9.0
-  resolution: "mongodb@npm:6.9.0"
+"mongodb@npm:^6.9.1":
+  version: 6.14.2
+  resolution: "mongodb@npm:6.14.2"
   dependencies:
-    "@mongodb-js/saslprep": "npm:^1.1.5"
-    bson: "npm:^6.7.0"
+    "@mongodb-js/saslprep": "npm:^1.1.9"
+    bson: "npm:^6.10.3"
     mongodb-connection-string-url: "npm:^3.0.0"
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
-    "@mongodb-js/zstd": ^1.1.0
+    "@mongodb-js/zstd": ^1.1.0 || ^2.0.0
     gcp-metadata: ^5.2.0
     kerberos: ^2.0.1
     mongodb-client-encryption: ">=6.0.0 <7"
@@ -3369,7 +3369,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/2b6c241a3361d014464a2c446fc9a71bae7270a9d8f777ffb8d69f0decfc6047f7dd6315c76caaa301fd61476948c3570b4b54a0866af5968e89b3cf5afa218e
+  checksum: 10c0/f95ce58defb2ad884250119f904b6ccbc11fd293515fb2cb2b1612200ef26211b0e2c3740bb9cb2481af993fca826453a4a5feb3916b34a9d7f25175342fbebc
   languageName: node
   linkType: hard
 
@@ -4395,7 +4395,7 @@ __metadata:
     fastify-type-provider-zod: "npm:^4.0.1"
     license-checker: "npm:^25.0.1"
     migrate-mongo: "npm:^11.0.0"
-    mongodb: "npm:^6.9.0"
+    mongodb: "npm:^6.9.1"
     nodemon: "npm:^3.1.0"
     reflect-metadata: "npm:^0.2.2"
     rimraf: "npm:^6.0.1"
