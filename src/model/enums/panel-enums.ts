@@ -22,6 +22,7 @@ export enum PanelCommandType {
   MODIFIER = 'MODIFIER',
   T_BAR = 'T_BAR',
   DISPLAY = 'DISPLAY',
+  MACRO = 'MACRO',
 }
 
 export enum KeyEvent {
