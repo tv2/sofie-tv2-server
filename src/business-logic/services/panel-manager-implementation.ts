@@ -120,6 +120,9 @@ export class PanelManagerImplementation implements PanelManager {
           this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown)
           return
         }
+        case PanelCommandType.MACRO: {
+          this.panelCommandExecutor.executeMacro(command, this.activeRundown)
+        }
       }
     } catch (error) {
       this.logger.data(error).error(`Failed executing command: ${JSON.stringify(command)}`)

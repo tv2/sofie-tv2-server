@@ -29,7 +29,7 @@ export interface ButtonWithDisplayConfiguration extends BaseInputConfiguration {
   triggersOn: KeyEvent[]
 }
 
-export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand | DisplayPanelCommand
+export type PanelCommand = ActionPanelCommand | ModifierPanelCommand | TBarPanelCommand | DisplayPanelCommand | MacroPanelCommand
 
 export interface BasePanelCommand {
   type: PanelCommandType
@@ -56,6 +56,11 @@ export interface DisplayPanelCommand extends BasePanelCommand {
   type: PanelCommandType.DISPLAY
 }
 
+export interface MacroPanelCommand extends BasePanelCommand {
+  type: PanelCommandType.MACRO
+  macroId: string
+}
+
 const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({
   type: z.literal(PanelCommandType.ACTION),
   actionId: z.string(),
@@ -75,11 +80,17 @@ export const ZOD_DISPLAY_PANEL_COMMAND_SCHEMA: ZodSchema<DisplayPanelCommand> = 
   type: z.literal(PanelCommandType.DISPLAY),
 })
 
+export const ZOD_MACRO_COMMAND_SCHEMA: ZodSchema<MacroPanelCommand> = z.object({
+  type: z.literal(PanelCommandType.MACRO),
+  macroId: z.string().min(1)
+})
+
 export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
   ZOD_ACTION_PANEL_COMMAND_SCHEMA,
   ZOD_MODIFIER_PANEL_COMMAND_SCHEMA,
   ZOD_T_BAR_PANEL_COMMAND_SCHEMA,
-  ZOD_DISPLAY_PANEL_COMMAND_SCHEMA
+  ZOD_DISPLAY_PANEL_COMMAND_SCHEMA,
+  ZOD_MACRO_COMMAND_SCHEMA
 ])
 
 const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z.object({

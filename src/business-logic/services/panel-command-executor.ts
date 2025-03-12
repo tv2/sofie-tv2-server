@@ -1,4 +1,4 @@
-import { ActionPanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
+import { ActionPanelCommand, MacroPanelCommand, TBarPanelCommand } from '../../model/interfaces/input-configuration'
 import { HttpService } from '../interfaces/http-service'
 import { Logger } from '../../logger/logger'
 import { VideoMixer } from '../panel-integrations/interfaces/video-mixer'
@@ -35,5 +35,11 @@ export class PanelCommandExecutor {
     if (command.shouldExecuteTake) {
       this.executeTake(rundown)
     }
+  }
+
+  public executeMacro(command: MacroPanelCommand, rundown: Rundown): void {
+    this.httpService.put(`/macros/execute/${command.macroId}/rundowns/${rundown.id}`).catch((error) => {
+      this.logger.data(error).error(`Error executing Macro ${command.macroId}`)
+    })
   }
 }
