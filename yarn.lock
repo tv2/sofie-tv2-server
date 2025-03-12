@@ -2254,15 +2254,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify-type-provider-zod@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "fastify-type-provider-zod@npm:4.0.1"
+"fastify-type-provider-zod@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "fastify-type-provider-zod@npm:4.0.2"
   dependencies:
+    "@fastify/error": "npm:^4.0.0"
     zod-to-json-schema: "npm:^3.23.3"
   peerDependencies:
     fastify: ^5.0.0
     zod: ^3.14.2
-  checksum: 10c0/6bfc558b9eb65830d98b962679f5a21f46028d295c4a11f8120651b452ec88efc830cc562c8c21c13523dd7579e99797b9f92e1987991ee5e9b5c24173c9bc33
+  checksum: 10c0/b9508d6e27b1632615f5b1facbe589302a68838aca29a3be6b8800e12682c8f4f85f370e7769abb9de793b48627618ff2d6098fc22617b4676d2596a053be6a9
   languageName: node
   linkType: hard
 
@@ -4392,7 +4393,7 @@ __metadata:
     cross-env: "npm:^7.0.3"
     eslint: "npm:^9.13.0"
     fastify: "npm:^5.0.0"
-    fastify-type-provider-zod: "npm:^4.0.1"
+    fastify-type-provider-zod: "npm:^4.0.2"
     license-checker: "npm:^25.0.1"
     migrate-mongo: "npm:^11.0.0"
     mongodb: "npm:^6.9.1"
