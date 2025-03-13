@@ -8,6 +8,7 @@ export interface PanelConfiguration {
   hostname: string
   panelGroupId: string
   panelLayoutConfigurationId?: string
+  isDisabled: boolean
 }
 
 export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConfiguration, 'id'>> = z.object({
@@ -16,6 +17,7 @@ export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConf
   hostname: z.string(),
   panelGroupId: z.string(),
   panelLayoutConfigurationId: z.string().optional(),
+  isDisabled: z.boolean()
 })
 
 export const ZOD_PANEL_CONFIGURATION_SCHEMA: ZodSchema<PanelConfiguration> = ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({

@@ -70,6 +70,10 @@ export class PanelManagerImplementation implements PanelManager {
   }
 
   private connectToPanel(panelConfiguration: PanelConfiguration): void {
+    if (panelConfiguration.isDisabled) {
+      this.logger.data(panelConfiguration).debug(`Panel ${panelConfiguration.model} on ${panelConfiguration.hostname} is disabled. No connection will be established`)
+      return
+    }
     const existingPanelForHostname: boolean = [...this.panelGroups.values()].some(panelGroup => panelGroup.hasExistingPanelWithHostname(panelConfiguration.hostname))
     if (existingPanelForHostname) {
       this.logger.data(panelConfiguration).warn(`A panel is already connected at ${panelConfiguration.hostname}. Skipping connecting to Panel`)
@@ -115,6 +119,9 @@ export class PanelManagerImplementation implements PanelManager {
         case PanelCommandType.T_BAR: {
           this.panelCommandExecutor.executeTBarCommand(command, this.activeRundown)
           return
+        }
+        case PanelCommandType.MACRO: {
+          this.panelCommandExecutor.executeMacro(command, this.activeRundown)
         }
       }
     } catch (error) {
