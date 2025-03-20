@@ -2,6 +2,7 @@
 FROM node:20-alpine as BUILD_PHASE
 WORKDIR /opt/sofie-tv2-server
 COPY . .
+RUN apk add --no-cache build-base harfbuzz-dev
 RUN yarn install --check-cache --immutable
 RUN yarn build
 RUN yarn workspaces focus --production
