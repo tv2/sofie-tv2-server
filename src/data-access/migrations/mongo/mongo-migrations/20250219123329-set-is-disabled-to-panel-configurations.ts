@@ -1,9 +1,8 @@
-module.exports = {
-  async up(db: any): Promise<void> {
-    await db.collection('panelConfigurations').updateMany({}, { $set: { isDisabled: false } })
-  },
+import { Db } from 'mongodb'
+export async function up(db: Db): Promise<void> {
+  await db.collection('panelConfigurations').updateMany({}, { $set: { isDisabled: false } })
+}
 
-  async down(db: any): Promise<void> {
-    await db.collection('panelConfigurations').updateMany({}, { $unset: { isDisabled: '' } })
-  }
+export async function down(db: Db): Promise<void> {
+  await db.collection('panelConfigurations').updateMany({}, { $unset: { isDisabled: '' } })
 }
