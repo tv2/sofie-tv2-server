@@ -4,6 +4,7 @@ import { HttpStatusCode } from '../enums/http-status-code'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageService } from '../../business-logic/services/status-message-service'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/systemInformation')
 export class SystemInformationController extends BaseController {
@@ -11,6 +12,7 @@ export class SystemInformationController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest('/statusMessages')
   public async getStatusMessages(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const statusMessages: StatusMessage[] = await this.statusMessageService.getStatusMessages()
