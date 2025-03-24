@@ -23,6 +23,7 @@ import {
   ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID
 } from '../../model/interfaces/panel-input-modifier'
 import { PanelInputModifierDto } from '../dtos/panel-input-modifier-dto'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/panels')
 export class PanelController extends BaseController {
@@ -35,6 +36,7 @@ export class PanelController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest('/physicalPanelLayouts')
   public async getPhysicalPanelLayouts(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
@@ -49,6 +51,7 @@ export class PanelController extends BaseController {
     await reply.code(HttpStatusCode.OK).send(this.httpResponseFormatter.formatSuccessResponse(data))
   }
 
+  @AuditLog()
   @GetRequest('/panelLayoutConfigurations/:id')
   public async getPanelLayoutConfiguration(request: FastifyRequest<{ Params: Pick<PanelLayoutConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
@@ -59,6 +62,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/panelLayoutConfigurations')
   public async getPanelLayoutConfigurations(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
@@ -69,6 +73,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/panelLayoutConfigurations', ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID)
   public async createPanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
@@ -80,6 +85,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/panelLayoutConfigurations', ZOD_UPDATE_PANEL_LAYOUT_CONFIGURATION_SCHEMA)
   public async updatePanelLayoutConfiguration(request: FastifyRequest<{ Body: PanelLayoutConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
@@ -91,6 +97,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/panelLayoutConfigurations/:id')
   public async deletePanelLayoutConfiguration(request: FastifyRequest<{ Params: Pick<PanelLayoutConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
@@ -101,6 +108,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/panelConfigurations/:id')
   public async getPanelConfiguration(request: FastifyRequest<{ Params: Pick<PanelConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
@@ -111,6 +119,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/panelConfigurations')
   public async getPanelConfigurations(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
@@ -121,6 +130,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/panelConfigurations', ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID)
   public async createPanelConfiguration(request: FastifyRequest<{ Body: PanelConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
@@ -132,6 +142,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/panelConfigurations', ZOD_PANEL_CONFIGURATION_SCHEMA)
   public async updatePanelConfiguration(request: FastifyRequest<{ Body: PanelConfiguration }>, reply: FastifyReply): Promise<void> {
     try {
@@ -143,6 +154,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/panelConfigurations/:id')
   public async deletePanelConfiguration(request: FastifyRequest<{ Params: Pick<PanelConfiguration, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
@@ -153,6 +165,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/panelInputModifiers')
   public async getPanelInputModifiers(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
@@ -163,6 +176,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/panelInputModifiers', ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID)
   public async createPanelInputModifier(request: FastifyRequest<{ Body: PanelInputModifier }>, reply: FastifyReply): Promise<void> {
     try {
@@ -174,6 +188,7 @@ export class PanelController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/panelInputModifiers/:id')
   public async deletePanelInputModifier(request: FastifyRequest<{ Params: Pick<PanelInputModifier, 'id'> }>, reply: FastifyReply): Promise<void> {
     try {
