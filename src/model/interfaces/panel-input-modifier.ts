@@ -5,6 +5,7 @@ export interface PanelInputModifier {
   name: string
 }
 
-export const ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelInputModifier, 'id'>> = z.object({
+export const ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITH_OPTIONAL_ID: ZodSchema<Omit<PanelInputModifier, 'id'> & Partial<PanelInputModifier>> = z.object({
+  id: z.string().optional(),
   name: z.string()
 })
