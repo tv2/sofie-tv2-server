@@ -122,7 +122,7 @@ describe(PanelConfigurationService.name, () => {
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       beforeEach(() => {
         panelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingPanelLayoutConfigurationId' })
-        when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenThrow(new NotFoundException(''))
+        when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId!)).thenThrow(new NotFoundException(''))
       })
 
       it('throws an Unsupported Operation error', async() => {
@@ -220,7 +220,7 @@ describe(PanelConfigurationService.name, () => {
     describe('no PanelLayoutConfiguration exist for the PanelConfiguration', () => {
       beforeEach(() => {
         panelConfiguration = EntityTestFactory.createPanelConfiguration({ panelLayoutConfigurationId: 'nonExistingId' })
-        when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId)).thenThrow(new NotFoundException(''))
+        when(panelLayoutConfigurationRepository.getPanelLayoutConfiguration(panelConfiguration.panelLayoutConfigurationId!)).thenThrow(new NotFoundException(''))
       })
 
       it('throws an Unsupported Operation error', async() => {

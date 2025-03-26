@@ -4,9 +4,6 @@ import { Logger } from '../../logger/logger'
 import { ErrorCode } from '../../model/enums/error-code'
 import { HttpStatusCode } from '../enums/http-status-code'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { NotFoundException } from '../../model/exceptions/not-found-exception'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
-import { DatabaseNotConnectedException } from '../../model/exceptions/database-not-connected-exception'
 import { HttpException } from '../../model/exceptions/http-exception'
 
 export class HttpErrorHandler {
@@ -34,15 +31,20 @@ export class HttpErrorHandler {
     if (exception instanceof HttpException) {
       return exception.httpStatusCode
     }
-    if (exception instanceof NotFoundException) {
-      return HttpStatusCode.NOT_FOUND
+    switch (exception.errorCode) {
+      case ErrorCode.NOT_FOUND: {
+        return HttpStatusCode.NOT_FOUND
+      }
+      case ErrorCode.INVALID_ID:
+      case ErrorCode.UNSUPPORTED_OPERATION: {
+        return HttpStatusCode.BAD_REQUEST
+      }
+      case ErrorCode.DATABASE_NOT_CONNECTED: {
+        return HttpStatusCode.SERVICE_UNAVAILABLE
+      }
+      default: {
+        return HttpStatusCode.INTERNAL_SERVER_ERROR
+      }
     }
-    if (exception instanceof UnsupportedOperationException) {
-      return HttpStatusCode.BAD_REQUEST
-    }
-    if (exception instanceof DatabaseNotConnectedException) {
-      return HttpStatusCode.SERVICE_UNAVAILABLE
-    }
-    return HttpStatusCode.INTERNAL_SERVER_ERROR
   }
 }

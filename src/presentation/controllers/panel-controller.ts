@@ -20,7 +20,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { PanelConfigurationDto } from '../dtos/panel-configuration-dto'
 import {
   PanelInputModifier,
-  ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID
+  ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITH_OPTIONAL_ID
 } from '../../model/interfaces/panel-input-modifier'
 import { PanelInputModifierDto } from '../dtos/panel-input-modifier-dto'
 import { AuditLog } from '../decorators/audit-log-decorator'
@@ -177,7 +177,7 @@ export class PanelController extends BaseController {
   }
 
   @AuditLog()
-  @PostRequest('/panelInputModifiers', ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITHOUT_ID)
+  @PostRequest('/panelInputModifiers', ZOD_PANEL_INPUT_MODIFIER_SCHEMA_WITH_OPTIONAL_ID)
   public async createPanelInputModifier(request: FastifyRequest<{ Body: PanelInputModifier }>, reply: FastifyReply): Promise<void> {
     try {
       const panelInputModifier: PanelInputModifier = request.body
