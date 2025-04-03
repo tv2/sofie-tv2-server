@@ -313,7 +313,7 @@ export class SkaarhojPanel extends Panel {
       return inputConfiguration ? this.mapInputConfigurationToSkaarhojCommands(inputId, inputConfiguration) : []
     })
 
-    if (this.activeRundown && this.panelConfiguration.model === SkaarhojModel.MKT1A) {
+    if (this.activeRundown && this.panelConfiguration.model !== SkaarhojModel.MK48) {
       commands.push(new SkaarhojTextCommand(this.getRundownDisplayId(), this.activeRundown.name))
     }
 
