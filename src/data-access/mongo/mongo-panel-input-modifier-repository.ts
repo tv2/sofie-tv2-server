@@ -3,6 +3,7 @@ import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
 import { PanelInputModifierRepository } from '../interfaces/panel-input-modifier-repository'
 import { MongoDatabase, MongoId } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
+import { InvalidIdException } from '../../model/exceptions/invalid-id-exception'
 
 const PANEL_INPUT_MODIFIER_COLLECTION_NAME: string = 'panelInputModifiers'
 
@@ -22,14 +23,24 @@ export class MongoPanelInputModifierRepository extends BaseMongoRepository<Mongo
     return this.getCollection().find<PanelInputModifier>({}).toArray()
   }
 
-  public async createPanelInputModifier(panelInputModifierWithoutId: Omit<PanelInputModifier, 'id'>): Promise<PanelInputModifier> {
+  public async createPanelInputModifier(panelInputModifier: PanelInputModifier): Promise<PanelInputModifier> {
     this.assertDatabaseConnection(this.createPanelInputModifier.name)
-    const panelInputModifier: PanelInputModifier = {
-      ...panelInputModifierWithoutId,
-      id: this.uuidGenerator.generateUuid()
+
+    if (panelInputModifier.id && !this.uuidGenerator.validateUuid(panelInputModifier.id)) {
+      throw new InvalidIdException(`"${panelInputModifier.id}" is not a valid UUID`)
     }
-    await this.getCollection().updateOne({ id: panelInputModifier.id }, { $set: panelInputModifier }, { upsert: true })
-    return panelInputModifier
+
+    const doesModifierAlreadyExist: boolean = await this.getCollection().countDocuments({ id: panelInputModifier.id }) > 0
+    if (doesModifierAlreadyExist) {
+      throw new InvalidIdException(`"${panelInputModifier.id}" already exist on a PanelInputModifier`)
+    }
+
+    const panelInputModifierToBeSaved: PanelInputModifier = {
+      ...panelInputModifier,
+      id: panelInputModifier.id && panelInputModifier.id.length > 0 ? panelInputModifier.id : this.uuidGenerator.generateUuid()
+    }
+    await this.getCollection().updateOne({ id: panelInputModifierToBeSaved.id }, { $set: panelInputModifierToBeSaved }, { upsert: true })
+    return panelInputModifierToBeSaved
   }
 
   public async deletedPanelInputModifier(panelInputModifierId: string): Promise<void> {

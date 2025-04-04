@@ -23,7 +23,10 @@
     "migration-status": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
     "undo-last-migration": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts && npm run migration-status",
     "migrate": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
-    "migrate-down": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts"
+    "migrate-down": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
+    "migration-status-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f data-access/migrations/mongo/migrate-mongo-config.js",
+    "migrate-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f data-access/migrations/mongo/migrate-mongo-config.js",
+    "migrate-down-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f data-access/migrations/mongo/migrate-mongo-config.js"
   },
   "engines": {
     "node": ">=20.12.0"
@@ -42,11 +45,8 @@
     "license-checker": "^25.0.1",
     "nodemon": "^3.1.0",
     "rimraf": "^6.0.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
     "vitest": "^1.5.3"
   },
-  "packageManager": "yarn@4.1.1",
   "dependencies": {
     "@fastify/http-proxy": "^11.0.1",
     "@fastify/websocket": "^11.0.1",
@@ -54,11 +54,13 @@
     "atem-connection": "^3.5.0",
     "fastify": "^5.0.0",
     "fastify-type-provider-zod": "^4.0.1",
-    "migrate-mongo": "^11.0.0",
+    "migrate-mongo": "^12.1.3",
     "mongodb": "^6.9.1",
     "reflect-metadata": "^0.2.2",
     "ws": "^8.18.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "typescript": "^5.6.3",
+    "ts-node": "^10.9.2"
   },
   "resolutions": {
     "cross-spawn": ">=7.0.5"
