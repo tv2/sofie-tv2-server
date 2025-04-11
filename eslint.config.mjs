@@ -5,7 +5,7 @@ import stylisticEslintPlugin from '@stylistic/eslint-plugin'
 export default [
 
   {
-    files: ['**/*.ts', 'eslint.config.mjs', 'vitest.config.mts'],
+    files: ['**/*.ts'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
@@ -22,7 +22,7 @@ export default [
       ...stylisticEslintPlugin.configs['recommended-flat'].rules,
       'linebreak-style': ['error', 'unix'],
       'indent': 'off',
-      '@typescript-eslint/indent': ['error', 2],
+      '@stylistic/indent': ['error', 2],
       'no-void': ['error'],
       'no-console': 'error',
       'no-unused-vars': 'off',
@@ -43,7 +43,7 @@ export default [
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/block-spacing': ['error', 'always'],
       '@stylistic/brace-style': ['error', '1tbs'],
-      '@stylistic/comma-dangle': ['error', 'always-multiline'],
+      '@stylistic/comma-dangle': 'off',
       '@stylistic/comma-spacing': ['error'],
       '@stylistic/function-call-spacing': ['error', 'never'],
       '@stylistic/key-spacing': ['error'],
@@ -73,6 +73,6 @@ export default [
     },
   },
   {
-    ignores: ['.yarn/**', 'coverage/**'],
+    ignores: ['.yarn/**', 'coverage/**','src/data-access/migrations/mongo/mongo-migrations/*.ts'],
   },
 ]
