@@ -73,7 +73,7 @@ export class SkaarhojPanel extends Panel {
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   private tBarDirection: TBarDirection = TBarDirection.DOWN
-  private previousTbarValue: number = 0
+  private previousTbarValue: number | undefined 
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -300,7 +300,7 @@ export class SkaarhojPanel extends Panel {
   }
 
   private getTBarDirection(directedTBarValue: number): TBarDirection {
-    if (Math.abs(this.previousTbarValue - directedTBarValue) > MAX_DEVIATION_THRESHOLD) {
+    if (this.previousTbarValue && Math.abs(this.previousTbarValue - directedTBarValue) > MAX_DEVIATION_THRESHOLD) {
       this.logger.warn(`TBar value ${directedTBarValue} is too far from previous value ${this.previousTbarValue}. Keeping the previous direction.`)
       return this.tBarDirection
     }
