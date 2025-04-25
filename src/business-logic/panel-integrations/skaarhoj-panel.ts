@@ -23,6 +23,7 @@ const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
 const MK48_RUNDOWN_DISPLAY_ID: string = '62'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
+const MAX_DEVIATION_THRESHOLD: number = 100
 
 /**
  * Regex to extract the different information in a command received from a Skaarhoj panel.
@@ -72,6 +73,7 @@ export class SkaarhojPanel extends Panel {
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   private tBarDirection: TBarDirection = TBarDirection.DOWN
+  private previousTbarValue: number = 0
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -280,20 +282,28 @@ export class SkaarhojPanel extends Panel {
   }
 
   private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+    this.logger.error(`Updating TBar command with value ${value}`)
     const tBarTransitionProgress: number = this.getTBarTransitionProgress(value)
     const tBarDirection: TBarDirection = this.getTBarDirection(tBarTransitionProgress)
+
     command.shouldExecuteTake = tBarDirection !== this.tBarDirection
     command.value = tBarTransitionProgress
     this.tBarDirection = tBarDirection
+    this.previousTbarValue = tBarTransitionProgress
     return command
   }
 
   private getTBarTransitionProgress(value: number): number {
+    this.logger.error(`Getting TBar transition progress for value ${value}`)
     const tBarPosition: number = this.tBarDirection === TBarDirection.DOWN ? T_BAR_UPPER_BOUND - value : value
     return Math.min(T_BAR_UPPER_BOUND, Math.max(T_BAR_LOWER_BOUND, tBarPosition))
   }
 
   private getTBarDirection(directedTBarValue: number): TBarDirection {
+    if (Math.abs(this.previousTbarValue - directedTBarValue) > MAX_DEVIATION_THRESHOLD) {
+      this.logger.warn(`TBar value ${directedTBarValue} is too far from previous value ${this.previousTbarValue}. Keeping the previous direction.`)
+      return this.tBarDirection
+    }
     if (directedTBarValue < T_BAR_UPPER_BOUND) {
       return this.tBarDirection
     }
