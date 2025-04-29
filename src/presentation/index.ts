@@ -16,7 +16,6 @@ const RETRY_START_DELAY_IN_MS: number = 5000
 
 const controllers: BaseController[] = ControllerFacade.getControllers()
 
-
 async function startAlbaTv2Server(logger: Logger): Promise<void> {
   try {
     await connectToDatabase(logger)
