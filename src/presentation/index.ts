@@ -19,12 +19,14 @@ const controllers: BaseController[] = ControllerFacade.getControllers()
 async function startAlbaTv2Server(logger: Logger): Promise<void> {
   try {
     await connectToDatabase(logger)
-    await startProxyServer(logger).catch(error => logger.data(error).error('Failed to start proxy server'))
+    await startProxyServer(logger).catch(error => logger.data(error).error('Failed to start proxy server.'))
     await startSystemServices()
     logger.info('Alba TV2 Server successfully started')
-  } catch (error) {
+  } catch {
     logger.error(`Failed to start Alba TV2 Server. Retrying in ${RETRY_START_DELAY_IN_MS / 1000} seconds.`)
-    setTimeout(() => startAlbaTv2Server(logger), RETRY_START_DELAY_IN_MS)
+    setTimeout(() => {
+      startAlbaTv2Server(logger).catch(error => logger.data(error).error('Failed to start server.'))
+    }, RETRY_START_DELAY_IN_MS)
   }
 }
 
