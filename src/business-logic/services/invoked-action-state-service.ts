@@ -127,6 +127,10 @@ export class InvokedActionStateService implements InvokedActionService {
     callback(this.invokedActionIds) // We emit the current invokedActionIds when subscribing, so the caller don't need to wait for the next event.
   }
 
+  public unsubscribeFromInvokedActionIds(subscriberId: string): void {
+    this.invokedActionIdSubscribers.delete(subscriberId)
+  }
+
   private updateInvokedActionIds(): void {
     const validPlayoutContentTypes: PlayoutContentType[] = [
       PlayoutContentType.CAMERA,

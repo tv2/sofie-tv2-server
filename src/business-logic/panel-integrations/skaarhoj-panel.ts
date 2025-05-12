@@ -18,6 +18,7 @@ import {
   SkaarhojTextCommand
 } from './skaarhoj-command'
 import { ColorConverter } from '../interfaces/color-converter'
+import { InvokedActionService } from '../interfaces/invoked-action-service'
 
 const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
 const MK48_RUNDOWN_DISPLAY_ID: string = '62'
@@ -65,6 +66,8 @@ interface SkaarhojInput {
 }
 
 export class SkaarhojPanel extends Panel {
+  private readonly id: string = `SKAARHOJ_PANEL_${Math.floor(Math.random() * 1000)}`
+
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
@@ -75,13 +78,18 @@ export class SkaarhojPanel extends Panel {
 
   public constructor(
     panelConfiguration: PanelConfiguration,
+    invokedActionService: InvokedActionService,
     statusMessageService: StatusMessageService,
     private readonly colorConverter: ColorConverter,
     logger: Logger,
     panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
-    super(panelConfiguration, statusMessageService, panelLayoutConfiguration)
+    super(panelConfiguration, invokedActionService, statusMessageService, panelLayoutConfiguration)
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
+  }
+
+  protected override getId(): string {
+    return this.id
   }
 
   protected assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
@@ -95,6 +103,7 @@ export class SkaarhojPanel extends Panel {
 
   public connect(): void {
     this.connectToSocket()
+    super.listenForInvokedActions()
   }
 
   private connectToSocket(): void {
@@ -176,7 +185,8 @@ export class SkaarhojPanel extends Panel {
     }
   }
 
-  public disconnect(): void {
+  public override disconnect(): void {
+    super.disconnect()
     this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
     this.keepAlive = false
     this.socket.resetAndDestroy()
@@ -322,7 +332,7 @@ export class SkaarhojPanel extends Panel {
 
   private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
     const commands: SkaarhojCommand[] = [
-      new SkaarhojStateCommand(inputId, this.isInputActiveModifier(inputConfiguration) ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED),
+      new SkaarhojStateCommand(inputId, this.getSkaarhojButtonStateForInputConfiguration(inputConfiguration)),
       new SkaarhojColorCommand(inputId, inputConfiguration.color ? this.colorConverter.hexToRgb(inputConfiguration.color) : undefined)
     ]
 
@@ -331,6 +341,20 @@ export class SkaarhojPanel extends Panel {
     }
 
     return commands
+  }
+
+  private getSkaarhojButtonStateForInputConfiguration(inputConfiguration: InputConfiguration): SkaarhojButtonState {
+    const isInvokedAction: boolean = this.isInputForInvokedAction(inputConfiguration)
+    const isActiveModifier: boolean = this.isInputActiveModifier(inputConfiguration)
+    return isInvokedAction || isActiveModifier ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED
+  }
+
+  private isInputForInvokedAction(inputConfiguration: InputConfiguration): boolean {
+    if (inputConfiguration.command.type !== PanelCommandType.ACTION) {
+      return false
+    }
+
+    return this.invokedActionIds.includes(inputConfiguration.command.actionId)
   }
 
   private isInputActiveModifier(inputConfiguration: InputConfiguration): boolean {

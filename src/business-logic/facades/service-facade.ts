@@ -46,7 +46,11 @@ export class ServiceFacade {
   }
 
   public static createPanelFactory(): PanelFactory {
-    return new PanelFactory(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
+    return new PanelFactory(
+      ServiceFacade.createInvokedActionService(),
+      ServiceFacade.createStatusMessageService(),
+      LoggerFacade.createLogger()
+    )
   }
 
   public static createStatusMessageService(): StatusMessageService {
