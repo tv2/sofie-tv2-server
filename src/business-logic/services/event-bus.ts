@@ -12,8 +12,26 @@ import { DeviceEmitter } from '../interfaces/device-emitter'
 import { RundownEmitter } from '../interfaces/rundown-emitter'
 import { RundownObserver } from '../interfaces/rundown-observer'
 import { PanelInputModifier } from '../../model/interfaces/panel-input-modifier'
+import { ActionEmitter } from '../interfaces/action-emitter'
+import { Action } from '../../model/entities/action'
+import { ActionObserver } from '../interfaces/action-observer'
+import { PlayoutContent } from '../../model/value-objects/playout-content'
+import { PlayoutContentEmitter } from '../interfaces/playout-content-emitter'
+import { PlayoutContentObserver } from '../interfaces/playout-content-observer'
 
-export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitter, StatusMessageObserver, DeviceEmitter, DeviceObserver, RundownEmitter, RundownObserver {
+export class EventBus implements
+  PanelEmitter,
+  PanelObserver,
+  StatusMessageEmitter,
+  StatusMessageObserver,
+  DeviceEmitter,
+  DeviceObserver,
+  RundownEmitter,
+  RundownObserver,
+  ActionEmitter,
+  ActionObserver,
+  PlayoutContentEmitter,
+  PlayoutContentObserver {
   private readonly eventEmitter: EventEmitter<{
     panelConfigurationCreated: [PanelConfiguration]
     panelConfigurationUpdated: [PanelConfiguration]
@@ -26,6 +44,9 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
     statusMessage: [StatusMessage]
     videoMixerConfigurationUpdated: [VideoMixerConfiguration]
     activeRundownId: [string | undefined]
+    actionsUpdated: [Action[], string | undefined]
+    programPlayoutContents: [PlayoutContent[]]
+    previewPlayoutContents: [PlayoutContent[]]
   }> = new EventEmitter()
 
   public emitPanelLayoutConfigurationCreated(panelLayoutConfiguration: PanelLayoutConfiguration): void {
@@ -114,5 +135,29 @@ export class EventBus implements PanelEmitter, PanelObserver, StatusMessageEmitt
 
   public subscribeToActiveRundownId(onActiveRundownIdChangedCallback: (rundownId: (string | undefined)) => void): void {
     this.eventEmitter.on('activeRundownId', onActiveRundownIdChangedCallback)
+  }
+
+  public emitActions(actions: Action[], rundownId?: string): void {
+    this.eventEmitter.emit('actionsUpdated', actions, rundownId)
+  }
+
+  public subscribeToActionsUpdated(onActionsUpdatedCallback: (actions: Action[], rundownId?: string) => void): void {
+    this.eventEmitter.on('actionsUpdated', onActionsUpdatedCallback)
+  }
+
+  public emitProgramPlayoutContents(playoutContents: PlayoutContent[]): void {
+    this.eventEmitter.emit('programPlayoutContents', playoutContents)
+  }
+
+  public emitPreviewPlayoutContents(playoutContents: PlayoutContent[]): void {
+    this.eventEmitter.emit('previewPlayoutContents', playoutContents)
+  }
+
+  public subscribeToProgramPlayoutContents(onProgramPlayoutContent: (playoutContents: PlayoutContent[]) => void): void {
+    this.eventEmitter.on('programPlayoutContents', onProgramPlayoutContent)
+  }
+
+  public subscribeToPreviewPlayoutContents(onPreviewPlayoutContent: (playoutContents: PlayoutContent[]) => void): void {
+    this.eventEmitter.on('previewPlayoutContents', onPreviewPlayoutContent)
   }
 }
