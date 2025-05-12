@@ -1,3 +1,3 @@
 export interface InvokedActionService {
-  subscribeToInvokedActionIds(): void
+  subscribeToInvokedActionIds(subscriberId: string, callback: (invokedActionIds: string[]) => void): void
 }

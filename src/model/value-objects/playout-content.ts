@@ -16,17 +16,17 @@ export type PlayoutContent =
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
 
-interface CameraPlayoutContent {
+export interface CameraPlayoutContent {
   type: PlayoutContentType.CAMERA
   source: string
 }
 
-interface RemotePlayoutContent {
+export interface RemotePlayoutContent {
   type: PlayoutContentType.REMOTE
   source: string
 }
 
-interface ReplayPlayoutContent {
+export interface ReplayPlayoutContent {
   type: PlayoutContentType.REPLAY
   source: string
 }

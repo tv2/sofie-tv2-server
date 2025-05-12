@@ -88,6 +88,8 @@ export class ServiceFacade {
 
   public static createInvokedActionService(): InvokedActionService {
     return InvokedActionStateService.getInstance(
+      ServiceFacade.createRundownService(),
+      DomainEventFacade.createRundownObserver(),
       DomainEventFacade.createActionObserver(),
       DomainEventFacade.createPlayoutContentObserver(),
       ServiceFacade.createHttpService(),
