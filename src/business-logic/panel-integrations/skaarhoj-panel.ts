@@ -19,12 +19,14 @@ import {
 } from './skaarhoj-command'
 import { ColorConverter } from '../interfaces/color-converter'
 import { InvokedActionService } from '../interfaces/invoked-action-service'
+import { TBarValueSpikeException } from '../../model/exceptions/t-bar-value-spike-exception'
 
 const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
 const MK48_RUNDOWN_DISPLAY_ID: string = '62'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
+const MAX_T_BAR_DEVIATION: number = 950 
 /**
  * Regex to extract the different information in a command received from a Skaarhoj panel.
  *
@@ -75,6 +77,7 @@ export class SkaarhojPanel extends Panel {
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   private tBarDirection: TBarDirection = TBarDirection.DOWN
+  private lastTbarValue: number | undefined
 
   public constructor(
     panelConfiguration: PanelConfiguration,
@@ -271,7 +274,14 @@ export class SkaarhojPanel extends Panel {
           return
         }
 
-        return this.updateTBarCommandWithValues(inputConfiguration.command, value)
+        try {
+          return this.updateTBarCommandWithValues(inputConfiguration.command, value)
+        }
+        catch(error: unknown) {
+          if (error instanceof TBarValueSpikeException) {
+            this.logger.error(error.message, error)
+          }
+        }
       }
     }
     return
@@ -289,13 +299,24 @@ export class SkaarhojPanel extends Panel {
     return undefined
   }
 
-  private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+  protected updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+    this.detectTbarSpike(value)
     const tBarTransitionProgress: number = this.getTBarTransitionProgress(value)
     const tBarDirection: TBarDirection = this.getTBarDirection(tBarTransitionProgress)
     command.shouldExecuteTake = tBarDirection !== this.tBarDirection
     command.value = tBarTransitionProgress
     this.tBarDirection = tBarDirection
     return command
+  }
+
+  private detectTbarSpike(value: number) {
+    if (this.lastTbarValue !== undefined) {
+      const deviation = Math.abs(value - this.lastTbarValue) 
+      if (deviation >= MAX_T_BAR_DEVIATION) {
+        throw new TBarValueSpikeException(`T-bar made a big spike of ${deviation}, this will cause issues.`)
+      }
+    }
+    this.lastTbarValue = value
   }
 
   private getTBarTransitionProgress(value: number): number {
