@@ -26,7 +26,7 @@ const MK48_RUNDOWN_DISPLAY_ID: string = '62'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
-const MAX_T_BAR_DEVIATION: number = 950 
+const MAX_T_BAR_DEVIATION: number = 950
 /**
  * Regex to extract the different information in a command received from a Skaarhoj panel.
  *
@@ -276,8 +276,7 @@ export class SkaarhojPanel extends Panel {
 
         try {
           return this.updateTBarCommandWithValues(inputConfiguration.command, value)
-        }
-        catch(error: unknown) {
+        } catch (error: unknown) {
           if (error instanceof TBarValueSpikeException) {
             this.logger.error(error.message, error)
           }
@@ -309,9 +308,9 @@ export class SkaarhojPanel extends Panel {
     return command
   }
 
-  private detectTbarSpike(value: number) {
+  private detectTbarSpike(value: number): void {
     if (this.lastTbarValue !== undefined) {
-      const deviation = Math.abs(value - this.lastTbarValue) 
+      const deviation = Math.abs(value - this.lastTbarValue)
       if (deviation >= MAX_T_BAR_DEVIATION) {
         throw new TBarValueSpikeException(`T-bar made a big spike of ${deviation}, this will cause issues.`)
       }

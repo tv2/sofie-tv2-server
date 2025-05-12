@@ -6,4 +6,3 @@ export class TBarValueSpikeException extends Exception {
     super(ErrorCode.T_BAR_VALUE_SPIKE, message)
   }
 }
-
