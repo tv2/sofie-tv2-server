@@ -312,7 +312,7 @@ export class SkaarhojPanel extends Panel {
     if (this.lastTbarValue !== undefined) {
       const deviation = Math.abs(value - this.lastTbarValue)
       if (deviation >= MAX_T_BAR_DEVIATION) {
-        throw new TBarValueSpikeException(`T-bar made a big spike of ${deviation}, this will cause issues.`)
+        throw new TBarValueSpikeException(`The T-bar made an unusual deviation in values. Deviation:  ${deviation}.`)
       }
     }
     this.lastTbarValue = value
