@@ -13,6 +13,7 @@ export type PlayoutContent =
   | ManusPlayoutContent
   | TransitionPlayoutContent
   | CommandPlayoutContent
+  | RecalledPlayoutContent
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
@@ -78,6 +79,11 @@ interface TransitionPlayoutContent {
 
 interface CommandPlayoutContent {
   type: PlayoutContentType.COMMAND
+}
+
+export interface RecalledPlayoutContent {
+  type: PlayoutContentType.RECALLED
+  recalledType: PlayoutContentType
 }
 
 interface UnknownPlayoutContent {

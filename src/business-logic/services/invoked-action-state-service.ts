@@ -7,6 +7,7 @@ import { PlayoutContentObserver } from '../interfaces/playout-content-observer'
 import {
   CameraPlayoutContent,
   PlayoutContent,
+  RecalledPlayoutContent,
   RemotePlayoutContent,
   ReplayPlayoutContent,
   SplitScreenInputPlayoutContent,
@@ -139,7 +140,8 @@ export class InvokedActionStateService implements InvokedActionService {
       PlayoutContentType.REMOTE,
       PlayoutContentType.REPLAY,
       PlayoutContentType.SPLIT_SCREEN,
-      PlayoutContentType.SPLIT_SCREEN_INPUT
+      PlayoutContentType.SPLIT_SCREEN_INPUT,
+      PlayoutContentType.RECALLED
     ]
     this.invokedActionIds = this.actions
       .filter(action => validPlayoutContentTypes.includes(action.metadata.playoutContent.type))
@@ -195,6 +197,9 @@ export class InvokedActionStateService implements InvokedActionService {
       }
       case PlayoutContentType.SPLIT_SCREEN_INPUT: {
         return this.isSplitScreenInputPlayoutContentsEqual(playoutContentB, playoutContentA as SplitScreenInputPlayoutContent)
+      }
+      case PlayoutContentType.RECALLED: {
+        return playoutContentB.recalledType === (playoutContentA as RecalledPlayoutContent).recalledType
       }
       default: {
         return false
