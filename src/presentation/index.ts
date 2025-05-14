@@ -31,7 +31,9 @@ async function startProxyServer(logger: Logger): Promise<void> {
     EventBuilderFacade.createPanelEventBuilder(),
     DomainEventFacade.createStatusMessageObserver(),
     DomainEventFacade.createDeviceEmitter(),
-    DomainEventFacade.createRundownEmitter()
+    DomainEventFacade.createRundownEmitter(),
+    DomainEventFacade.createActionEmitter(),
+    DomainEventFacade.createPlayoutContentEmitter()
   )
   await proxyServer.start(PROXY_SERVER_PORT, { httpUrl: ALBA_REST_URL, websocketUrl: ALBA_WEBSOCKET_URL })
 }
@@ -43,6 +45,7 @@ async function connectToDatabase(logger: Logger): Promise<void> {
 async function startSystemServices(): Promise<void> {
   try {
     await ServiceFacade.createPanelManager().initialize()
+    ServiceFacade.createInvokedActionService()
   } catch {
     setTimeout(() => {
       logger.error(`Failed while starting system services. Retrying in ${RETRY_SYSTEM_SERVICES_DELAY_IN_MS / 1000} seconds.`)
