@@ -7,8 +7,11 @@ import { PlayoutContentObserver } from '../interfaces/playout-content-observer'
 import {
   CameraPlayoutContent,
   PlayoutContent,
+  RecalledPlayoutContent,
   RemotePlayoutContent,
-  ReplayPlayoutContent, SplitScreenPlayoutContent
+  ReplayPlayoutContent,
+  SplitScreenInputPlayoutContent,
+  SplitScreenPlayoutContent
 } from '../../model/value-objects/playout-content'
 import { RundownService } from '../interfaces/rundown-service'
 import { RundownObserver } from '../interfaces/rundown-observer'
@@ -136,7 +139,9 @@ export class InvokedActionStateService implements InvokedActionService {
       PlayoutContentType.CAMERA,
       PlayoutContentType.REMOTE,
       PlayoutContentType.REPLAY,
-      PlayoutContentType.SPLIT_SCREEN
+      PlayoutContentType.SPLIT_SCREEN,
+      PlayoutContentType.SPLIT_SCREEN_INPUT,
+      PlayoutContentType.RECALLED
     ]
     this.invokedActionIds = this.actions
       .filter(action => validPlayoutContentTypes.includes(action.metadata.playoutContent.type))
@@ -149,10 +154,14 @@ export class InvokedActionStateService implements InvokedActionService {
   private isActionInProgramPreviewPlayoutContent(action: Action): boolean {
     switch (action.metadata.outputChannel) {
       case OutputChannel.PROGRAM: {
-        return this.programPlayoutContents.some((programPlayoutContent: PlayoutContent) => this.isPlayoutContentsEqual(programPlayoutContent, action.metadata.playoutContent))
+        return this.isActionInvokedInPlayoutContents(action, this.programPlayoutContents)
       }
       case OutputChannel.PREVIEW: {
-        return this.previewPlayoutContents.some((previewPlayoutContent: PlayoutContent) => this.isPlayoutContentsEqual(previewPlayoutContent, action.metadata.playoutContent))
+        return this.isActionInvokedInPlayoutContents(action, this.previewPlayoutContents)
+      }
+      case OutputChannel.UNKNOWN: {
+        return this.isActionInvokedInPlayoutContents(action, this.programPlayoutContents)
+          || this.isActionInvokedInPlayoutContents(action, this.previewPlayoutContents)
       }
       default: {
         return false
@@ -160,7 +169,16 @@ export class InvokedActionStateService implements InvokedActionService {
     }
   }
 
-  private isPlayoutContentsEqual(playoutContentA: PlayoutContent, playoutContentB: PlayoutContent): boolean {
+  private isActionInvokedInPlayoutContents(action: Action, playoutContents: PlayoutContent[]): boolean {
+    return playoutContents.some((playoutContent: PlayoutContent) => {
+      if (action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN_INPUT && playoutContent.type === PlayoutContentType.SPLIT_SCREEN) {
+        return playoutContent.inputPlayoutContents.some(playoutContentSource => this.arePlayoutContentsEqual(playoutContentSource, action.metadata.playoutContent))
+      }
+      return this.arePlayoutContentsEqual(playoutContent, action.metadata.playoutContent)
+    })
+  }
+
+  private arePlayoutContentsEqual(playoutContentA: PlayoutContent, playoutContentB: PlayoutContent): boolean {
     if (playoutContentA.type !== playoutContentB.type) {
       return false
     }
@@ -175,12 +193,25 @@ export class InvokedActionStateService implements InvokedActionService {
         return playoutContentB.source === (playoutContentA as ReplayPlayoutContent).source
       }
       case PlayoutContentType.SPLIT_SCREEN: {
-        return playoutContentB.layout === (playoutContentA as SplitScreenPlayoutContent).layout
+        return playoutContentB.layout.toLowerCase() === (playoutContentA as SplitScreenPlayoutContent).layout.toLowerCase()
+      }
+      case PlayoutContentType.SPLIT_SCREEN_INPUT: {
+        return this.isSplitScreenInputPlayoutContentsEqual(playoutContentB, playoutContentA as SplitScreenInputPlayoutContent)
+      }
+      case PlayoutContentType.RECALLED: {
+        return playoutContentB.recalledType === (playoutContentA as RecalledPlayoutContent).recalledType
       }
       default: {
         return false
       }
     }
+  }
+
+  private isSplitScreenInputPlayoutContentsEqual(splitScreenInputA: SplitScreenInputPlayoutContent, splitScreenInputB: SplitScreenInputPlayoutContent): boolean {
+    if (splitScreenInputA.inputIndex !== splitScreenInputB.inputIndex) {
+      return false
+    }
+    return this.arePlayoutContentsEqual(splitScreenInputA.sourcePlayoutContent, splitScreenInputB.sourcePlayoutContent)
   }
 
   private emitInvokedActionIds(): void {
