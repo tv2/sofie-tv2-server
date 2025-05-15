@@ -7,7 +7,7 @@ import { Logger } from '../../../logger/logger'
 import { instance, mock } from '@typestrong/ts-mockito'
 import { StatusMessageService } from '../../services/status-message-service'
 import { ColorConverter } from '../../interfaces/color-converter'
-import {  TBarPanelCommand, PanelCommand } from '../../../model/interfaces/input-configuration'
+import { TBarPanelCommand, PanelCommand } from '../../../model/interfaces/input-configuration'
 
 class FakeSkaarhojPanel extends SkaarhojPanel {
   public callUpdateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
