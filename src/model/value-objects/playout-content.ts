@@ -14,6 +14,7 @@ export type PlayoutContent =
   | TransitionPlayoutContent
   | CommandPlayoutContent
   | RecalledPlayoutContent
+  | DownstreamKeyerPlayoutContent
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
@@ -84,6 +85,12 @@ interface CommandPlayoutContent {
 export interface RecalledPlayoutContent {
   type: PlayoutContentType.RECALLED
   recalledType: PlayoutContentType
+}
+
+export interface DownstreamKeyerPlayoutContent {
+  type: PlayoutContentType.DOWNSTREAM_KEYER
+  identifier: string
+  isOn: boolean
 }
 
 interface UnknownPlayoutContent {

@@ -6,6 +6,7 @@ import { ActionObserver } from '../interfaces/action-observer'
 import { PlayoutContentObserver } from '../interfaces/playout-content-observer'
 import {
   CameraPlayoutContent,
+  DownstreamKeyerPlayoutContent,
   PlayoutContent,
   RecalledPlayoutContent,
   RemotePlayoutContent,
@@ -141,7 +142,8 @@ export class InvokedActionStateService implements InvokedActionService {
       PlayoutContentType.REPLAY,
       PlayoutContentType.SPLIT_SCREEN,
       PlayoutContentType.SPLIT_SCREEN_INPUT,
-      PlayoutContentType.RECALLED
+      PlayoutContentType.RECALLED,
+      PlayoutContentType.DOWNSTREAM_KEYER
     ]
     this.invokedActionIds = this.actions
       .filter(action => validPlayoutContentTypes.includes(action.metadata.playoutContent.type))
@@ -200,6 +202,11 @@ export class InvokedActionStateService implements InvokedActionService {
       }
       case PlayoutContentType.RECALLED: {
         return playoutContentB.recalledType === (playoutContentA as RecalledPlayoutContent).recalledType
+      }
+      case PlayoutContentType.DOWNSTREAM_KEYER: {
+        const downstreamKeyerPlayoutContentA: DownstreamKeyerPlayoutContent = playoutContentA as DownstreamKeyerPlayoutContent
+        return playoutContentB.identifier === downstreamKeyerPlayoutContentA.identifier
+          && playoutContentB.isOn === downstreamKeyerPlayoutContentA.isOn
       }
       default: {
         return false
