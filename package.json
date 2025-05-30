@@ -1,7 +1,7 @@
 {
-  "name": "sofie-tv2-server",
+  "name": "alba-tv2-server",
   "version": "0.0.0",
-  "repository": "git@github.com:tv2/sofie-tv2-server.git",
+  "repository": "git@github.com:tv2/alba-tv2-server.git",
   "license": "MIT",
   "type": "commonjs",
   "scripts": {

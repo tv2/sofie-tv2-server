@@ -1,6 +1,6 @@
 # MongoDB migrations
 
-Sofie server uses the library [migrate-mongo](https://www.npmjs.com/package/migrate-mongo) for running the migrations.
+Alba server uses the library [migrate-mongo](https://www.npmjs.com/package/migrate-mongo) for running the migrations.
 A migration consists of `up` and `down` methods, where `up` applies the migration and `down` rolls back the changes from `up`.
 
 Below is a migration-template that contains the `up`' and `down` methods.
