@@ -26,3 +26,12 @@ export enum RundownEventType {
   REHEARSE = 'REHEARSE',
   DEACTIVATED = 'DEACTIVATED'
 }
+
+export enum ActionEventType {
+  ACTIONS_UPDATED = 'ACTIONS_UPDATED'
+}
+
+export enum PlayoutContentEventType {
+  PROGRAM_PLAYOUT_CONTENT = 'PROGRAM_PLAYOUT_CONTENT',
+  PREVIEW_PLAYOUT_CONTENT = 'PREVIEW_PLAYOUT_CONTENT'
+}

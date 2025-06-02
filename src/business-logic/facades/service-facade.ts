@@ -18,6 +18,8 @@ import { RundownService } from '../interfaces/rundown-service'
 import { RundownHttpService } from '../services/rundown-http-service'
 import { ColorConverter } from '../interfaces/color-converter'
 import { HexRgbColorConverter } from '../services/hex-rgb-color-converter'
+import { InvokedActionService } from '../interfaces/invoked-action-service'
+import { InvokedActionStateService } from '../services/invoked-action-state-service'
 
 export class ServiceFacade {
   public static createPanelService(): PanelService {
@@ -44,7 +46,11 @@ export class ServiceFacade {
   }
 
   public static createPanelFactory(): PanelFactory {
-    return new PanelFactory(ServiceFacade.createStatusMessageService(), LoggerFacade.createLogger())
+    return new PanelFactory(
+      ServiceFacade.createInvokedActionService(),
+      ServiceFacade.createStatusMessageService(),
+      LoggerFacade.createLogger()
+    )
   }
 
   public static createStatusMessageService(): StatusMessageService {
@@ -82,5 +88,16 @@ export class ServiceFacade {
 
   public static createColorConverter(): ColorConverter {
     return new HexRgbColorConverter()
+  }
+
+  public static createInvokedActionService(): InvokedActionService {
+    return InvokedActionStateService.getInstance(
+      ServiceFacade.createRundownService(),
+      DomainEventFacade.createRundownObserver(),
+      DomainEventFacade.createActionObserver(),
+      DomainEventFacade.createPlayoutContentObserver(),
+      ServiceFacade.createHttpService(),
+      LoggerFacade.createLogger()
+    )
   }
 }
