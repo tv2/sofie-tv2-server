@@ -1280,6 +1280,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"alba-tv2-server@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "alba-tv2-server@workspace:."
+  dependencies:
+    "@fastify/http-proxy": "npm:^11.0.1"
+    "@fastify/websocket": "npm:^11.0.1"
+    "@stylistic/eslint-plugin": "npm:^2.10.1"
+    "@tv2media/logger": "npm:^2.0.2"
+    "@types/license-checker": "npm:^25"
+    "@types/node": "npm:^22.7.5"
+    "@types/ws": "npm:^8.5.12"
+    "@typescript-eslint/eslint-plugin": "npm:^8.19.0"
+    "@typescript-eslint/parser": "npm:^8.12.2"
+    "@typestrong/ts-mockito": "npm:^2.7.12"
+    "@vitest/coverage-v8": "npm:^1.5.3"
+    atem-connection: "npm:^3.5.0"
+    cross-env: "npm:^7.0.3"
+    eslint: "npm:^9.13.0"
+    fastify: "npm:^5.3.2"
+    fastify-type-provider-zod: "npm:^4.0.1"
+    license-checker: "npm:^25.0.1"
+    migrate-mongo: "npm:^12.1.3"
+    mongodb: "npm:^6.9.1"
+    nodemon: "npm:^3.1.0"
+    reflect-metadata: "npm:^0.2.2"
+    rimraf: "npm:^6.0.1"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.6.3"
+    vitest: "npm:^1.5.3"
+    ws: "npm:^8.18.0"
+    zod: "npm:^3.23.8"
+  languageName: unknown
+  linkType: soft
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -4426,40 +4460,6 @@ __metadata:
   checksum: 10c0/d54a52bf9325165770b674a67241143a3d8b4e4c8884560c4e0e078aace2a728dffc7f70150660f51b85797c4e1a3b82f9b7aa25e0a0ceae1a243365da5c51a7
   languageName: node
   linkType: hard
-
-"sofie-tv2-server@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "sofie-tv2-server@workspace:."
-  dependencies:
-    "@fastify/http-proxy": "npm:^11.0.1"
-    "@fastify/websocket": "npm:^11.0.1"
-    "@stylistic/eslint-plugin": "npm:^2.10.1"
-    "@tv2media/logger": "npm:^2.0.2"
-    "@types/license-checker": "npm:^25"
-    "@types/node": "npm:^22.7.5"
-    "@types/ws": "npm:^8.5.12"
-    "@typescript-eslint/eslint-plugin": "npm:^8.19.0"
-    "@typescript-eslint/parser": "npm:^8.12.2"
-    "@typestrong/ts-mockito": "npm:^2.7.12"
-    "@vitest/coverage-v8": "npm:^1.5.3"
-    atem-connection: "npm:^3.5.0"
-    cross-env: "npm:^7.0.3"
-    eslint: "npm:^9.13.0"
-    fastify: "npm:^5.3.2"
-    fastify-type-provider-zod: "npm:^4.0.1"
-    license-checker: "npm:^25.0.1"
-    migrate-mongo: "npm:^12.1.3"
-    mongodb: "npm:^6.9.1"
-    nodemon: "npm:^3.1.0"
-    reflect-metadata: "npm:^0.2.2"
-    rimraf: "npm:^6.0.1"
-    ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.6.3"
-    vitest: "npm:^1.5.3"
-    ws: "npm:^8.18.0"
-    zod: "npm:^3.23.8"
-  languageName: unknown
-  linkType: soft
 
 "sonic-boom@npm:^4.0.1":
   version: 4.0.1
