@@ -23,7 +23,7 @@ describe(MongoPanelInputModifierRepository.name, () => {
 
     describe('it receives a Modifier with no id', () => {
       describe('the id is undefined', () => {
-        it('creates the Modifier with a new UUID', async() => {
+        it('creates the Modifier with a new UUID', async () => {
           const modifier: PanelInputModifier = EntityTestFactory.createPanelInputModifier({ id: undefined })
 
           const testee: MongoPanelInputModifierRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
@@ -37,7 +37,7 @@ describe(MongoPanelInputModifierRepository.name, () => {
       })
 
       describe('the id is an empty string', () => {
-        it('creates the Modifier with a new UUID', async() => {
+        it('creates the Modifier with a new UUID', async () => {
           const modifier: PanelInputModifier = EntityTestFactory.createPanelInputModifier({ id: '' })
 
           const testee: MongoPanelInputModifierRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
@@ -70,7 +70,7 @@ describe(MongoPanelInputModifierRepository.name, () => {
           when(uuidGenerator.validateUuid(validUuid)).thenReturn(true)
         })
 
-        it('creates the Modifier with the pre-existing id', async() => {
+        it('creates the Modifier with the pre-existing id', async () => {
           const modifier: PanelInputModifier = EntityTestFactory.createPanelInputModifier({ id: validUuid })
 
           const testee: MongoPanelInputModifierRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
