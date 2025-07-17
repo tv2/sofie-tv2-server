@@ -41,6 +41,7 @@
   },
   "exclude": [
     "**/**.spec.ts",
-    "vitest.config.mts"
+    "vitest.config.mts",
+    "migrations"
   ]
 }
