@@ -4,9 +4,9 @@ The package is for running database migrations for Alba server.
 
 ## Usage
 
-Running `docker run tv2media/alba-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host>` will perform pending migrations.
+Running `docker run tv2media/alba-tv2-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host>` will perform pending migrations.
 
-Running `docker run tv2media/alba-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host> migrate-down` will undo the latest migration.
+Running `docker run tv2media/alba-tv2-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host> migrate-down` will undo the latest migration.
 
 Both commands will output the status of the migrations.
 
