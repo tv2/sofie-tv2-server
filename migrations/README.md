@@ -1,4 +1,4 @@
-# Alba server migrations
+# Alba TV2 server migrations
 
 The package is for running database migrations for Alba server.
 
