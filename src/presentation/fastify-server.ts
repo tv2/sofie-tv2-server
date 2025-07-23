@@ -74,7 +74,7 @@ export class FastifyServer implements ProxyServer {
   }
 
   private addCors(): void {
-    this.fastifyServer.addHook('onRequest', async(request, reply) => {
+    this.fastifyServer.addHook('onRequest', async (request, reply) => {
       reply.header('Access-Control-Allow-Origin', '*')
         .header('Access-Control-Allow-Credentials', true)
         .header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Slug, X-UID')
