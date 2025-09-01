@@ -8,7 +8,7 @@ import { StatusMessage } from '../../../model/entities/status-message'
 
 describe(StatusMessageService.name, () => {
   describe(StatusMessageService.prototype.getStatusMessages.name, () => {
-    it('returns statusMessages both from internally and from Alba', async() => {
+    it('returns statusMessages both from internally and from Alba', async () => {
       const albaStatusMessages: StatusMessage[] = [
         EntityTestFactory.createStatusMessage({ id: 'alba1' }),
         EntityTestFactory.createStatusMessage({ id: 'alba2' })

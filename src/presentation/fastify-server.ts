@@ -14,13 +14,23 @@ import { StatusMessageObserver } from '../business-logic/interfaces/status-messa
 import { StatusMessageEvent } from './value-objects/status-message-event'
 import { PanelEventBuilder } from './interfaces/panel-event-builder'
 import { TypedEvent } from './value-objects/typed-event'
-import { DeviceEventType, RundownEventType, StatusMessageEventType } from './enums/event-type'
+import {
+  ActionEventType,
+  DeviceEventType,
+  PlayoutContentEventType,
+  RundownEventType,
+  StatusMessageEventType
+} from './enums/event-type'
 import { StatusMessage } from '../model/entities/status-message'
 import { DeviceEmitter } from '../business-logic/interfaces/device-emitter'
 import { VideoMixerConfigurationUpdatedEvent } from './value-objects/device-event'
 import { RundownEvent } from './value-objects/rundown-event'
 import { RundownEmitter } from '../business-logic/interfaces/rundown-emitter'
 import { StatusCode } from '../model/enums/status-code'
+import { ActionEmitter } from '../business-logic/interfaces/action-emitter'
+import { ActionUpdatedEvent } from './value-objects/action-event'
+import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from './value-objects/playout-content-event'
+import { PlayoutContentEmitter } from '../business-logic/interfaces/playout-content-emitter'
 
 const RECONNECT_DELAY_IN_MS: number = 5_000
 const TV2_SERVER_API_PREFIX: string = process.env.TV2_SERVER_API_PREFIX ?? '/tv2-server'
@@ -38,7 +48,9 @@ export class FastifyServer implements ProxyServer {
     private readonly panelEventBuilder: PanelEventBuilder,
     private readonly statusMessageObserver: StatusMessageObserver,
     private readonly deviceEmitter: DeviceEmitter,
-    private readonly rundownEmitter: RundownEmitter
+    private readonly rundownEmitter: RundownEmitter,
+    private readonly actionEmitter: ActionEmitter,
+    private readonly playoutContentEmitter: PlayoutContentEmitter
   ) {
     this.logger = logger.tag(this.constructor.name)
   }
@@ -62,7 +74,7 @@ export class FastifyServer implements ProxyServer {
   }
 
   private addCors(): void {
-    this.fastifyServer.addHook('onRequest', async(request, reply) => {
+    this.fastifyServer.addHook('onRequest', async (request, reply) => {
       reply.header('Access-Control-Allow-Origin', '*')
         .header('Access-Control-Allow-Credentials', true)
         .header('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Slug, X-UID')
@@ -168,6 +180,18 @@ export class FastifyServer implements ProxyServer {
       this.deviceEmitter.emitVideoMixerConfiguration(parsedData.videoMixer)
     }
 
+    if (this.isActionUpdatedEvent(parsedData)) {
+      this.actionEmitter.emitActions(parsedData.actions, parsedData.rundownId)
+    }
+
+    if (this.isProgramPlayoutContentEvent(parsedData)) {
+      this.playoutContentEmitter.emitProgramPlayoutContents(parsedData.playoutContents)
+    }
+
+    if (this.isPreviewPlayoutContentEvent(parsedData)) {
+      this.playoutContentEmitter.emitPreviewPlayoutContents(parsedData.playoutContents)
+    }
+
     if (!this.isRundownEvent(parsedData)) {
       return
     }
@@ -189,6 +213,18 @@ export class FastifyServer implements ProxyServer {
 
   private isEventVideoMixerConfigurationUpdatedEvent(event: TypedEvent): event is VideoMixerConfigurationUpdatedEvent {
     return event.type === DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED
+  }
+
+  private isActionUpdatedEvent(event: TypedEvent): event is ActionUpdatedEvent {
+    return event.type === ActionEventType.ACTIONS_UPDATED
+  }
+
+  private isProgramPlayoutContentEvent(event: TypedEvent): event is ProgramPlayoutContentEvent {
+    return event.type === PlayoutContentEventType.PROGRAM_PLAYOUT_CONTENT
+  }
+
+  private isPreviewPlayoutContentEvent(event: TypedEvent): event is PreviewPlayoutContentEvent {
+    return event.type === PlayoutContentEventType.PREVIEW_PLAYOUT_CONTENT
   }
 
   private isRundownEvent(event: TypedEvent): event is RundownEvent {

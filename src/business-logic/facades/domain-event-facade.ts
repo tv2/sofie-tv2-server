@@ -7,6 +7,10 @@ import { DeviceObserver } from '../interfaces/device-observer'
 import { DeviceEmitter } from '../interfaces/device-emitter'
 import { RundownEmitter } from '../interfaces/rundown-emitter'
 import { RundownObserver } from '../interfaces/rundown-observer'
+import { ActionEmitter } from '../interfaces/action-emitter'
+import { ActionObserver } from '../interfaces/action-observer'
+import { PlayoutContentObserver } from '../interfaces/playout-content-observer'
+import { PlayoutContentEmitter } from '../interfaces/playout-content-emitter'
 
 export class DomainEventFacade {
   private static eventBus: EventBus
@@ -40,6 +44,22 @@ export class DomainEventFacade {
   }
 
   public static createRundownEmitter(): RundownEmitter {
+    return this.eventBus
+  }
+
+  public static createActionObserver(): ActionObserver {
+    return this.eventBus
+  }
+
+  public static createActionEmitter(): ActionEmitter {
+    return this.eventBus
+  }
+
+  public static createPlayoutContentObserver(): PlayoutContentObserver {
+    return this.eventBus
+  }
+
+  public static createPlayoutContentEmitter(): PlayoutContentEmitter {
     return this.eventBus
   }
 

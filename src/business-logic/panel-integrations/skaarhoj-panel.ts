@@ -18,12 +18,15 @@ import {
   SkaarhojTextCommand
 } from './skaarhoj-command'
 import { ColorConverter } from '../interfaces/color-converter'
+import { InvokedActionService } from '../interfaces/invoked-action-service'
+import { TBarValueSpikeException } from '../../model/exceptions/t-bar-value-spike-exception'
 
 const MKT1A_RUNDOWN_DISPLAY_ID: string = '47'
 const MK48_RUNDOWN_DISPLAY_ID: string = '62'
 
 const SKAARHOJ_INPUT_PREFIX: string = 'HWC'
 
+const MAX_T_BAR_DEVIATION: number = 950
 /**
  * Regex to extract the different information in a command received from a Skaarhoj panel.
  *
@@ -65,6 +68,8 @@ interface SkaarhojInput {
 }
 
 export class SkaarhojPanel extends Panel {
+  private readonly id: string = `SKAARHOJ_PANEL_${Math.floor(Math.random() * 1000)}`
+
   private readonly logger: Logger
   private socket: Socket = new Socket()
 
@@ -72,16 +77,22 @@ export class SkaarhojPanel extends Panel {
   private reconnectTimeoutIdentifier: NodeJS.Timeout | undefined
 
   private tBarDirection: TBarDirection = TBarDirection.DOWN
+  private lastTbarValue: number | undefined
 
   public constructor(
     panelConfiguration: PanelConfiguration,
+    invokedActionService: InvokedActionService,
     statusMessageService: StatusMessageService,
     private readonly colorConverter: ColorConverter,
     logger: Logger,
     panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
-    super(panelConfiguration, statusMessageService, panelLayoutConfiguration)
+    super(panelConfiguration, invokedActionService, statusMessageService, panelLayoutConfiguration)
     this.logger = logger.tag(`${SkaarhojPanel.name}:${panelConfiguration.hostname}`)
+  }
+
+  protected override getId(): string {
+    return this.id
   }
 
   protected assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void {
@@ -95,6 +106,7 @@ export class SkaarhojPanel extends Panel {
 
   public connect(): void {
     this.connectToSocket()
+    super.listenForInvokedActions()
   }
 
   private connectToSocket(): void {
@@ -176,7 +188,8 @@ export class SkaarhojPanel extends Panel {
     }
   }
 
-  public disconnect(): void {
+  public override disconnect(): void {
+    super.disconnect()
     this.logger.debug(`Disconnecting from the Skaarhoj Panel at ${this.panelConfiguration.hostname}`)
     this.keepAlive = false
     this.socket.resetAndDestroy()
@@ -261,7 +274,13 @@ export class SkaarhojPanel extends Panel {
           return
         }
 
-        return this.updateTBarCommandWithValues(inputConfiguration.command, value)
+        try {
+          return this.updateTBarCommandWithValues(inputConfiguration.command, value)
+        } catch (error: unknown) {
+          if (error instanceof TBarValueSpikeException) {
+            this.logger.error(error.message, error)
+          }
+        }
       }
     }
     return
@@ -279,13 +298,24 @@ export class SkaarhojPanel extends Panel {
     return undefined
   }
 
-  private updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+  protected updateTBarCommandWithValues(command: TBarPanelCommand, value: number): PanelCommand {
+    this.detectTbarSpike(value)
     const tBarTransitionProgress: number = this.getTBarTransitionProgress(value)
     const tBarDirection: TBarDirection = this.getTBarDirection(tBarTransitionProgress)
     command.shouldExecuteTake = tBarDirection !== this.tBarDirection
     command.value = tBarTransitionProgress
     this.tBarDirection = tBarDirection
     return command
+  }
+
+  private detectTbarSpike(value: number): void {
+    if (this.lastTbarValue !== undefined) {
+      const deviation = Math.abs(value - this.lastTbarValue)
+      if (deviation >= MAX_T_BAR_DEVIATION) {
+        throw new TBarValueSpikeException(`The T-bar made an unusual deviation in values. Deviation:  ${deviation}.`)
+      }
+    }
+    this.lastTbarValue = value
   }
 
   private getTBarTransitionProgress(value: number): number {
@@ -322,7 +352,7 @@ export class SkaarhojPanel extends Panel {
 
   private mapInputConfigurationToSkaarhojCommands(inputId: string, inputConfiguration: InputConfiguration): SkaarhojCommand[] {
     const commands: SkaarhojCommand[] = [
-      new SkaarhojStateCommand(inputId, this.isInputActiveModifier(inputConfiguration) ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED),
+      new SkaarhojStateCommand(inputId, this.getSkaarhojButtonStateForInputConfiguration(inputConfiguration)),
       new SkaarhojColorCommand(inputId, inputConfiguration.color ? this.colorConverter.hexToRgb(inputConfiguration.color) : undefined)
     ]
 
@@ -331,6 +361,20 @@ export class SkaarhojPanel extends Panel {
     }
 
     return commands
+  }
+
+  private getSkaarhojButtonStateForInputConfiguration(inputConfiguration: InputConfiguration): SkaarhojButtonState {
+    const isInvokedAction: boolean = this.isInputForInvokedAction(inputConfiguration)
+    const isActiveModifier: boolean = this.isInputActiveModifier(inputConfiguration)
+    return isInvokedAction || isActiveModifier ? SkaarhojButtonState.ON : SkaarhojButtonState.DIMMED
+  }
+
+  private isInputForInvokedAction(inputConfiguration: InputConfiguration): boolean {
+    if (inputConfiguration.command.type !== PanelCommandType.ACTION) {
+      return false
+    }
+
+    return this.invokedActionIds.includes(inputConfiguration.command.actionId)
   }
 
   private isInputActiveModifier(inputConfiguration: InputConfiguration): boolean {

@@ -5,12 +5,13 @@ import { KeyEvent, PanelCommandType } from '../../model/enums/panel-enums'
 import { StatusMessageService } from '../services/status-message-service'
 import { StatusMessage } from '../../model/entities/status-message'
 import { Rundown } from '../../model/entities/rundown'
+import { InvokedActionService } from '../interfaces/invoked-action-service'
 
 const MODIFIER_DELIMITER: string = ';'
 
 export abstract class Panel {
   public abstract connect(): void
-  public abstract disconnect(): void
+  protected abstract getId(): string
   protected abstract assertValidPanelConfiguration(panelConfiguration: PanelConfiguration): void
   protected abstract clearPanelState(): void
   protected abstract sendActivePanelState(): void
@@ -19,12 +20,15 @@ export abstract class Panel {
   protected activeModifiers: ReadonlySet<string> = new Set()
   private modifierInputKeys: ReadonlySet<string> = new Set()
 
+  protected invokedActionIds: string[] = []
+
   protected activeRundown: Rundown | undefined
 
   protected onCommandCallback?: (command: PanelCommand, keyEvent: KeyEvent | undefined) => void
 
   protected constructor(
     protected readonly panelConfiguration: PanelConfiguration,
+    private readonly invokedActionService: InvokedActionService,
     private readonly statusMessageService: StatusMessageService,
     protected panelLayoutConfiguration?: PanelLayoutConfiguration
   ) {
@@ -69,6 +73,17 @@ export abstract class Panel {
       return inputConfiguration?.command.type === PanelCommandType.MODIFIER
     })
     this.modifierInputKeys = new Set(keysForModifierInputs)
+  }
+
+  protected listenForInvokedActions(): void {
+    this.invokedActionService.subscribeToInvokedActionIds(this.getId(), (invokedActionIds: string[]) => {
+      this.invokedActionIds = invokedActionIds
+      this.updatePanelState()
+    })
+  }
+
+  public disconnect(): void {
+    this.invokedActionService.unsubscribeFromInvokedActionIds(this.getId())
   }
 
   protected getInputConfiguration(inputConfigurationKey: string): InputConfiguration | undefined {
