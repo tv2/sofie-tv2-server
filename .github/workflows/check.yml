@@ -39,7 +39,7 @@ jobs:
         run: 'yarn coverage'
 
       - name: 'Display Coverage Report'
-        uses: davelosert/vitest-coverage-report-action@v2.8.0
+        uses: davelosert/vitest-coverage-report-action@v2.8.3
         with:
           name: 'TV 2 Server'
           json-summary-path: './coverage/coverage-summary.json'
