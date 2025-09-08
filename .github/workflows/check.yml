@@ -8,7 +8,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     name: 'Checking code and dependencies'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@v5'
 
       - name: 'Get Yarn cache directory path'
         id: 'yarn-cache-directory-path'
