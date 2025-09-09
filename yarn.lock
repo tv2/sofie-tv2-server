@@ -1072,10 +1072,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tv2media/logger@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@tv2media/logger@npm:2.0.2"
-  checksum: 10c0/62d640e5aa369335dfa3fb369cae015fc0751b659d904ad821b2a8ca02a7acd5c9a3e5546c4027ffd96bdc3d6bac1d44613f457f2f10faafd56e94df72e1b0f7
+"@tv2media/logger@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@tv2media/logger@npm:2.0.3"
+  checksum: 10c0/90593c6d6efd833856e6efb09839c025b163a57df697aab19f96622bb4d1d7f0168fc109822384c9aaf199465581f241177225714ddb6f755f451aefe7bef312
   languageName: node
   linkType: hard
 
@@ -1590,7 +1590,7 @@ __metadata:
     "@fastify/http-proxy": "npm:^11.0.1"
     "@fastify/websocket": "npm:^11.0.1"
     "@tv2media/eslint-config": "npm:1.0.3"
-    "@tv2media/logger": "npm:^2.0.2"
+    "@tv2media/logger": "npm:^2.0.3"
     "@types/license-checker": "npm:^25"
     "@types/node": "npm:^22.7.5"
     "@types/ws": "npm:^8.18.1"
