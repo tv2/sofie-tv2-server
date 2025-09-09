@@ -1164,12 +1164,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^8.5.12":
-  version: 8.5.12
-  resolution: "@types/ws@npm:8.5.12"
+"@types/ws@npm:^8.18.1":
+  version: 8.18.1
+  resolution: "@types/ws@npm:8.18.1"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 10c0/3fd77c9e4e05c24ce42bfc7647f7506b08c40a40fe2aea236ef6d4e96fc7cb4006a81ed1b28ec9c457e177a74a72924f4768b7b4652680b42dfd52bc380e15f9
+  checksum: 10c0/61aff1129143fcc4312f083bc9e9e168aa3026b7dd6e70796276dcfb2c8211c4292603f9c4864fae702f2ed86e4abd4d38aa421831c2fd7f856c931a481afbab
   languageName: node
   linkType: hard
 
@@ -1593,7 +1593,7 @@ __metadata:
     "@tv2media/logger": "npm:^2.0.2"
     "@types/license-checker": "npm:^25"
     "@types/node": "npm:^22.7.5"
-    "@types/ws": "npm:^8.5.12"
+    "@types/ws": "npm:^8.18.1"
     "@typestrong/ts-mockito": "npm:^2.7.12"
     "@vitest/coverage-istanbul": "npm:3.2.4"
     "@vitest/coverage-v8": "npm:^1.5.3"
@@ -1610,7 +1610,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.6.3"
     vitest: "npm:^3.2.4"
-    ws: "npm:^8.18.0"
+    ws: "npm:^8.18.3"
     zod: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
@@ -5594,7 +5594,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.16.0, ws@npm:^8.18.0":
+"ws@npm:^8.16.0":
   version: 8.18.0
   resolution: "ws@npm:8.18.0"
   peerDependencies:
@@ -5606,6 +5606,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/25eb33aff17edcb90721ed6b0eb250976328533ad3cd1a28a274bd263682e7296a6591ff1436d6cbc50fa67463158b062f9d1122013b361cec99a05f84680e06
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.3":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
   languageName: node
   linkType: hard
 
