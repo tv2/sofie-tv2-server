@@ -53,13 +53,13 @@ describe(MongoPanelInputModifierRepository.name, () => {
 
     describe('it receives a Modifier with a pre-existing id', () => {
       describe('the id is not a valid UUID', () => {
-        it('throws an InvalidIdException', () => {
+        it('throws an InvalidIdException', async () => {
           const modifier: PanelInputModifier = EntityTestFactory.createPanelInputModifier({ id: 'invalid-uuid' })
           when(uuidGenerator.validateUuid(modifier.id)).thenReturn(false)
 
           const testee: MongoPanelInputModifierRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
 
-          expect(() => testee.createPanelInputModifier(modifier)).rejects.toThrow(InvalidIdException)
+          await expect(() => testee.createPanelInputModifier(modifier)).rejects.toThrow(InvalidIdException)
         })
       })
 
@@ -83,13 +83,13 @@ describe(MongoPanelInputModifierRepository.name, () => {
         })
 
         describe('a Modifier already exist with the UUID', () => {
-          it('throws an InvalidIdException', () => {
+          it('throws an InvalidIdException', async () => {
             const modifier: PanelInputModifier = EntityTestFactory.createPanelInputModifier({ id: validUuid })
             when(collection.countDocuments(anything())).thenReturn(Promise.resolve(1))
 
             const testee: MongoPanelInputModifierRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
 
-            expect(() => testee.createPanelInputModifier(modifier)).rejects.toThrow(InvalidIdException)
+            await expect(() => testee.createPanelInputModifier(modifier)).rejects.toThrow(InvalidIdException)
           })
         })
       })
