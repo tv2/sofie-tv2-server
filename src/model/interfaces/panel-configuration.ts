@@ -1,5 +1,5 @@
 import { PanelModel, PanelType, SkaarhojModel } from '../enums/panel-enums'
-import z, { ZodSchema } from 'zod'
+import z, { ZodType } from 'zod'
 
 export interface PanelConfiguration {
   id: string
@@ -11,7 +11,7 @@ export interface PanelConfiguration {
   isDisabled: boolean
 }
 
-export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConfiguration, 'id'>> = z.object({
+export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodType<Omit<PanelConfiguration, 'id'>> = z.object({
   type: z.enum(PanelType),
   model: z.enum(SkaarhojModel),
   hostname: z.string(),
@@ -20,6 +20,6 @@ export const ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelConf
   isDisabled: z.boolean()
 })
 
-export const ZOD_PANEL_CONFIGURATION_SCHEMA: ZodSchema<PanelConfiguration> = ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({
+export const ZOD_PANEL_CONFIGURATION_SCHEMA: ZodType<PanelConfiguration> = ZOD_PANEL_CONFIGURATION_SCHEMA_WITHOUT_ID.and(z.object({
   id: z.string()
 }))

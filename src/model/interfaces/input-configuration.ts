@@ -1,5 +1,5 @@
 import { InputType, KeyEvent, PanelCommandType } from '../enums/panel-enums'
-import z, { ZodSchema } from 'zod'
+import z, { ZodType } from 'zod'
 
 export type InputConfiguration = ButtonConfiguration | FaderConfiguration | DisplayConfiguration | ButtonWithDisplayConfiguration
 
@@ -61,31 +61,31 @@ export interface MacroPanelCommand extends BasePanelCommand {
   macroId: string
 }
 
-const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodSchema<ActionPanelCommand> = z.object({
+const ZOD_ACTION_PANEL_COMMAND_SCHEMA: ZodType<ActionPanelCommand> = z.object({
   type: z.literal(PanelCommandType.ACTION),
   actionId: z.string(),
   actionArguments: z.unknown().optional()
 })
 
-const ZOD_MODIFIER_PANEL_COMMAND_SCHEMA: ZodSchema<ModifierPanelCommand> = z.object({
+const ZOD_MODIFIER_PANEL_COMMAND_SCHEMA: ZodType<ModifierPanelCommand> = z.object({
   type: z.literal(PanelCommandType.MODIFIER),
   modifier: z.string(),
 })
 
-export const ZOD_T_BAR_PANEL_COMMAND_SCHEMA: ZodSchema<TBarPanelCommand> = z.object({
+export const ZOD_T_BAR_PANEL_COMMAND_SCHEMA: ZodType<TBarPanelCommand> = z.object({
   type: z.literal(PanelCommandType.T_BAR),
 })
 
-export const ZOD_DISPLAY_PANEL_COMMAND_SCHEMA: ZodSchema<DisplayPanelCommand> = z.object({
+export const ZOD_DISPLAY_PANEL_COMMAND_SCHEMA: ZodType<DisplayPanelCommand> = z.object({
   type: z.literal(PanelCommandType.DISPLAY),
 })
 
-export const ZOD_MACRO_COMMAND_SCHEMA: ZodSchema<MacroPanelCommand> = z.object({
+export const ZOD_MACRO_COMMAND_SCHEMA: ZodType<MacroPanelCommand> = z.object({
   type: z.literal(PanelCommandType.MACRO),
   macroId: z.string().min(1)
 })
 
-export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
+export const ZOD_PANEL_COMMAND_SCHEMA: ZodType<PanelCommand> = z.union([
   ZOD_ACTION_PANEL_COMMAND_SCHEMA,
   ZOD_MODIFIER_PANEL_COMMAND_SCHEMA,
   ZOD_T_BAR_PANEL_COMMAND_SCHEMA,
@@ -93,32 +93,32 @@ export const ZOD_PANEL_COMMAND_SCHEMA: ZodSchema<PanelCommand> = z.union([
   ZOD_MACRO_COMMAND_SCHEMA
 ])
 
-const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodSchema<BaseInputConfiguration> = z.object({
+const ZOD_BASE_INPUT_CONFIGURATION_SCHEMA: ZodType<BaseInputConfiguration> = z.object({
   type: z.enum(InputType),
   command: ZOD_PANEL_COMMAND_SCHEMA,
   color: z.string().optional(),
 })
 
-const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodSchema<ButtonConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+const ZOD_BUTTON_CONFIGURATION_SCHEMA: ZodType<ButtonConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.BUTTON),
   triggersOn: z.enum(KeyEvent).array(),
 }))
-const ZOD_FADER_CONFIGURATION_SCHEMA: ZodSchema<FaderConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+const ZOD_FADER_CONFIGURATION_SCHEMA: ZodType<FaderConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.FADER),
 }))
 
-const ZOD_DISPLAY_CONFIGURATION_SCHEMA: ZodSchema<DisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+const ZOD_DISPLAY_CONFIGURATION_SCHEMA: ZodType<DisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.DISPLAY),
   text: z.string()
 }))
 
-const ZOD_BUTTON_WITH_DISPLAY_CONFIGURATION_SCHEMA: ZodSchema<ButtonWithDisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
+const ZOD_BUTTON_WITH_DISPLAY_CONFIGURATION_SCHEMA: ZodType<ButtonWithDisplayConfiguration> = z.intersection(ZOD_BASE_INPUT_CONFIGURATION_SCHEMA, z.object({
   type: z.literal(InputType.BUTTON_WITH_DISPLAY),
   text: z.string(),
   triggersOn: z.enum(KeyEvent).array(),
 }))
 
-export const ZOD_INPUT_CONFIGURATION_SCHEMA: ZodSchema<InputConfiguration> = z.union([
+export const ZOD_INPUT_CONFIGURATION_SCHEMA: ZodType<InputConfiguration> = z.union([
   ZOD_BUTTON_CONFIGURATION_SCHEMA,
   ZOD_FADER_CONFIGURATION_SCHEMA,
   ZOD_DISPLAY_CONFIGURATION_SCHEMA,
