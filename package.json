@@ -29,6 +29,7 @@
     "@types/node": "^22.7.5",
     "@types/ws": "^8.5.12",
     "@typestrong/ts-mockito": "^2.7.12",
+    "@vitest/coverage-istanbul": "3.2.4",
     "@vitest/coverage-v8": "^1.5.3",
     "cross-env": "^7.0.3",
     "eslint": "^9.13.0",
