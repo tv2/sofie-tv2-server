@@ -12,8 +12,8 @@ export interface PanelLayoutConfiguration {
 
 export const ZOD_PANEL_LAYOUT_CONFIGURATION_SCHEMA_WITHOUT_ID: ZodSchema<Omit<PanelLayoutConfiguration, 'id'>> = z.object({
   name: z.string(),
-  type: z.nativeEnum(PanelType),
-  model: z.nativeEnum(SkaarhojModel),
+  type: z.enum(PanelType),
+  model: z.enum(SkaarhojModel),
   inputConfigurations: z.record(z.string(), ZOD_INPUT_CONFIGURATION_SCHEMA),
 })
 
