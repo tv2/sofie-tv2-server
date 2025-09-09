@@ -274,8 +274,8 @@ describe(PanelConfigurationService.name, () => {
           verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
         })
 
-        it('throws an unsupported operation exception', () => {
-          expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+        it('throws an unsupported operation exception', async () => {
+          await expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
         })
       })
 
@@ -305,8 +305,8 @@ describe(PanelConfigurationService.name, () => {
           verify(panelEmitter.emitPanelConfigurationUpdated(anything())).never()
         })
 
-        it('throws an unsupported operation exception', () => {
-          expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
+        it('throws an unsupported operation exception', async () => {
+          await expect(() => testee.updatePanelConfiguration(panelConfiguration)).rejects.toThrow(UnsupportedOperationException)
         })
       })
     })

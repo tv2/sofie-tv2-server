@@ -29,13 +29,14 @@
     "@types/node": "^22.7.5",
     "@types/ws": "^8.5.12",
     "@typestrong/ts-mockito": "^2.7.12",
+    "@vitest/coverage-istanbul": "3.2.4",
     "@vitest/coverage-v8": "^1.5.3",
     "cross-env": "^7.0.3",
     "eslint": "^9.13.0",
     "license-checker": "^25.0.1",
     "nodemon": "^3.1.0",
     "rimraf": "^6.0.1",
-    "vitest": "^1.5.3"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@fastify/http-proxy": "^11.0.1",
