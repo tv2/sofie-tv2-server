@@ -1,46 +1,15 @@
 name: 'Check'
 run-name: 'Test, build, lint and validate'
+
 on:
   pull_request:
+  push:
+    branches: [main]
+
 jobs:
-
-  test:
-    runs-on: 'ubuntu-latest'
-    name: 'Checking code and dependencies'
-    steps:
-      - uses: 'actions/checkout@v5'
-
-      - name: 'Get Yarn cache directory path'
-        id: 'yarn-cache-directory-path'
-        run: 'echo "directory=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT'
-
-      - name: 'Configure Node version and Yarn cache'
-        uses: 'actions/setup-node@v4'
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: 'Install dependencies'
-        run: 'yarn install'
-
-      - name: 'Build'
-        run: 'yarn build'
-
-      - name: 'Test'
-        run: 'yarn test'
-
-      - name: 'Lint'
-        run: 'yarn lint'
-
-      - name: 'Validate dependencies'
-        run: 'yarn validate'
-
-      - name: 'Generate Code Coverage'
-        run: 'yarn coverage'
-
-      - name: 'Display Coverage Report'
-        uses: davelosert/vitest-coverage-report-action@v2.8.3
-        with:
-          name: 'TV 2 Server'
-          json-summary-path: './coverage/coverage-summary.json'
-          json-final-path: './coverage/coverage-final.json'
+  status:
+    uses: tv2/ag-github-actions/.github/workflows/status-check.yml@v0.2.0
+    with:
+      node-version: '20'
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
