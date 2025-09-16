@@ -4,7 +4,9 @@ run-name: 'Test, build, lint and validate'
 on:
   pull_request:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'release/**'
 
 jobs:
   status:
