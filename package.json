@@ -9,7 +9,7 @@
     "build": "yarn clean && tsc --build",
     "build-watch": "tsc --build --watch",
     "watch": "nodemon",
-    "test": "vitest run --coverage",
+    "test": "vitest run",
     "test-watch": "vitest",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
