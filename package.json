@@ -9,7 +9,7 @@
     "build": "yarn clean && tsc --build",
     "build-watch": "tsc --build --watch",
     "watch": "nodemon",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test-watch": "vitest",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
@@ -17,8 +17,7 @@
     "validate-dependencies": "yarn npm audit --environment production --severity moderate --recursive",
     "validate-licenses": "license-checker --production --onlyAllow \"MIT;MIT/X11;BSD;BSD-3-Clause;BSD-2-Clause;ISC;Apache;Apache-2.0;WTFPL;CC-BY-3.0;CC-BY-4.0;CC0-1.0;BlueOak-1.0.0;Unlicense\"",
     "clean": "rimraf dist",
-    "reset": "rimraf --glob dist node_modules coverage \"*.log\"",
-    "coverage": "vitest run --coverage"
+    "reset": "rimraf --glob dist node_modules coverage \"*.log\""
   },
   "engines": {
     "node": ">=20.12.0"
