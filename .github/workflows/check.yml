@@ -7,10 +7,13 @@ on:
     branches:
       - main
       - 'release/**'
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   status:
-    uses: tv2/ag-github-actions/.github/workflows/status-check.yml@v0.3.0
+    uses: tv2/ag-github-actions/.github/workflows/status-check.yml@test-branch
     with:
       node-version: '20'
     secrets:
