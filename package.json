@@ -25,7 +25,7 @@
   "devDependencies": {
     "@tv2media/eslint-config": "1.0.3",
     "@types/license-checker": "^25",
-    "@types/node": "^22.7.5",
+    "@types/node": "^24.6.1",
     "@types/ws": "^8.18.1",
     "@typestrong/ts-mockito": "^2.7.12",
     "@vitest/coverage-istanbul": "3.2.4",
