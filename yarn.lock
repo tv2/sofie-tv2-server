@@ -1580,7 +1580,7 @@ __metadata:
     atem-connection: "npm:^3.5.0"
     cross-env: "npm:^7.0.3"
     eslint: "npm:^9.13.0"
-    fastify: "npm:^5.3.2"
+    fastify: "npm:^5.6.1"
     fastify-type-provider-zod: "npm:^6.0.0"
     license-checker: "npm:^25.0.1"
     mongodb: "npm:^6.9.1"
@@ -2615,9 +2615,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "fastify@npm:5.3.2"
+"fastify@npm:^5.6.1":
+  version: 5.6.1
+  resolution: "fastify@npm:5.6.1"
   dependencies:
     "@fastify/ajv-compiler": "npm:^4.0.0"
     "@fastify/error": "npm:^4.0.0"
@@ -2634,7 +2634,7 @@ __metadata:
     secure-json-parse: "npm:^4.0.0"
     semver: "npm:^7.6.0"
     toad-cache: "npm:^3.7.0"
-  checksum: 10c0/86ec8d6af1ddf779d9350958424d985e274d867786efa677ff88c1d1db9d7a3ee05e25dff29b3893e835a61893cf4df52d696f6ea193da1a29b8d098866914e8
+  checksum: 10c0/ded119174c175d22f78ca524d9a466cf70bc50468b4efcb6f520bc027f33670aed7d95b3946ecc9de43cad810dceb6c9f7429e63534e0a8bfd80f5e23337a979
   languageName: node
   linkType: hard
 
