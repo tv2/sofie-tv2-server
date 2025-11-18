@@ -1581,7 +1581,7 @@ __metadata:
     "@typestrong/ts-mockito": "npm:^2.7.12"
     "@vitest/coverage-istanbul": "npm:3.2.4"
     "@vitest/coverage-v8": "npm:^3.2.4"
-    atem-connection: "npm:^3.5.0"
+    atem-connection: "npm:^3.7.0"
     cross-env: "npm:^7.0.3"
     eslint: "npm:^9.13.0"
     fastify: "npm:^5.6.1"
@@ -1687,9 +1687,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"atem-connection@npm:^3.5.0":
-  version: 3.5.0
-  resolution: "atem-connection@npm:3.5.0"
+"atem-connection@npm:^3.7.0":
+  version: 3.7.0
+  resolution: "atem-connection@npm:3.7.0"
   dependencies:
     "@julusian/freetype2": "npm:^1.1.2"
     debug: "npm:^4.3.4"
@@ -1701,7 +1701,7 @@ __metadata:
     threadedclass: "npm:^1.2.1"
     tslib: "npm:^2.6.2"
     wavefile: "npm:^8.4.6"
-  checksum: 10c0/43283a726aa06c3a40781c982f0ff74901d2d0e18c7e4dca53bb49c4734f0b3116b6ebec5709aae80414d5e775892fc3ebb55dab58baf64ef7daaf443d28649b
+  checksum: 10c0/7fbf2fe0e00331c3a3344a5a2fac44a558107249acdf3295518b93d9cbf18ac207571ebcb27f335c0210e90cd1473a3f47a2ca09c95baee833560595b2397659
   languageName: node
   linkType: hard
 
