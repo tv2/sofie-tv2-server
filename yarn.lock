@@ -559,15 +559,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/http-proxy@npm:^11.0.1":
-  version: 11.0.1
-  resolution: "@fastify/http-proxy@npm:11.0.1"
+"@fastify/http-proxy@npm:^11.3.0":
+  version: 11.3.0
+  resolution: "@fastify/http-proxy@npm:11.3.0"
   dependencies:
-    "@fastify/reply-from": "npm:^12.0.0"
+    "@fastify/reply-from": "npm:^12.0.2"
     fast-querystring: "npm:^1.1.2"
-    fastify-plugin: "npm:^5.0.0"
-    ws: "npm:^8.16.0"
-  checksum: 10c0/0b523ee851767c452fedebf7631a847c7e9ba2d55e743e827454d16354ea711f6664325212d2a29eba7ae0a4e23b83e61a0736635c178cdfe5eb1495f99ad5a2
+    fastify-plugin: "npm:^5.0.1"
+    ws: "npm:^8.18.0"
+  checksum: 10c0/e059c0d3b9202d72a07231ad7d8b2a1f661f1c6c1fdd5d335b31299ce00663121ed1ecdf97f6ea9056eda4b6b043a715728acfa203aac4c2148c91e2d792cc7f
   languageName: node
   linkType: hard
 
@@ -590,18 +590,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/reply-from@npm:^12.0.0":
-  version: 12.0.1
-  resolution: "@fastify/reply-from@npm:12.0.1"
+"@fastify/reply-from@npm:^12.0.2":
+  version: 12.5.0
+  resolution: "@fastify/reply-from@npm:12.5.0"
   dependencies:
     "@fastify/error": "npm:^4.0.0"
     end-of-stream: "npm:^1.4.4"
-    fast-content-type-parse: "npm:^2.0.0"
+    fast-content-type-parse: "npm:^3.0.0"
     fast-querystring: "npm:^1.1.2"
     fastify-plugin: "npm:^5.0.1"
     toad-cache: "npm:^3.7.0"
     undici: "npm:^7.0.0"
-  checksum: 10c0/06b440862bcb9993833e678ab0fc698faddcc212086b7e153cc22f257160d3c3837b99ee7187d3f050430a046ee8034c1779f51cb7be13e54d9d16b050f762c0
+  checksum: 10c0/630d5265e13005213360b9afce0cb7608635e743a7a9ec7f2c55b64378a0f10fe9d3678dd70aa323762132067e09ab5fdc5887b1e370b2bb984310ff7b185cb5
   languageName: node
   linkType: hard
 
@@ -1586,7 +1586,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "alba-tv2-server@workspace:."
   dependencies:
-    "@fastify/http-proxy": "npm:^11.0.1"
+    "@fastify/http-proxy": "npm:^11.3.0"
     "@fastify/websocket": "npm:^11.2.0"
     "@tv2media/eslint-config": "npm:1.0.3"
     "@tv2media/logger": "npm:^2.0.3"
@@ -2490,10 +2490,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-content-type-parse@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "fast-content-type-parse@npm:2.0.0"
-  checksum: 10c0/13fbe7beb744fa6c521c12954d06753d0557e3bc970a3941515ada2bffdd8eb73095a8c4ab7b0f2078c295f6f639e9d0fbd0601e47ff57bc043f2a099d63d8b8
+"fast-content-type-parse@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "fast-content-type-parse@npm:3.0.0"
+  checksum: 10c0/06251880c83b7118af3a5e66e8bcee60d44f48b39396fc60acc2b4630bd5f3e77552b999b5c8e943d45a818854360e5e97164c374ec4b562b4df96a2cdf2e188
   languageName: node
   linkType: hard
 
@@ -5430,7 +5430,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.18.3":
+"ws@npm:^8.18.0, ws@npm:^8.18.3":
   version: 8.18.3
   resolution: "ws@npm:8.18.3"
   peerDependencies:
