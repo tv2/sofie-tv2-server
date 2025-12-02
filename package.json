@@ -30,7 +30,7 @@
     "@typestrong/ts-mockito": "^2.7.12",
     "@vitest/coverage-istanbul": "3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "eslint": "^9.13.0",
     "license-checker": "^25.0.1",
     "nodemon": "^3.1.10",
