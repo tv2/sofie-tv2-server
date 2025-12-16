@@ -17,4 +17,10 @@ RUN ln -s data-access/migrations/mongo/mongo-migrations
 
 EXPOSE 3010
 
+ARG GIT_REVISION
+ENV GIT_REVISION=${GIT_REVISION}
+
+ARG RELEASE_VERSION
+ENV RELEASE_VERSION=${RELEASE_VERSION}
+
 CMD node .
