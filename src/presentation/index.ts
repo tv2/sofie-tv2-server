@@ -8,6 +8,7 @@ import { RepositoryFacade } from '../data-access/repository-facade'
 import { ServiceFacade } from '../business-logic/facades/service-facade'
 import { DomainEventFacade } from '../business-logic/facades/domain-event-facade'
 import { EventBuilderFacade } from './facades/event-builder-facade'
+import { ApplicationMetadataGenerator } from './services/application-metadata-generator'
 
 const ALBA_REST_URL: string = process.env.ALBA_REST_URL ?? 'http://localhost:3005'
 const ALBA_WEBSOCKET_URL: string = process.env.ALBA_WEBSOCKET_URL ?? 'ws://localhost:3006'
@@ -54,5 +55,9 @@ async function startSystemServices(): Promise<void> {
   }
 }
 
-const logger: Logger = LoggerFacade.createLogger().tag('startup')
+const applicationMetadataGenerator: ApplicationMetadataGenerator = new ApplicationMetadataGenerator()
+
+const logger: Logger = LoggerFacade.createLogger()
+  .tag('startup')
+  .metadata(applicationMetadataGenerator.generateMetadata())
 startAlbaTv2Server(logger).catch(error => logger.data(error).error('Failed to start Alba TV2 Server'))
