@@ -20,79 +20,79 @@ export type PlayoutContent =
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
 
 export interface CameraPlayoutContent {
-  type: PlayoutContentType.CAMERA
-  source: string
+  readonly type: PlayoutContentType.CAMERA
+  readonly source: string
 }
 
 export interface RemotePlayoutContent {
-  type: PlayoutContentType.REMOTE
-  source: string
+  readonly type: PlayoutContentType.REMOTE
+  readonly source: string
 }
 
 export interface ReplayPlayoutContent {
-  type: PlayoutContentType.REPLAY
-  source: string
+  readonly type: PlayoutContentType.REPLAY
+  readonly source: string
 }
 
 export interface SplitScreenPlayoutContent {
-  type: PlayoutContentType.SPLIT_SCREEN
-  layout: string
-  inputPlayoutContents: SourcePlayoutContent[]
+  readonly type: PlayoutContentType.SPLIT_SCREEN
+  readonly layout: string
+  readonly inputPlayoutContents: Readonly<Record<number, SourcePlayoutContent>>
 }
 
 export interface SplitScreenInputPlayoutContent {
-  type: PlayoutContentType.SPLIT_SCREEN_INPUT
-  inputIndex: number // zero-indexed
-  sourcePlayoutContent: SourcePlayoutContent
+  readonly type: PlayoutContentType.SPLIT_SCREEN_INPUT
+  readonly inputIndex: number // zero-indexed
+  readonly sourcePlayoutContent: SourcePlayoutContent
 }
 
 interface GraphicsPlayoutContent {
-  type: PlayoutContentType.GRAPHICS
+  readonly type: PlayoutContentType.GRAPHICS
 }
 
 interface OverlayGraphicsPlayoutContent {
-  type: PlayoutContentType.OVERLAY_GRAPHICS
+  readonly type: PlayoutContentType.OVERLAY_GRAPHICS
 }
 
 interface VideoPlayoutContent {
-  type: PlayoutContentType.VIDEO_CLIP
+  readonly type: PlayoutContentType.VIDEO_CLIP
 }
 
 interface VoiceOverPlayoutContent {
-  type: PlayoutContentType.VOICE_OVER
+  readonly type: PlayoutContentType.VOICE_OVER
 }
 
 interface JinglePlayoutContent {
-  type: PlayoutContentType.JINGLE
+  readonly type: PlayoutContentType.JINGLE
 }
 
 interface AudioPlayoutContent {
-  type: PlayoutContentType.AUDIO
+  readonly type: PlayoutContentType.AUDIO
 }
 
 interface ManusPlayoutContent {
-  type: PlayoutContentType.MANUS
+  readonly type: PlayoutContentType.MANUS
 }
 
 interface TransitionPlayoutContent {
-  type: PlayoutContentType.TRANSITION
+  readonly type: PlayoutContentType.TRANSITION
 }
 
 interface CommandPlayoutContent {
-  type: PlayoutContentType.COMMAND
+  readonly type: PlayoutContentType.COMMAND
 }
 
 export interface RecalledPlayoutContent {
-  type: PlayoutContentType.RECALLED
-  recalledType: PlayoutContentType
+  readonly type: PlayoutContentType.RECALLED
+  readonly recalledType: PlayoutContentType
 }
 
 export interface DownstreamKeyerPlayoutContent {
-  type: PlayoutContentType.DOWNSTREAM_KEYER
-  identifier: string
-  isOn: boolean
+  readonly type: PlayoutContentType.DOWNSTREAM_KEYER
+  readonly identifier: string
+  readonly isOn: boolean
 }
 
 interface UnknownPlayoutContent {
-  type: PlayoutContentType.UNKNOWN
+  readonly type: PlayoutContentType.UNKNOWN
 }
