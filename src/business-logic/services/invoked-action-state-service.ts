@@ -174,7 +174,7 @@ export class InvokedActionStateService implements InvokedActionService {
   private isActionInvokedInPlayoutContents(action: Action, playoutContents: PlayoutContent[]): boolean {
     return playoutContents.some((playoutContent: PlayoutContent) => {
       if (action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN_INPUT && playoutContent.type === PlayoutContentType.SPLIT_SCREEN) {
-        return playoutContent.inputPlayoutContents.some(playoutContentSource => this.arePlayoutContentsEqual(playoutContentSource, action.metadata.playoutContent))
+        return Object.values(playoutContent.inputPlayoutContents).some(playoutContentSource => this.arePlayoutContentsEqual(playoutContentSource, action.metadata.playoutContent))
       }
       return this.arePlayoutContentsEqual(playoutContent, action.metadata.playoutContent)
     })
