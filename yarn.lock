@@ -566,15 +566,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/http-proxy@npm:^11.3.0":
-  version: 11.3.0
-  resolution: "@fastify/http-proxy@npm:11.3.0"
+"@fastify/http-proxy@npm:^11.4.1":
+  version: 11.4.1
+  resolution: "@fastify/http-proxy@npm:11.4.1"
   dependencies:
-    "@fastify/reply-from": "npm:^12.0.2"
+    "@fastify/reply-from": "npm:^12.5.0"
     fast-querystring: "npm:^1.1.2"
-    fastify-plugin: "npm:^5.0.1"
-    ws: "npm:^8.18.0"
-  checksum: 10c0/e059c0d3b9202d72a07231ad7d8b2a1f661f1c6c1fdd5d335b31299ce00663121ed1ecdf97f6ea9056eda4b6b043a715728acfa203aac4c2148c91e2d792cc7f
+    fastify-plugin: "npm:^5.1.0"
+    ws: "npm:^8.18.3"
+  checksum: 10c0/1905365dacb5d74fd3f8265a9a527b153d735269b15a39b3766a819eb26eef7cdaefffcce25864c502b90bdfc7f07d8f095a0762e83e6fdf95335447c61a70e5
   languageName: node
   linkType: hard
 
@@ -597,7 +597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/reply-from@npm:^12.0.2":
+"@fastify/reply-from@npm:^12.5.0":
   version: 12.5.0
   resolution: "@fastify/reply-from@npm:12.5.0"
   dependencies:
@@ -1593,7 +1593,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "alba-tv2-server@workspace:."
   dependencies:
-    "@fastify/http-proxy": "npm:^11.3.0"
+    "@fastify/http-proxy": "npm:^11.4.1"
     "@fastify/websocket": "npm:^11.2.0"
     "@tv2media/eslint-config": "npm:1.0.3"
     "@tv2media/logger": "npm:^2.0.3"
@@ -2595,6 +2595,13 @@ __metadata:
   version: 5.0.1
   resolution: "fastify-plugin@npm:5.0.1"
   checksum: 10c0/c5e5932e7b8c5713ff881adeade3e8ee8fc288e8249d79cd193a2a2438eef1ad58ae5814f12835acbf04025dbddf2628787cd845f3e550dee847f494a08f7c5b
+  languageName: node
+  linkType: hard
+
+"fastify-plugin@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "fastify-plugin@npm:5.1.0"
+  checksum: 10c0/61b330b8cb03a3581b796d745137499a782934abcf65dbf9a41d07248520cfd220b3ae8b16afeaf81af712e68e1ac24352895132cfeb2b372c66662c0170f365
   languageName: node
   linkType: hard
 
@@ -5438,7 +5445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.18.0, ws@npm:^8.18.3":
+"ws@npm:^8.18.3":
   version: 8.18.3
   resolution: "ws@npm:8.18.3"
   peerDependencies:
