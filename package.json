@@ -42,7 +42,7 @@
     "@fastify/websocket": "^11.2.0",
     "@tv2media/logger": "^2.0.3",
     "atem-connection": "^3.5.0",
-    "fastify": "^5.6.1",
+    "fastify": "^5.7.4",
     "fastify-type-provider-zod": "^6.1.0",
     "mongodb": "^6.9.1",
     "reflect-metadata": "^0.2.2",
